@@ -1,0 +1,16 @@
+{
+  "name": "canvas-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -a localhost -p 3000 -P http://localhost:3000?"
+  },
+  "author": "DKS",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "git": "^0.1.5",
+    "http-server": "^0.12.3"
+  }
+}
