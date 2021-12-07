@@ -1,5 +1,5 @@
-import { ctx } from './app.js';
-import createTimer from './Timer.js';
+import { ctx } from '../app.js';
+import createTimer from '../common/Timer.js';
 
 const manaTimer = new createTimer();
 manaTimer.raw = true;

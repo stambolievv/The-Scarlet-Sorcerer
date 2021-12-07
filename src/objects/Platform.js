@@ -1,4 +1,4 @@
-import { ctx } from './app.js';
+import { ctx } from '../app.js';
 export default class Platform {
     constructor(x, y, width, height, length) {
         this.pos = { x: x * ctx.canvas.width, y: y * ctx.canvas.height };

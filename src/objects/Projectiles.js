@@ -1,4 +1,4 @@
-import { ctx } from './app.js';
+import { ctx } from '../app.js';
 export default class Projectiles {
     constructor(parent, speed, angle) {
         this.dim = { w: parent.dim.w / 2, h: parent.dim.w / 2 };

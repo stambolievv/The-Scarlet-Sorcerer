@@ -1,4 +1,4 @@
-import { ctx } from './app.js';
+import { ctx } from '../app.js';
 export default class Enemy {
     constructor(player, inputStats) {
         this.player = player;

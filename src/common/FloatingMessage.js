@@ -1,4 +1,4 @@
-import { ctx } from './app.js';
+import { ctx } from '../app.js';
 export default class FloatingMessage {
     constructor(text, x, y, font = '', size = 18, color = 'white') {
         this.text = text;

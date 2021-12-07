@@ -1,9 +1,9 @@
-import Platform from './Platform.js';
-import Player from './Player.js';
-import Enemy from './Enemy.js';
-import Projectiles from './Projectiles.js';
-import createTimer from './Timer.js';
-import FloatingMessage from './FloatingMessage.js';
+import Platform from './objects/Platform.js';
+import Player from './objects/Player.js';
+import Enemy from './objects/Enemy.js';
+import Projectiles from './objects/Projectiles.js';
+import createTimer from './common/Timer.js';
+import FloatingMessage from './common/FloatingMessage.js';
 
 export const ctx = document.getElementById('game').getContext('2d');
 ctx.canvas.width = window.innerWidth;
