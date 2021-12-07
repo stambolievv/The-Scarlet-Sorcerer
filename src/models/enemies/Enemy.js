@@ -39,7 +39,9 @@ export default class Enemy {
             left: sideWorld.left || sideCollision.left,
             right: sideWorld.right || sideCollision.right
         };
+
         const offset = ctx.canvas.width * 0.1;
+
         if (side.left || this.pos.x < this.player.pos.x - offset) {
             this.vel.x = this.vel.x > this.stats.movementSpeed ? this.stats.movementSpeed : this.vel.x += 0.1;
         } else if (side.right || this.pos.x > this.player.pos.x + offset) {

@@ -6,6 +6,7 @@ export default class Platform {
         this.dim = { w: width * length, h: height };
         this.type = type;
     }
+
     draw() {
         ctx.beginPath();
         ctx.fillStyle = 'hsl(10, 50%, 50%, 0.5)';

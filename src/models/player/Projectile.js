@@ -6,6 +6,7 @@ export default class Projectiles {
         this.vel = { x: speed, y: speed };
         this.angle = angle;
     }
+
     draw() {
         ctx.beginPath();
         ctx.fillStyle = 'hsl(35, 100%, 50%, 0.3)';
@@ -13,6 +14,7 @@ export default class Projectiles {
         ctx.closePath();
         ctx.fill();
     }
+
     update() {
         this.pos.x += this.vel.x * Math.cos(this.angle);
         this.pos.y += this.vel.y * Math.sin(this.angle);
