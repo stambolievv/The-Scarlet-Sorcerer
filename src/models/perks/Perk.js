@@ -29,4 +29,8 @@ export default class Perk {
         ctx.closePath();
         ctx.fill();
     }
+
+    update() {
+
+    }
 }

@@ -172,6 +172,7 @@ function perkCreate() {
 function perkAnimation() {
     perks.forEach(p => {
         p.draw();
+        p.update();
     });
 
     overlap(players, perks, (player, perk) => {
@@ -202,7 +203,9 @@ function perkAnimation() {
         perks.splice(perks.indexOf(perk), 1);
     });
 }
+//!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 window.perkCreate = perkCreate;
+//!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 // handle score and floating text
 function handleScore() {
