@@ -1,15 +1,18 @@
-import Platform from './objects/Platform.js';
-import Player from './objects/Player.js';
-import Enemy from './objects/Enemy.js';
-import Projectiles from './objects/Projectiles.js';
+import Platform from './models/platforms/Platform.js';
+import Player from './models/player/Player.js';
+import Enemy from './models/enemies/Enemy.js';
+import Projectiles from './models/player/Projectile.js';
+import Perk from './models/perks/Perk.js';
 import createTimer from './common/Timer.js';
 import FloatingMessage from './common/FloatingMessage.js';
 
 export const ctx = document.getElementById('game').getContext('2d');
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
+// ctx.canvas.width = 1280;
+// ctx.canvas.height = 920;
 
-const customFont = new FontFace('customFont', 'url(../assets/fonts/rubber-biscuit.bold.ttf)');
+const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
 customFont.load().then((font) => { document.fonts.add(font); });
 
 const gameTimer = new createTimer();
@@ -25,6 +28,7 @@ const enemyStats = {
     movementSpeed: 2,
 };
 const projectiles = [];
+const perks = [];
 const textMessages = [];
 
 function animate() {
@@ -35,6 +39,7 @@ function animate() {
     playerAnimation();
     enemiesAnimation();
     projectilesAnimation();
+    perkAnimation();
     handleMessages();
 }
 
@@ -60,13 +65,13 @@ function initBackground() {
 //handle platforms
 function platformsCreate() {
     platforms.push(
-        new Platform(0, 0.95, ctx.canvas.width, 100, 1),
-        new Platform(0.30, 0.17, 32, 32, 10),
-        new Platform(0.16, 0.42, 32, 32, 10),
-        new Platform(0.71, 0.42, 32, 32, 10),
-        new Platform(0.40, 0.55, 32, 32, 10),
-        new Platform(0.60, 0.66, 32, 32, 10),
-        new Platform(0.02, 0.70, 32, 32, 10)
+        new Platform(0, 0.95, ctx.canvas.width, 100, 1, 'ground'),
+        new Platform(0.30, 0.17, 32, 32, 10, 'island'),
+        new Platform(0.16, 0.42, 32, 32, 10, 'island'),
+        new Platform(0.71, 0.42, 32, 32, 10, 'island'),
+        new Platform(0.40, 0.55, 32, 32, 10, 'island'),
+        new Platform(0.60, 0.66, 32, 32, 10, 'island'),
+        new Platform(0.02, 0.70, 32, 32, 10, 'island')
     );
 }
 platformsCreate();
@@ -105,7 +110,8 @@ function keyPress(e) {
     }
 }
 function onClick(e) {
-    if (players[0].stats.mana > 0) {
+    if (players[0].stats.mana > 0 && players[0].stats._canShoot) {
+        players[0].stats._canShoot = false;
         players[0].stats.mana--;
         projectilesCreate(e.offsetX, e.offsetY);
     }
@@ -157,6 +163,47 @@ function projectilesAnimation() {
     removeWorldOutBounds(projectiles);
 }
 
+//handle perks
+function perkCreate() {
+    const position = Math.floor(Math.random() * 6);
+    const type = Math.floor(Math.random() * 4);
+    perks.push(new Perk(position, type));
+}
+function perkAnimation() {
+    perks.forEach(p => {
+        p.draw();
+    });
+
+    overlap(players, perks, (player, perk) => {
+        if (perk.type.name == 'BS') {
+            if (player.stats.health < 3) {
+                player.stats.health += 1;
+            } else {
+                player.stats.bonusHealth += 1;
+            }
+            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
+        }
+
+        if (perk.type.name == 'JB') {
+            player.stats.jumpBoost += 5;
+            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
+        }
+
+        if (perk.type.name == 'MS') {
+            player.stats.movementSpeed += 1;
+            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
+        }
+
+        if (perk.type.name == 'FR') {
+            player.stats.fireRate -= 0.5;
+            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
+        }
+
+        perks.splice(perks.indexOf(perk), 1);
+    });
+}
+window.perkCreate = perkCreate;
+
 // handle score and floating text
 function handleScore() {
     if (scorePoints % 10 == 0 && scorePoints % 100 != 0) {
@@ -203,7 +250,7 @@ function overlap(AA, BB, callback) {
 function collision(AA, BB) {
     // collision detection with different side of objects
     // a from AA array stop because b from BB array is immovable
-    const side = { top: false, bottom: false, left: false, right: false };
+    const side = { top: false, bottom: false, left: false, right: false, type: undefined };
     AA.forEach(a => {
         BB.forEach(b => {
             const dx = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
@@ -216,13 +263,14 @@ function collision(AA, BB) {
                 // figures out on which side we are colliding (top, bottom, left, or right)
                 const crossWidth = widthHalf - Math.abs(dx);
                 const crossHeight = heightHalf - Math.abs(dy);
+                side.type = b.type;
                 if (crossWidth >= crossHeight) {
                     if (dy > 0) {
                         side.top = true;
                         a.pos.y += crossHeight;
                     } else {
                         side.bottom = true;
-                        a.pos.y -= crossHeight * 2; //bouncing
+                        a.pos.y -= crossHeight; // * 2; // bouncing
                     }
                 }
                 if ((crossWidth < crossHeight)) {
