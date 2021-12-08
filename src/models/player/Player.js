@@ -1,4 +1,3 @@
-import { ctx } from '../../app.js';
 import createTimer from '../../common/Timer.js';
 
 const manaTimer = new createTimer(true);
@@ -6,8 +5,8 @@ const fireRateTimer = new createTimer(true);
 const oxygenTimer = new createTimer(true);
 
 export default class Player {
-    constructor(posX, posY) {
-        this.pos = { x: posX * ctx.canvas.width, y: posY * ctx.canvas.height };
+    constructor(position) {
+        this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
         this.dim = { w: 54.92, h: 80 };
         this.gravity = { x: 0, y: 0.6 };
@@ -18,18 +17,19 @@ export default class Player {
             level: 1,
             health: 3,
             bonusHealth: 2,
-            mana: 10,
+            mana: 1,
             _manaReg: 3,
             oxygen: 3,
+            _outOfOxygen: false,
             _onIsland: false,
-            fireRate: 2,
+            fireRate: 0.2,
             _canShoot: true,
             movementSpeed: 5,
             jumpBoost: 20
         };
     }
 
-    draw() {
+    draw(ctx) {
         ctx.beginPath();
         ctx.fillStyle = 'hsl(100, 100%, 50%, 0.3)';
         ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
@@ -60,7 +60,6 @@ export default class Player {
             right: sideWorld.right || sideCollision.right,
             type: sideCollision.type
         };
-
         const keys = [...keysPressed];
         const controller = {
             KeyW: () => {
@@ -117,7 +116,7 @@ export default class Player {
     }
 
     handleStats() {
-        // dandle fireRate 
+        // handle fireRate 
         if (!this.stats._canShoot) {
             fireRateTimer.start();
             if (fireRateTimer.output / 2 >= this.stats.fireRate) {
@@ -135,14 +134,17 @@ export default class Player {
                 this.stats.oxygen += 1;
                 oxygenTimer.reset();
             }
+            this.stats._outOfOxygen = false;
         } else if (this.stats.oxygen > 0 && this.stats._onIsland) {
             oxygenTimer.start();
             if (oxygenTimer.output > 3) {
                 this.stats.oxygen -= 1;
                 oxygenTimer.reset();
             }
+            this.stats._outOfOxygen = false;
         } else if (this.stats.oxygen == 0 && this.stats._onIsland) {
             oxygenTimer.start();
+            this.stats._outOfOxygen = false;
             if (oxygenTimer.output > 3) {
                 if (this.stats.bonusHealth > 0) {
                     this.stats.bonusHealth -= 1;
@@ -150,9 +152,11 @@ export default class Player {
                     this.stats.health -= 1;
                 }
                 oxygenTimer.reset();
+                this.stats._outOfOxygen = true;
             }
         } else {
             oxygenTimer.reset();
+            this.stats._outOfOxygen = false;
         }
 
         // handle mana

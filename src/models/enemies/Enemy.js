@@ -1,9 +1,7 @@
-import { ctx } from '../../app.js';
-
 export default class Enemy {
-    constructor(player, inputStats) {
+    constructor(player, position, inputStats) {
         this.player = player;
-        this.pos = { x: Math.random() * ctx.canvas.width, y: Math.random() * ctx.canvas.height * 0.2 };
+        this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
         this.dim = { w: 80, h: 50 };
         this.gravity = { x: 0, y: 0.1 };
@@ -14,7 +12,7 @@ export default class Enemy {
         };
     }
 
-    draw() {
+    draw(ctx) {
         ctx.beginPath();
         ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%, 0.3)`;
         ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
@@ -32,7 +30,7 @@ export default class Enemy {
         ctx.fillText('Movement Speed: ' + Math.round((this.stats.movementSpeed) * 100) / 100, ctx.canvas.width * 0.93, ctx.canvas.height * 0.14);
     }
 
-    update(sideWorld, sideCollision) {
+    update(offset, sideWorld, sideCollision) {
         const side = {
             top: sideWorld.top || sideCollision.top,
             bottom: sideWorld.bottom || sideCollision.bottom,
@@ -40,7 +38,7 @@ export default class Enemy {
             right: sideWorld.right || sideCollision.right
         };
 
-        const offset = ctx.canvas.width * 0.1;
+
 
         if (side.left || this.pos.x < this.player.pos.x - offset) {
             this.vel.x = this.vel.x > this.stats.movementSpeed ? this.stats.movementSpeed : this.vel.x += 0.1;

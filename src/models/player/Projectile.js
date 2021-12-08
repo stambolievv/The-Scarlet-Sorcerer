@@ -1,14 +1,12 @@
-import { ctx } from '../../app.js';
-
 export default class Projectiles {
-    constructor(parent, speed, angle) {
+    constructor(parent, angle) {
         this.pos = { x: parent.pos.x + parent.dim.w * 0.25, y: parent.pos.y + parent.dim.h * 0.25 };
-        this.vel = { x: speed, y: speed };
+        this.vel = { x: 3, y: 3 };
         this.dim = { w: parent.dim.w / 2, h: parent.dim.w / 2 };
         this.angle = angle;
     }
 
-    draw() {
+    draw(ctx) {
         ctx.beginPath();
         ctx.fillStyle = 'hsl(35, 100%, 50%, 0.3)';
         ctx.rect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);

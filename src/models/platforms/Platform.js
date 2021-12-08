@@ -1,13 +1,11 @@
-import { ctx } from '../../app.js';
-
 export default class Platform {
-    constructor(x, y, width, height, length, type) {
-        this.pos = { x: x * ctx.canvas.width, y: y * ctx.canvas.height };
+    constructor(position, width, height, length, type) {
+        this.pos = { x: position.x, y: position.y };
         this.dim = { w: width * length, h: height };
         this.type = type;
     }
 
-    draw() {
+    draw(ctx) {
         ctx.beginPath();
         ctx.fillStyle = 'hsl(10, 50%, 50%, 0.5)';
         ctx.rect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);

@@ -1,30 +1,26 @@
-import { ctx } from '../app.js';
-
 export default class FloatingMessage {
-    constructor(text, x, y, font = '', size = 18, color = 'white') {
+    constructor(text, position, size, color) {
         this.text = text;
-        this.x = x * ctx.canvas.width;
-        this.y = y * ctx.canvas.height;
-        this.font = font;
+        this.pos = { x: position.x, y: position.y };
         this.size = size;
         this.color = color;
         this.lifeSpan = 0;
         this.opacity = 1;
     }
 
-    draw() {
+    draw(ctx, offset) {
         ctx.save();
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = this.color;
         ctx.textAlign = 'center';
-        ctx.font = this.size + 'px ' + this.font;
-        ctx.fillText(this.text, this.x, this.y);
+        ctx.font = this.size + 'px customFont';
+        ctx.fillText(this.text, this.pos.x, this.pos.y);
         ctx.restore();
     }
 
     update() {
-        this.y -= 0.3;
+        this.pos.y -= 0.3;
         this.lifeSpan += 1;
-        if (this.opacity > 0.01) { this.opacity -= 0.01; }
+        if (this.opacity > 0.01) { this.opacity -= 0.005; }
     }
 }
