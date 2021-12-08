@@ -81,12 +81,13 @@ function platformsAnimation() {
 
 // handle player
 function playerCreate() {
-    players.push(new Player(ctx.canvas.width * 0.5, ctx.canvas.height * 0.8));
+    players.push(new Player(0.5, 0.8));
 }
 playerCreate();
 function playerAnimation() {
     const sideWorld = collideWorldBounds(players);
     const sideCollision = collision(players, platforms);
+
     players.forEach(p => {
         p.draw();
         p.update([...keysPressed], sideWorld, sideCollision);
@@ -128,6 +129,7 @@ function enemiesAnimation() {
 
     const sideWorld = collideWorldBounds(enemies);
     const sideCollision = collision(enemies, platforms);
+
     enemies.forEach(e => {
         e.draw();
         e.update(sideWorld, sideCollision);
@@ -135,11 +137,13 @@ function enemiesAnimation() {
 
     overlap(enemies, projectiles, (enemy, projectile) => {
         projectiles.splice(projectiles.indexOf(projectile), 1);
+
         if (enemy.stats.bonusHealth > 0) {
             enemy.stats.bonusHealth -= 1;
         } else {
             enemy.stats.health -= 1;
         }
+
         if (enemy.stats.health == 0) {
             scorePoints += 10;
             enemies.splice(enemies.indexOf(enemy), 1);
@@ -160,21 +164,24 @@ function projectilesAnimation() {
         p.draw();
         p.update();
     });
+
     removeWorldOutBounds(projectiles);
 }
 
 //handle perks
-window.perkCreate = perkCreate;
 function perkCreate() {
     const position = Math.floor(Math.random() * 6);
     const type = Math.floor(Math.random() * 4);
+
     perks.push(new Perk(position, type));
+
+    textMessages.push(new FloatingMessage('New Perk spawned for 15 sec!!!', 0.5, 0.35, 'customFont'));
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
         p.draw();
         p.update();
-        if (p.theta > 100) { perks.splice(i, 1); }
+        if (p.theta > 50) { perks.splice(i, 1); }
     });
 
     overlap(players, perks, (player, perk) => {
@@ -198,7 +205,10 @@ function perkAnimation() {
             player.stats.fireRate -= 0.5;
         }
 
-        textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.5, 'customFont', 20));
+        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / ctx.canvas.width, y: (player.pos.y + player.dim.h / 2) / ctx.canvas.height };
+
+        textMessages.push(new FloatingMessage(perk.type.text, playerCenter.x, playerCenter.y * 0.9, 'customFont', 20));
+
         perks.splice(perks.indexOf(perk), 1);
     });
 }
@@ -209,18 +219,22 @@ function handleScore() {
         enemyStats.movementSpeed += 0.1;
         textMessages.push(new FloatingMessage('Enemy movement speed increase!!!', 0.5, 0.4, 'customFont'));
     }
+
     if (scorePoints % 30 == 0 && scorePoints % 100 !== 0) {
         players[0].stats.level += 1;
         perkCreate();
         textMessages.push(new FloatingMessage('New Perk spawned for 15 sec!!!', 0.5, 0.35, 'customFont', 20));
     }
+
     if (scorePoints % 50 == 0 && scorePoints % 100 !== 0) {
         enemyStats.bonusHealth += 1;
         textMessages.push(new FloatingMessage('Enemy hit points increase!!!', 0.5, 0.3, 'customFont'));
     }
+
     if (scorePoints == 100 || scorePoints == 200) {
         textMessages.push(new FloatingMessage('Mini Boss will spawn\n after 5 seconds.', 0.5, 0.35, 'customFont', 48));
     }
+
     if (scorePoints == 300) {
         textMessages.push(new FloatingMessage('Final Boss will spawn\n after 5 seconds.', 0.5, 0.35, 'customFont', 48));
     }
@@ -310,6 +324,12 @@ function removeWorldOutBounds(AA) {
 }
 function collideWorldBounds(AA) {
     // collision detection with the world boundaries 
+    // by checking their sides points
+    // were : 
+    //      top side is - pos.y
+    //      left side is - pos.x
+    //      bottom side is - pos.y + dim.h
+    //      right side is - pos.x + dim.w
     // a from AA array can't leave the screen
     const side = { top: false, bottom: false, left: false, right: false };
     AA.forEach(a => {
