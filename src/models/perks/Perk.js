@@ -16,10 +16,10 @@ export default class Perk {
             { name: 'MS', text: 'Movement Speed Increase', color: '#aaff80' },
             { name: 'FR', text: 'FireRate Increase', color: '#ffcc00' },
         ];
-
         this.pos = { x: this._mapPosition[position].x * ctx.canvas.width, y: this._mapPosition[position].y * ctx.canvas.height };
         this.dim = { w: 50, h: 50 };
         this.type = this._variety[type];
+        this.theta = 0;
     }
 
     draw() {
@@ -31,6 +31,11 @@ export default class Perk {
     }
 
     update() {
+        this.theta += Math.PI / 60;
+        const scale = Math.sin(this.theta);
 
+        this.pos.y += scale * 0.2;
+        this.dim.w += scale * 0.3;
+        this.dim.h += scale * 0.3;
     }
 }
