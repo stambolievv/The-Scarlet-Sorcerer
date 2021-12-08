@@ -6,11 +6,9 @@ import Perk from './models/perks/Perk.js';
 import createTimer from './common/Timer.js';
 import FloatingMessage from './common/FloatingMessage.js';
 
-export const ctx = document.getElementById('game').getContext('2d');
+const ctx = document.getElementById('game').getContext('2d');
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
-// ctx.canvas.width = 1280;
-// ctx.canvas.height = 920;
 
 const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
 customFont.load().then((font) => { document.fonts.add(font); });
@@ -29,6 +27,22 @@ const enemyStats = {
 };
 const projectiles = [];
 const perks = [];
+const perksData = {
+    position: [
+        { x: 0.40, y: 0.13 },
+        { x: 0.20, y: 0.38 },
+        { x: 0.85, y: 0.38 },
+        { x: 0.48, y: 0.51 },
+        { x: 0.08, y: 0.66 },
+        { x: 0.71, y: 0.62 },
+    ],
+    variety: [
+        { name: 'BS', text: 'Bonus Heart +1', color: '#ff471a' },
+        { name: 'JB', text: 'Jump Boost Increase', color: '#66ccff' },
+        { name: 'MS', text: 'Movement Speed Increase', color: '#aaff80' },
+        { name: 'FR', text: 'FireRate Increase', color: '#ffcc00' },
+    ]
+};
 const textMessages = [];
 
 function animate() {
@@ -40,7 +54,7 @@ function animate() {
     enemiesAnimation();
     projectilesAnimation();
     perkAnimation();
-    handleMessages();
+    messagesAnimation();
 }
 
 //handle background
@@ -65,23 +79,25 @@ function initBackground() {
 //handle platforms
 function platformsCreate() {
     platforms.push(
-        new Platform(0, 0.95, ctx.canvas.width, 100, 1, 'ground'),
-        new Platform(0.30, 0.17, 32, 32, 10, 'island'),
-        new Platform(0.16, 0.42, 32, 32, 10, 'island'),
-        new Platform(0.71, 0.42, 32, 32, 10, 'island'),
-        new Platform(0.40, 0.55, 32, 32, 10, 'island'),
-        new Platform(0.60, 0.66, 32, 32, 10, 'island'),
-        new Platform(0.02, 0.70, 32, 32, 10, 'island')
+        new Platform(relativePosition(0, 0.95), ctx.canvas.width, 100, 1, 'ground'),
+        new Platform(relativePosition(0.30, 0.17), 32, 32, 10, 'island'),
+        new Platform(relativePosition(0.16, 0.42), 32, 32, 10, 'island'),
+        new Platform(relativePosition(0.71, 0.42), 32, 32, 10, 'island'),
+        new Platform(relativePosition(0.40, 0.55), 32, 32, 10, 'island'),
+        new Platform(relativePosition(0.60, 0.66), 32, 32, 10, 'island'),
+        new Platform(relativePosition(0.02, 0.70), 32, 32, 10, 'island')
     );
 }
 platformsCreate();
 function platformsAnimation() {
-    platforms.forEach(p => p.draw());
+    platforms.forEach(p => {
+        p.draw(ctx);
+    });
 }
 
 // handle player
 function playerCreate() {
-    players.push(new Player(0.5, 0.8));
+    players.push(new Player(relativePosition(0.5, 0.8)));
 }
 playerCreate();
 function playerAnimation() {
@@ -89,9 +105,12 @@ function playerAnimation() {
     const sideCollision = collision(players, platforms);
 
     players.forEach(p => {
-        p.draw();
-        p.update([...keysPressed], sideWorld, sideCollision);
+        p.draw(ctx);
+        p.update(keysPressed, sideWorld, sideCollision);
         p.handleStats();
+        if (p.stats._outOfOxygen) {
+            messageCreate('Out of oxygen. You are taking damage', 90, 32, 'red');
+        }
     });
 
     overlap(players, enemies, (player, enemy) => {
@@ -105,34 +124,43 @@ function playerAnimation() {
 }
 function keyPress(e) {
     if (e.type == 'keydown') {
+        // on keydown event
         keysPressed.add(e.code);
     } else {
+        // on keyup event
         keysPressed.delete(e.code);
     }
 }
 function onClick(e) {
-    if (players[0].stats.mana > 0 && players[0].stats._canShoot) {
-        players[0].stats._canShoot = false;
-        players[0].stats.mana--;
-        projectilesCreate(e.offsetX, e.offsetY);
+    if (players[0].stats.mana > 0) {
+        if (players[0].stats._canShoot) {
+            players[0].stats._canShoot = false;
+            players[0].stats.mana--;
+            projectilesCreate(e.offsetX, e.offsetY);
+        }
+    } else {
+        messageCreate('Out of Mana. Cant cast that spell', 10, 20, 'blue');
     }
 }
 
 // handle enemies
 function enemiesCreate() {
     handleScore();
-    enemies.push(new Enemy(players[0], enemyStats));
+
+    const spawnPoint = relativePosition(Math.random(), Math.random() * 0.2);
+    enemies.push(new Enemy(players[0], spawnPoint, enemyStats));
 }
 enemiesCreate();
 function enemiesAnimation() {
     if (enemies.length == 0) { enemiesCreate(); }
 
+    const offset = ctx.canvas.width * 0.1;
     const sideWorld = collideWorldBounds(enemies);
     const sideCollision = collision(enemies, platforms);
 
     enemies.forEach(e => {
-        e.draw();
-        e.update(sideWorld, sideCollision);
+        e.draw(ctx);
+        e.update(offset, sideWorld, sideCollision);
     });
 
     overlap(enemies, projectiles, (enemy, projectile) => {
@@ -148,7 +176,8 @@ function enemiesAnimation() {
             scorePoints += 10;
             enemies.splice(enemies.indexOf(enemy), 1);
         } else {
-            enemy.pos = { x: Math.random() * ctx.canvas.width, y: Math.random() * ctx.canvas.height * 0.2 };
+            const spawnPoint = relativePosition(Math.random(), Math.random() * 0.2);
+            enemy.pos = { x: spawnPoint.x, y: spawnPoint.y };
         }
     });
 
@@ -157,11 +186,11 @@ function enemiesAnimation() {
 // handle projectiles
 function projectilesCreate(mouseX, mouseY) {
     const angle = Math.atan2(mouseY - players[0].pos.y, mouseX - players[0].pos.x);
-    projectiles.push(new Projectiles(players[0], 3, angle));
+    projectiles.push(new Projectiles(players[0], angle));
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
-        p.draw();
+        p.draw(ctx);
         p.update();
     });
 
@@ -169,17 +198,17 @@ function projectilesAnimation() {
 }
 
 //handle perks
+window.perkCreate = perkCreate;
 function perkCreate() {
-    const position = Math.floor(Math.random() * 6);
-    const type = Math.floor(Math.random() * 4);
+    const rngPosition = Math.floor(Math.random() * 6);
+    const rngType = Math.floor(Math.random() * 4);
 
-    perks.push(new Perk(position, type));
-
-    textMessages.push(new FloatingMessage('New Perk spawned for 15 sec!!!', 0.5, 0.35, 'customFont'));
+    const spawnPoint = relativePosition(perksData.position[rngPosition].x, perksData.position[rngPosition].y);
+    perks.push(new Perk(spawnPoint, perksData.variety[rngType]));
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
-        p.draw();
+        p.draw(ctx);
         p.update();
         if (p.theta > 50) { perks.splice(i, 1); }
     });
@@ -205,46 +234,60 @@ function perkAnimation() {
             player.stats.fireRate -= 0.5;
         }
 
-        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / ctx.canvas.width, y: (player.pos.y + player.dim.h / 2) / ctx.canvas.height };
-
-        textMessages.push(new FloatingMessage(perk.type.text, playerCenter.x, playerCenter.y * 0.9, 'customFont', 20));
+        const playerCenter = { x: (player.pos.x + player.dim.w / 2), y: (player.pos.y + player.dim.h / 2) };
+        messageCreate(perk.type.text, 100, 20, perk.type.color, playerCenter);
 
         perks.splice(perks.indexOf(perk), 1);
     });
 }
 
-// handle score and floating text
+// handle score
 function handleScore() {
     if (scorePoints % 10 == 0 && scorePoints % 100 != 0) {
         enemyStats.movementSpeed += 0.1;
-        textMessages.push(new FloatingMessage('Enemy movement speed increase!!!', 0.5, 0.4, 'customFont'));
+        messageCreate('Enemy movement speed increase', 50);
     }
 
-    if (scorePoints % 30 == 0 && scorePoints % 100 !== 0) {
+    if (scorePoints % 30 == 0 && scorePoints % 100 != 0) {
         players[0].stats.level += 1;
         perkCreate();
-        textMessages.push(new FloatingMessage('New Perk spawned for 15 sec!!!', 0.5, 0.35, 'customFont', 20));
+        messageCreate('New Perk spawned for 15 sec', 70, 20);
     }
 
-    if (scorePoints % 50 == 0 && scorePoints % 100 !== 0) {
+    if (scorePoints % 50 == 0 && scorePoints % 100 != 0) {
         enemyStats.bonusHealth += 1;
-        textMessages.push(new FloatingMessage('Enemy hit points increase!!!', 0.5, 0.3, 'customFont'));
+        messageCreate('Enemy hit points increase', 60);
     }
 
     if (scorePoints == 100 || scorePoints == 200) {
-        textMessages.push(new FloatingMessage('Mini Boss will spawn\n after 5 seconds.', 0.5, 0.35, 'customFont', 48));
+        messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 48);
     }
 
     if (scorePoints == 300) {
-        textMessages.push(new FloatingMessage('Final Boss will spawn\n after 5 seconds.', 0.5, 0.35, 'customFont', 48));
+        messageCreate('Final Boss will spawn\n after 5 seconds', 100, 48);
     }
 }
-function handleMessages() {
-    textMessages.forEach((t, i) => {
-        t.draw();
-        t.update();
-        if (t.lifeSpan > 100) { textMessages.splice(i, 1); }
-    });
+
+// handle floating text
+function messageCreate(text, priority = 0, size = 18, color = 'white', position = { x: 0.5, y: 0.3 }) {
+    const spawnPoint = relativePosition(position.x, position.y);
+    textMessages.unshift({ priority, text: new FloatingMessage(text, spawnPoint, size, color) });
+}
+function messagesAnimation() {
+    if (textMessages.length != 0) {
+        textMessages
+            .sort((a, b) => b.priority - a.priority)
+            .map((m, i) => Object.values(m).map((t) => console.log(t)))
+            .forEach((t, i) => {
+                return t;
+                // const offset = i + 10;
+                // t.text.pos.y -= offset;
+                // t.text.draw(ctx);
+                // t.text.update();
+                // if (t.text.lifeSpan > 200) { textMessages.splice(i, 1); }
+                // return;
+            });
+    }
 }
 
 // handle game physics
@@ -355,6 +398,9 @@ function collideWorldBounds(AA) {
         }
     });
     return side;
+}
+function relativePosition(posX, posY) {
+    return { x: posX * ctx.canvas.width, y: posY * ctx.canvas.height };
 }
 
 window.addEventListener('keydown', keyPress);
