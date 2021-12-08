@@ -164,15 +164,17 @@ function projectilesAnimation() {
 }
 
 //handle perks
+window.perkCreate = perkCreate;
 function perkCreate() {
     const position = Math.floor(Math.random() * 6);
     const type = Math.floor(Math.random() * 4);
     perks.push(new Perk(position, type));
 }
 function perkAnimation() {
-    perks.forEach(p => {
+    perks.forEach((p, i) => {
         p.draw();
         p.update();
+        if (p.theta > 100) { perks.splice(i, 1); }
     });
 
     overlap(players, perks, (player, perk) => {
@@ -182,30 +184,24 @@ function perkAnimation() {
             } else {
                 player.stats.bonusHealth += 1;
             }
-            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
         }
 
         if (perk.type.name == 'JB') {
             player.stats.jumpBoost += 5;
-            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
         }
 
         if (perk.type.name == 'MS') {
             player.stats.movementSpeed += 1;
-            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
         }
 
         if (perk.type.name == 'FR') {
             player.stats.fireRate -= 0.5;
-            textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.35, 'customFont', 20));
         }
 
+        textMessages.push(new FloatingMessage(perk.type.text, 0.5, 0.5, 'customFont', 20));
         perks.splice(perks.indexOf(perk), 1);
     });
 }
-//!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-window.perkCreate = perkCreate;
-//!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 // handle score and floating text
 function handleScore() {
@@ -215,7 +211,7 @@ function handleScore() {
     }
     if (scorePoints % 30 == 0 && scorePoints % 100 !== 0) {
         players[0].stats.level += 1;
-        // perks();
+        perkCreate();
         textMessages.push(new FloatingMessage('New Perk spawned for 15 sec!!!', 0.5, 0.35, 'customFont', 20));
     }
     if (scorePoints % 50 == 0 && scorePoints % 100 !== 0) {
@@ -240,6 +236,12 @@ function handleMessages() {
 // handle game physics
 function overlap(AA, BB, callback) {
     // collision detection with two different objects
+    // by checking their sides points
+    // were : 
+    //      top side is - pos.y
+    //      left side is - pos.x
+    //      bottom side is - pos.y + dim.h
+    //      right side is - pos.x + dim.w
     // returns a and b if they touched, from AA and BB array
     AA.forEach(a => {
         BB.forEach(b => {
@@ -273,7 +275,7 @@ function collision(AA, BB) {
                         a.pos.y += crossHeight;
                     } else {
                         side.bottom = true;
-                        a.pos.y -= crossHeight; // * 2; // bouncing
+                        a.pos.y -= crossHeight;// * 2; // bouncing
                     }
                 }
                 if ((crossWidth < crossHeight)) {
@@ -292,6 +294,12 @@ function collision(AA, BB) {
 }
 function removeWorldOutBounds(AA) {
     // collision detection with outside world boundaries 
+    // by checking their sides points
+    // were : 
+    //      top side is - pos.y
+    //      left side is - pos.x
+    //      bottom side is - pos.y + dim.h
+    //      right side is - pos.x + dim.w
     // if a from AA array goes out of screen will be deleted
     AA.forEach((a, i) => {
         if (a.pos.x + a.dim.w < 0 || a.pos.x > ctx.canvas.width ||
