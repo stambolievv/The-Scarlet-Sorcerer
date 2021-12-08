@@ -7,10 +7,10 @@ const oxygenTimer = new createTimer(true);
 
 export default class Player {
     constructor(posX, posY) {
-        this.pos = { x: posX, y: posY };
+        this.pos = { x: posX * ctx.canvas.width, y: posY * ctx.canvas.height };
         this.vel = { x: 0, y: 0 };
-        this.gravity = { x: 0, y: 0.6 };
         this.dim = { w: 54.92, h: 80 };
+        this.gravity = { x: 0, y: 0.6 };
         this.friction = { x: 0.9, y: 0.99 };
         this.grounded = false;
         this.jumping = false;

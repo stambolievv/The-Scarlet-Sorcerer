@@ -2,9 +2,9 @@ import { ctx } from '../../app.js';
 
 export default class Projectiles {
     constructor(parent, speed, angle) {
-        this.dim = { w: parent.dim.w / 2, h: parent.dim.w / 2 };
         this.pos = { x: parent.pos.x + parent.dim.w * 0.25, y: parent.pos.y + parent.dim.h * 0.25 };
         this.vel = { x: speed, y: speed };
+        this.dim = { w: parent.dim.w / 2, h: parent.dim.w / 2 };
         this.angle = angle;
     }
 

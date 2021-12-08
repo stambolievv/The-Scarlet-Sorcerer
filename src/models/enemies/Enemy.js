@@ -5,8 +5,8 @@ export default class Enemy {
         this.player = player;
         this.pos = { x: Math.random() * ctx.canvas.width, y: Math.random() * ctx.canvas.height * 0.2 };
         this.vel = { x: 0, y: 0 };
-        this.gravity = { x: 0, y: 0.1 };
         this.dim = { w: 80, h: 50 };
+        this.gravity = { x: 0, y: 0.1 };
         this.stats = {
             health: inputStats.health,
             bonusHealth: inputStats.bonusHealth,
