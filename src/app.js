@@ -198,7 +198,6 @@ function projectilesAnimation() {
 }
 
 //handle perks
-window.perkCreate = perkCreate;
 function perkCreate() {
     const rngPosition = Math.floor(Math.random() * 6);
     const rngType = Math.floor(Math.random() * 4);
@@ -234,8 +233,8 @@ function perkAnimation() {
             player.stats.fireRate -= 0.5;
         }
 
-        const playerCenter = { x: (player.pos.x + player.dim.w / 2), y: (player.pos.y + player.dim.h / 2) };
-        messageCreate(perk.type.text, 100, 20, perk.type.color, playerCenter);
+        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / ctx.canvas.width, y: (player.pos.y + player.dim.h / 2) / ctx.canvas.height };
+        messageCreate(perk.type.text, 100, 20, perk.type.color, playerCenter, false);
 
         perks.splice(perks.indexOf(perk), 1);
     });
@@ -269,25 +268,22 @@ function handleScore() {
 }
 
 // handle floating text
-function messageCreate(text, priority = 0, size = 18, color = 'white', position = { x: 0.5, y: 0.3 }) {
+function messageCreate(text, priority = 0, size = 18, color = 'white', position = { x: 0.5, y: 0.3 }, fixed = true) {
     const spawnPoint = relativePosition(position.x, position.y);
-    textMessages.unshift({ priority, text: new FloatingMessage(text, spawnPoint, size, color) });
+    textMessages.unshift({ priority, text: new FloatingMessage(text, spawnPoint, fixed, size, color) });
 }
 function messagesAnimation() {
-    if (textMessages.length != 0) {
-        textMessages
-            .sort((a, b) => b.priority - a.priority)
-            .map((m, i) => Object.values(m).map((t) => console.log(t)))
-            .forEach((t, i) => {
-                return t;
-                // const offset = i + 10;
-                // t.text.pos.y -= offset;
-                // t.text.draw(ctx);
-                // t.text.update();
-                // if (t.text.lifeSpan > 200) { textMessages.splice(i, 1); }
-                // return;
-            });
-    }
+    textMessages
+        .sort((a, b) => b.priority - a.priority)
+        .forEach(({ text }, i) => {
+            if (text.fixed) {
+                const offset = ctx.canvas.height * 0.3 - i * 30;
+                text.pos.y = offset;
+            }
+            text.draw(ctx);
+            text.update();
+            if (text.lifeSpan > 200) { textMessages.splice(i, 1); }
+        });
 }
 
 // handle game physics
