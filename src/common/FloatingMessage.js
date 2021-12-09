@@ -1,14 +1,15 @@
 export default class FloatingMessage {
-    constructor(text, position, size, color) {
+    constructor(text, position, fixed, size, color) {
         this.text = text;
         this.pos = { x: position.x, y: position.y };
+        this.fixed = fixed;
         this.size = size;
         this.color = color;
         this.lifeSpan = 0;
         this.opacity = 1;
     }
 
-    draw(ctx, offset) {
+    draw(ctx) {
         ctx.save();
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = this.color;
