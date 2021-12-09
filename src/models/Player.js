@@ -1,4 +1,4 @@
-import createTimer from '../../common/Timer.js';
+import createTimer from './Timer.js';
 
 const manaTimer = new createTimer(true);
 const fireRateTimer = new createTimer(true);
