@@ -1,14 +1,14 @@
 export default class Enemy {
-    constructor(player, position, inputStats) {
+    constructor(player, position, stats) {
         this.player = player;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
         this.dim = { w: 80, h: 50 };
         this.gravity = { x: 0, y: 0.1 };
         this.stats = {
-            health: inputStats.health,
-            bonusHealth: inputStats.bonusHealth,
-            movementSpeed: inputStats.movementSpeed,
+            health: stats.health,
+            bonusHealth: stats.bonusHealth,
+            movementSpeed: stats.movementSpeed,
         };
     }
 
@@ -38,8 +38,6 @@ export default class Enemy {
             right: sideWorld.right || sideCollision.right
         };
 
-
-
         if (side.left || this.pos.x < this.player.pos.x - offset) {
             this.vel.x = this.vel.x > this.stats.movementSpeed ? this.stats.movementSpeed : this.vel.x += 0.1;
         } else if (side.right || this.pos.x > this.player.pos.x + offset) {
@@ -53,10 +51,10 @@ export default class Enemy {
             }
         }
 
-        // this.vel.x += this.gravity.x;
-        // this.vel.y += this.gravity.y;
-        // this.pos.x += this.vel.x;
-        // this.pos.y += this.vel.y;
-        // if (side.bottom) { this.vel.y = 0; }
+        this.vel.x += this.gravity.x;
+        this.vel.y += this.gravity.y;
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+        if (side.bottom) { this.vel.y = 0; }
     }
 }
