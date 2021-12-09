@@ -6,12 +6,13 @@ import Perk from './models/perks/Perk.js';
 import createTimer from './common/Timer.js';
 import FloatingMessage from './common/FloatingMessage.js';
 
-const ctx = document.getElementById('game').getContext('2d');
-ctx.canvas.width = window.innerWidth;
-ctx.canvas.height = window.innerHeight;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
-customFont.load().then((font) => { document.fonts.add(font); });
+// const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
+// customFont.load().then((font) => { document.fonts.add(font); });
 
 const gameTimer = new createTimer();
 let scorePoints = 0;
@@ -63,23 +64,24 @@ function initBackground() {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = 'hsl(200, 30%, 50%, 0.6)';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.closePath();
     //timer
     gameTimer.start();
     ctx.font = '16px customFont';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
-    ctx.fillText('Timer: ' + gameTimer.output, ctx.canvas.width * 0.5, ctx.canvas.height * 0.05);
+    ctx.fillText('Timer: ' + gameTimer.output, canvas.width * 0.5, canvas.height * 0.05);
     //scorePoints
-    ctx.fillText('Score: ' + scorePoints, ctx.canvas.width * 0.5, ctx.canvas.height * 0.02);
+    ctx.fillText('Score: ' + scorePoints, canvas.width * 0.5, canvas.height * 0.02);
     ctx.restore();
 }
 
 //handle platforms
 function platformsCreate() {
+    console.log(ctx);
     platforms.push(
-        new Platform(relativePosition(0, 0.95), ctx.canvas.width, 100, 1, 'ground'),
+        new Platform(relativePosition(0, 0.95), canvas.width, 100, 1, 'ground'),
         new Platform(relativePosition(0.30, 0.17), 32, 32, 10, 'island'),
         new Platform(relativePosition(0.16, 0.42), 32, 32, 10, 'island'),
         new Platform(relativePosition(0.71, 0.42), 32, 32, 10, 'island'),
@@ -154,7 +156,7 @@ enemiesCreate();
 function enemiesAnimation() {
     if (enemies.length == 0) { enemiesCreate(); }
 
-    const offset = ctx.canvas.width * 0.1;
+    const offset = canvas.width * 0.1;
     const sideWorld = collideWorldBounds(enemies);
     const sideCollision = collision(enemies, platforms);
 
@@ -233,7 +235,7 @@ function perkAnimation() {
             player.stats.fireRate -= 0.5;
         }
 
-        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / ctx.canvas.width, y: (player.pos.y + player.dim.h / 2) / ctx.canvas.height };
+        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / canvas.width, y: (player.pos.y + player.dim.h / 2) / canvas.height };
         messageCreate(perk.type.text, 100, 20, perk.type.color, playerCenter, false);
 
         perks.splice(perks.indexOf(perk), 1);
@@ -277,7 +279,7 @@ function messagesAnimation() {
         .sort((a, b) => b.priority - a.priority)
         .forEach(({ text }, i) => {
             if (text.fixed) {
-                const offset = ctx.canvas.height * 0.3 - i * 30;
+                const offset = canvas.height * 0.3 - i * 30;
                 text.pos.y = offset;
             }
             text.draw(ctx);
@@ -355,8 +357,8 @@ function removeWorldOutBounds(AA) {
     //      right side is - pos.x + dim.w
     // if a from AA array goes out of screen will be deleted
     AA.forEach((a, i) => {
-        if (a.pos.x + a.dim.w < 0 || a.pos.x > ctx.canvas.width ||
-            a.pos.y + a.dim.h < 0 || a.pos.y > ctx.canvas.height) {
+        if (a.pos.x + a.dim.w < 0 || a.pos.x > canvas.width ||
+            a.pos.y + a.dim.h < 0 || a.pos.y > canvas.height) {
             AA.splice(i, 1);
         }
     });
@@ -377,9 +379,9 @@ function collideWorldBounds(AA) {
             a.pos.y = 0;
             a.vel.y = 0;
         }
-        if (a.pos.y + a.dim.h > ctx.canvas.height) {
+        if (a.pos.y + a.dim.h > canvas.height) {
             side.bottom = true;
-            a.pos.y = ctx.canvas.height - a.dim.h;
+            a.pos.y = canvas.height - a.dim.h;
             a.vel.y = 0;
         }
         if (a.pos.x < 0) {
@@ -387,16 +389,16 @@ function collideWorldBounds(AA) {
             a.pos.x = 0;
             a.vel.x = 0;
         }
-        if (a.pos.x + a.dim.w > ctx.canvas.width) {
+        if (a.pos.x + a.dim.w > canvas.width) {
             side.right = true;
-            a.pos.x = ctx.canvas.width - a.dim.w;
+            a.pos.x = canvas.width - a.dim.w;
             a.vel.x = 0;
         }
     });
     return side;
 }
 function relativePosition(posX, posY) {
-    return { x: posX * ctx.canvas.width, y: posY * ctx.canvas.height };
+    return { x: posX * canvas.width, y: posY * canvas.height };
 }
 
 window.addEventListener('keydown', keyPress);
