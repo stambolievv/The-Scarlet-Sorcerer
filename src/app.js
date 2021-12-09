@@ -79,7 +79,6 @@ function initBackground() {
 
 //handle platforms
 function platformsCreate() {
-    console.log(ctx);
     platforms.push(
         new Platform(relativePosition(0, 0.95), canvas.width, 100, 1, 'ground'),
         new Platform(relativePosition(0.30, 0.17), 32, 32, 10, 'island'),
@@ -141,7 +140,7 @@ function onClick(e) {
             projectilesCreate(e.offsetX, e.offsetY);
         }
     } else {
-        messageCreate('Out of Mana. Cant cast that spell', 10, 20, 'blue');
+        messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
     }
 }
 
@@ -182,7 +181,6 @@ function enemiesAnimation() {
             enemy.pos = { x: spawnPoint.x, y: spawnPoint.y };
         }
     });
-
 }
 
 // handle projectiles
@@ -236,7 +234,7 @@ function perkAnimation() {
         }
 
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / canvas.width, y: (player.pos.y + player.dim.h / 2) / canvas.height };
-        messageCreate(perk.type.text, 100, 20, perk.type.color, playerCenter, false);
+        messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
 
         perks.splice(perks.indexOf(perk), 1);
     });
@@ -252,7 +250,7 @@ function handleScore() {
     if (scorePoints % 30 == 0 && scorePoints % 100 != 0) {
         players[0].stats.level += 1;
         perkCreate();
-        messageCreate('New Perk spawned for 15 sec', 70, 20);
+        messageCreate('New Perk spawned for 15 sec', 70, 22);
     }
 
     if (scorePoints % 50 == 0 && scorePoints % 100 != 0) {
@@ -261,11 +259,11 @@ function handleScore() {
     }
 
     if (scorePoints == 100 || scorePoints == 200) {
-        messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 48);
+        messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
     }
 
     if (scorePoints == 300) {
-        messageCreate('Final Boss will spawn\n after 5 seconds', 100, 48);
+        messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
     }
 }
 
