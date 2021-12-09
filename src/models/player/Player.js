@@ -17,12 +17,12 @@ export default class Player {
             level: 1,
             health: 3,
             bonusHealth: 2,
-            mana: 1,
-            _manaReg: 3,
+            mana: 5,
+            _manaReg: 5,
             oxygen: 3,
             _outOfOxygen: false,
             _onIsland: false,
-            fireRate: 0.2,
+            fireRate: 2,
             _canShoot: true,
             movementSpeed: 5,
             jumpBoost: 20
@@ -160,7 +160,7 @@ export default class Player {
         }
 
         // handle mana
-        if (this.stats.mana < 10) {
+        if (this.stats.mana < 5) {
             manaTimer.start();
             if (manaTimer.output > this.stats._manaReg) {
                 this.stats.mana++;
