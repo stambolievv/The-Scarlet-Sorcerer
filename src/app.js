@@ -1,10 +1,11 @@
-import Platform from './models/platforms/Platform.js';
-import Player from './models/player/Player.js';
-import Enemy from './models/enemies/Enemy.js';
-import Projectiles from './models/player/Projectile.js';
-import Perk from './models/perks/Perk.js';
-import createTimer from './common/Timer.js';
-import FloatingMessage from './common/FloatingMessage.js';
+import Platform from './models/Platform.js';
+import Player from './models/Player.js';
+import Enemy from './models/Enemy.js';
+import Projectiles from './models/Projectile.js';
+import Perk from './models/Perk.js';
+import createTimer from './models/Timer.js';
+import FloatingMessage from './models/FloatingMessage.js';
+import data from '../static/data/asset-pack.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -56,6 +57,38 @@ function animate() {
     projectilesAnimation();
     perkAnimation();
     messagesAnimation();
+
+    drawAnimation();
+}
+
+const enemy = data.sprites.enemy.hyena;
+
+const img = new Image();
+img.src = enemy.url;
+
+const staggerFrame = 5;
+const state = 'runR';
+
+let gameFrame = 0;
+
+function drawAnimation() {
+    const position = Math.floor(gameFrame / staggerFrame) % enemy.animations[state].loc.length;
+    const frameX = enemy.animations[state].loc[position].x;
+    const frameY = enemy.animations[state].loc[position].y;
+
+    // ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh); s <=> source; d <=> destination
+    ctx.drawImage(
+        img,
+        frameX,
+        frameY,
+        enemy.frameWidth,
+        enemy.frameHeight,
+        0,
+        0,
+        enemy.frameWidth,
+        enemy.frameHeight
+    );
+    gameFrame++;
 }
 
 //handle background
