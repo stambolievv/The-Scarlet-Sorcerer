@@ -7,7 +7,11 @@ export default class Platform {
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.fillStyle = 'hsl(10, 50%, 50%, 0.5)';
+        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+        gradient.addColorStop(0, 'lightgreen');
+        gradient.addColorStop(1, 'darkgreen');
+        ctx.fillStyle = gradient;
+        // ctx.fillStyle = 'hsl(10, 50%, 50%, 0.5)';
         ctx.rect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
         ctx.closePath();
         ctx.fill();
