@@ -9,6 +9,7 @@ import data from '../static/data/asset-pack.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+ctx.DEBUG = true;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
@@ -57,38 +58,6 @@ function animate() {
     projectilesAnimation();
     perkAnimation();
     messagesAnimation();
-
-    drawAnimation();
-}
-
-const enemy = data.sprites.enemy.hyena;
-
-const img = new Image();
-img.src = enemy.url;
-
-const staggerFrame = 5;
-const state = 'runR';
-
-let gameFrame = 0;
-
-function drawAnimation() {
-    const position = Math.floor(gameFrame / staggerFrame) % enemy.animations[state].loc.length;
-    const frameX = enemy.animations[state].loc[position].x;
-    const frameY = enemy.animations[state].loc[position].y;
-
-    // ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh); s <=> source; d <=> destination
-    ctx.drawImage(
-        img,
-        frameX,
-        frameY,
-        enemy.frameWidth,
-        enemy.frameHeight,
-        0,
-        0,
-        enemy.frameWidth,
-        enemy.frameHeight
-    );
-    gameFrame++;
 }
 
 //handle background
@@ -131,7 +100,12 @@ function platformsAnimation() {
 
 // handle player
 function playerCreate() {
-    players.push(new Player(relativePosition(0.5, 0.8)));
+    const playerData = data.sprites.player;
+
+    const playerSprite = new Image();
+    playerSprite.src = playerData.url;
+
+    players.push(new Player(playerData, playerSprite, relativePosition(0.5, 0.8)));
 }
 playerCreate();
 function playerAnimation() {
@@ -170,6 +144,8 @@ function onClick(e) {
         if (players[0].stats._canShoot) {
             players[0].stats._canShoot = false;
             players[0].stats.mana--;
+            players[0].state = 'attack2';
+
             projectilesCreate(e.offsetX, e.offsetY);
         }
     } else {
