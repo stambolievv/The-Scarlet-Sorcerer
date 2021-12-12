@@ -5,10 +5,15 @@ const fireRateTimer = new createTimer(true);
 const oxygenTimer = new createTimer(true);
 
 export default class Player {
-    constructor(position) {
+    constructor(data, sprite, position) {
+        this.data = data;
+        this.sprite = sprite;
+        this.state = 'idle';
+        this.orientation = 'right';
+        this.gameFrame = 0;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
-        this.dim = { w: 54.92, h: 80 };
+        this.dim = { w: 45, h: 72 };
         this.gravity = { x: 0, y: 0.6 };
         this.friction = { x: 0.9, y: 0.99 };
         this.grounded = false;
@@ -30,11 +35,27 @@ export default class Player {
     }
 
     draw(ctx) {
-        ctx.beginPath();
-        ctx.fillStyle = 'hsl(100, 100%, 50%, 0.3)';
-        ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-        ctx.closePath();
-        ctx.fill();
+        ctx.save();
+        if (this.orientation == 'left') {
+
+        } else if (this.orientation == 'right') {
+
+        }
+
+        const position = Math.floor(this.gameFrame / 5) % this.data.animations[this.state].loc.length;
+        const frameX = this.data.animations[this.state].loc[position].x;
+        const frameY = this.data.animations[this.state].loc[position].y;
+        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * 0.8, this.pos.y - this.dim.h * 0.8, this.data.frameWidth, this.data.frameHeight);
+        this.gameFrame++;
+
+        ctx.restore();
+        if (ctx.DEBUG) {
+            ctx.beginPath();
+            ctx.fillStyle = 'hsl(100, 100%, 50%, 0.3)';
+            ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+            ctx.closePath();
+            ctx.fill();
+        }
 
         ctx.font = '24px customFont';
         ctx.textAlign = 'left';
@@ -67,21 +88,27 @@ export default class Player {
                     this.jumping = true;
                     this.grounded = false;
                     this.vel.y -= this.stats.jumpBoost;
+                    this.state = 'jump';
                 }
             },
             KeyA: () => {
                 if (!side.left && this.vel.x > -this.stats.movementSpeed) {
                     this.vel.x--;
+                    this.orientation = 'right';
+                    this.state = 'run';
                 }
             },
             KeyS: () => {
                 if (!side.bottom && this.vel.y < this.stats.jumpBoost) {
                     this.vel.y++;
+                    this.state = 'fall';
                 }
             },
             KeyD: () => {
                 if (!side.right && this.vel.x < this.stats.movementSpeed) {
                     this.vel.x++;
+                    this.orientation = 'left';
+                    this.state = 'run';
                 }
             },
             Space: () => { controller.KeyW(); },
@@ -110,7 +137,6 @@ export default class Player {
         this.vel.y *= this.friction.y;
         this.pos.x += this.vel.x;
         this.pos.y += this.vel.y;
-
         if (Math.abs(this.vel.x) < 0.1) { this.vel.x = 0; }
         if (this.grounded) { this.vel.y = 0; }
     }
