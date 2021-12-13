@@ -9,12 +9,12 @@ export default class Player {
         this.data = data;
         this.sprite = sprite;
         this.state = 'idle';
-        this.orientation = 'right';
+        this.orientation = 'Right';
         this.gameFrame = 0;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
-        this.dim = { w: 45, h: 72 };
-        this.gravity = { x: 0, y: 0.6 };
+        this.dim = { w: 50, h: 90 };
+        this.gravity = { x: 0, y: 0.7 };
         this.friction = { x: 0.9, y: 0.99 };
         this.grounded = false;
         this.jumping = false;
@@ -30,31 +30,26 @@ export default class Player {
             fireRate: 2,
             _canShoot: true,
             movementSpeed: 5,
-            jumpBoost: 20
+            jumpBoost: 21
         };
     }
 
     draw(ctx) {
-        ctx.save();
-        if (this.orientation == 'left') {
-
-        } else if (this.orientation == 'right') {
-
-        }
-
-        const position = Math.floor(this.gameFrame / 5) % this.data.animations[this.state].loc.length;
-        const frameX = this.data.animations[this.state].loc[position].x;
-        const frameY = this.data.animations[this.state].loc[position].y;
-        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * 0.8, this.pos.y - this.dim.h * 0.8, this.data.frameWidth, this.data.frameHeight);
+        const offset = this.orientation == 'Right' ? 0.8 : 1.5;
+        const position = Math.floor(this.gameFrame / 10) % this.data.animations[(this.state + this.orientation)].loc.length;
+        const frameX = this.data.animations[(this.state + this.orientation)].loc[position].x;
+        const frameY = this.data.animations[(this.state + this.orientation)].loc[position].y;
+        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h / 2, this.data.frameWidth, this.data.frameHeight);
         this.gameFrame++;
 
-        ctx.restore();
+
         if (ctx.DEBUG) {
             ctx.beginPath();
-            ctx.fillStyle = 'hsl(100, 100%, 50%, 0.3)';
+            ctx.fillStyle = 'black';
+            ctx.lineWidth = 2;
             ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-            ctx.closePath();
             ctx.fill();
+            ctx.closePath();
         }
 
         ctx.font = '24px customFont';
@@ -88,28 +83,28 @@ export default class Player {
                     this.jumping = true;
                     this.grounded = false;
                     this.vel.y -= this.stats.jumpBoost;
-                    this.state = 'jump';
                 }
+                this.state = this.grounded ? 'idle' : 'jump';
             },
             KeyA: () => {
                 if (!side.left && this.vel.x > -this.stats.movementSpeed) {
                     this.vel.x--;
-                    this.orientation = 'right';
-                    this.state = 'run';
                 }
+                this.orientation = 'Left';
+                this.state = 'run';
             },
             KeyS: () => {
                 if (!side.bottom && this.vel.y < this.stats.jumpBoost) {
                     this.vel.y++;
-                    this.state = 'fall';
                 }
+                this.state = this.grounded ? 'idle' : 'fall';
             },
             KeyD: () => {
                 if (!side.right && this.vel.x < this.stats.movementSpeed) {
                     this.vel.x++;
-                    this.orientation = 'left';
-                    this.state = 'run';
                 }
+                this.orientation = 'Right';
+                this.state = 'run';
             },
             Space: () => { controller.KeyW(); },
             ArrowUp: () => { controller.KeyW(); },
@@ -123,6 +118,8 @@ export default class Player {
             } catch (err) {
                 // console.error('Not a functional key is pressed!');
             }
+        } else {
+            this.state = 'idle';
         }
 
         this.grounded = false;
@@ -130,6 +127,8 @@ export default class Player {
         if (side.left || side.right) { this.vel.x = 0; }
         if (side.top) { this.vel.y *= -0.1; }
         if (side.type == 'island' && side.bottom) { this.stats._onIsland = true; } else { this.stats._onIsland = false; }
+
+        if (!side.left && !side.top && !side.right && !side.bottom && !this.jumping) { this.state = 'fall'; }
 
         this.vel.x += this.gravity.x;
         this.vel.y += this.gravity.y;
@@ -197,3 +196,28 @@ export default class Player {
         }
     }
 }
+
+
+// // Touch states
+//     touches: { left: false, right: false, up: false },
+//     // Movement states
+//     holdsRight: function() {
+//         return this.keyboard.right.isDown || this.keyboard.D.isDown || this.touches.right
+//     },
+//     holdsLeft: function() {
+//         return this.keyboard.left.isDown || this.keyboard.A.isDown || this.touches.left
+//     },
+//     holdsUp: function() {
+//         return this.keyboard.space.isDown || this.keyboard.up.isDown || this.keyboard.W.isDown || this.touches.up
+//     },
+//     // Player stands
+//     playerStands: function() { return this.player.body.onFloor() || this.player.body.touching.down },
+//     // Collision with ground
+//     landPlayer: function() {
+//         if (this.playerState.jumping && this.playerStands()) {
+//             // Update state to running
+//             this.playerState.jumping = false
+//             // Update player animation
+//             playerSpriteStand()
+//         }
+//     },

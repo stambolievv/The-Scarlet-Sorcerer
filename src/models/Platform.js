@@ -1,19 +1,22 @@
 export default class Platform {
-    constructor(position, width, height, length, type) {
-        this.pos = { x: position.x, y: position.y };
-        this.dim = { w: width * length, h: height };
-        this.type = type;
+    constructor(tilesheet, sourceX, sourceY, destinationX, destinationY, frameWidth, frameHeight) {
+        this.sprite = tilesheet;
+        this.src = { x: sourceX, y: sourceY };
+        this.pos = { x: destinationX, y: destinationY };
+        this.dim = { w: frameWidth, h: frameHeight };
     }
 
     draw(ctx) {
-        ctx.beginPath();
-        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
-        gradient.addColorStop(0, 'LightGreen');
-        gradient.addColorStop(1, 'DarkGreen');
-        ctx.fillStyle = gradient;
-        // ctx.fillStyle = 'hsl(10, 50%, 50%, 0.5)';
-        ctx.rect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-        ctx.closePath();
-        ctx.fill();
+
+        ctx.drawImage(this.sprite, this.src.x, this.src.y, this.dim.w, this.dim.h, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+
+        if (ctx.DEBUG) {
+            ctx.beginPath();
+            ctx.fillStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 }

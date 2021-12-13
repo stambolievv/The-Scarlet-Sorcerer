@@ -5,19 +5,24 @@ import Projectiles from './models/Projectile.js';
 import Perk from './models/Perk.js';
 import createTimer from './models/Timer.js';
 import FloatingMessage from './models/FloatingMessage.js';
-import data from '../static/data/asset-pack.js';
+import data from './data/asset-pack.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-ctx.DEBUG = true;
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+ctx.DEBUG = false;
+canvas.width = 1280;
+canvas.height = 720;
 
 // const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
 // customFont.load().then((font) => { document.fonts.add(font); });
 
 const gameTimer = new createTimer();
 let scorePoints = 0;
+
+const display = {
+    tilesheet: new Image(),
+    player: new Image(),
+};
 
 const platforms = [];
 const players = [];
@@ -30,23 +35,9 @@ const enemyStats = {
 };
 const projectiles = [];
 const perks = [];
-const perksData = {
-    position: [
-        { x: 0.40, y: 0.13 },
-        { x: 0.20, y: 0.38 },
-        { x: 0.85, y: 0.38 },
-        { x: 0.48, y: 0.51 },
-        { x: 0.08, y: 0.66 },
-        { x: 0.71, y: 0.62 },
-    ],
-    variety: [
-        { name: 'BS', text: 'Bonus Heart +1', color: '#ff471a' },
-        { name: 'JB', text: 'Jump Boost Increase', color: '#66ccff' },
-        { name: 'MS', text: 'Movement Speed Increase', color: '#aaff80' },
-        { name: 'FR', text: 'FireRate Increase', color: '#ffcc00' },
-    ]
-};
 const textMessages = [];
+
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -63,11 +54,11 @@ function animate() {
 //handle background
 function initBackground() {
     //background
-    ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = 'hsl(200, 30%, 50%, 0.6)';
+    ctx.fillStyle = 'hsl(200, 30%, 50%, 0.9)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.closePath();
+
     //timer
     gameTimer.start();
     ctx.font = '16px customFont';
@@ -76,20 +67,27 @@ function initBackground() {
     ctx.fillText('Timer: ' + gameTimer.output, canvas.width * 0.5, canvas.height * 0.05);
     //scorePoints
     ctx.fillText('Score: ' + scorePoints, canvas.width * 0.5, canvas.height * 0.02);
-    ctx.restore();
 }
 
 //handle platforms
 function platformsCreate() {
-    platforms.push(
-        new Platform(relativePosition(0, 0.95), canvas.width, 100, 1, 'ground'),
-        new Platform(relativePosition(0.30, 0.17), 32, 32, 10, 'island'),
-        new Platform(relativePosition(0.16, 0.42), 32, 32, 10, 'island'),
-        new Platform(relativePosition(0.71, 0.42), 32, 32, 10, 'island'),
-        new Platform(relativePosition(0.40, 0.55), 32, 32, 10, 'island'),
-        new Platform(relativePosition(0.60, 0.66), 32, 32, 10, 'island'),
-        new Platform(relativePosition(0.02, 0.70), 32, 32, 10, 'island')
-    );
+    const tileset = data.sprites.tileset;
+    display.tilesheet.src = tileset.url;
+
+    for (let index = tileset.map.length - 1; index > -1; --index) {
+
+        const tile = tileset.map[index];
+
+        const sourceX = (tile % tileset.columns) * tileset.frameWidth;
+        const sourceY = Math.floor(tile / tileset.columns) * tileset.frameHeight;
+
+        const destinationX = (index % (canvas.width / tileset.frameWidth)) * tileset.frameWidth;
+        const destinationY = Math.floor(index / (canvas.width / tileset.frameWidth)) * tileset.frameHeight;
+
+        if (tile != 0) {
+            platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight));
+        }
+    }
 }
 platformsCreate();
 function platformsAnimation() {
@@ -101,11 +99,9 @@ function platformsAnimation() {
 // handle player
 function playerCreate() {
     const playerData = data.sprites.player;
+    display.player.src = playerData.url;
 
-    const playerSprite = new Image();
-    playerSprite.src = playerData.url;
-
-    players.push(new Player(playerData, playerSprite, relativePosition(0.5, 0.8)));
+    players.push(new Player(playerData, display.player, relativePosition(0.2, 0.9)));
 }
 playerCreate();
 function playerAnimation() {
@@ -144,13 +140,14 @@ function onClick(e) {
         if (players[0].stats._canShoot) {
             players[0].stats._canShoot = false;
             players[0].stats.mana--;
-            players[0].state = 'attack2';
+            players[0].state = 'attack';
 
             projectilesCreate(e.offsetX, e.offsetY);
         }
     } else {
         messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
     }
+
 }
 
 // handle enemies
@@ -208,6 +205,7 @@ function projectilesAnimation() {
 
 //handle perks
 function perkCreate() {
+    const perksData = data.sprites.perk;
     const rngPosition = Math.floor(Math.random() * 6);
     const rngType = Math.floor(Math.random() * 4);
 

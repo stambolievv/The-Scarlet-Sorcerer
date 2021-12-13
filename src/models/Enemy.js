@@ -51,10 +51,10 @@ export default class Enemy {
             }
         }
 
-        this.vel.x += this.gravity.x;
-        this.vel.y += this.gravity.y;
-        this.pos.x += this.vel.x;
-        this.pos.y += this.vel.y;
-        if (side.bottom) { this.vel.y = 0; }
+        // this.vel.x += this.gravity.x;
+        // this.vel.y += this.gravity.y;
+        // this.pos.x += this.vel.x;
+        // this.pos.y += this.vel.y;
+        // if (side.bottom) { this.vel.y = 0; }
     }
 }
