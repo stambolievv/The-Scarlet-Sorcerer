@@ -9,7 +9,7 @@ import data from './data/asset-pack.js';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-ctx.DEBUG = false;
+ctx.DEBUG = true;
 canvas.width = 1280;
 canvas.height = 720;
 
@@ -65,6 +65,7 @@ function initBackground() {
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
     ctx.fillText('Timer: ' + gameTimer.output, canvas.width * 0.5, canvas.height * 0.05);
+
     //scorePoints
     ctx.fillText('Score: ' + scorePoints, canvas.width * 0.5, canvas.height * 0.02);
 }
@@ -76,16 +77,24 @@ function platformsCreate() {
 
     for (let index = tileset.map.length - 1; index > -1; --index) {
 
-        const tile = tileset.map[index];
+        /* We get the value of each tile in the map which corresponds to the tile
+            graphic index in the tileset. */
+        const tileValue = tileset.map[index];
 
-        const sourceX = (tile % tileset.columns) * tileset.frameWidth;
-        const sourceY = Math.floor(tile / tileset.columns) * tileset.frameHeight;
+        /* This is the x and y location at which to cut the tile
+            image out of the tileset. */
+        const sourceX = (tileValue % tileset.columns) * tileset.frameWidth;
+        const sourceY = Math.floor(tileValue / tileset.columns) * tileset.frameHeight;
 
-        const destinationX = (index % (canvas.width / tileset.frameWidth)) * tileset.frameWidth;
-        const destinationY = Math.floor(index / (canvas.width / tileset.frameWidth)) * tileset.frameHeight;
+        /* This is the x and y location at which to draw the tile image we are cutting
+            from the tileset to the canvas. */
+        const destinationX = (index % Math.round(canvas.width / tileset.frameWidth)) * tileset.frameWidth;
+        const destinationY = Math.floor(index / Math.round(canvas.width / tileset.frameWidth)) * tileset.frameHeight;
 
-        if (tile != 0) {
-            platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight));
+        /* If value of the tile the tile is not in ignore array draw image to the canvas.
+            The width and height of the tile is taken from the tileset object. */
+        if (tileValue && !tileset.ignoreFrame.includes(tileValue)) {
+            platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
         }
     }
 }
@@ -101,7 +110,7 @@ function playerCreate() {
     const playerData = data.sprites.player;
     display.player.src = playerData.url;
 
-    players.push(new Player(playerData, display.player, relativePosition(0.2, 0.9)));
+    players.push(new Player(playerData, display.player, relativePosition(0.1, 0.65)));
 }
 playerCreate();
 function playerAnimation() {
@@ -154,7 +163,7 @@ function onClick(e) {
 function enemiesCreate() {
     handleScore();
 
-    const spawnPoint = relativePosition(Math.random(), Math.random() * 0.2);
+    const spawnPoint = relativePosition(Math.random(), Math.random() * 0.5);
     enemies.push(new Enemy(players[0], spawnPoint, enemyStats));
 }
 enemiesCreate();
@@ -295,14 +304,15 @@ function messagesAnimation() {
 
 // handle game physics
 function overlap(AA, BB, callback) {
-    // collision detection with two different objects
-    // by checking their sides points
-    // were : 
-    //      top side is - pos.y
-    //      left side is - pos.x
-    //      bottom side is - pos.y + dim.h
-    //      right side is - pos.x + dim.w
-    // returns a and b if they touched, from AA and BB array
+    /*
+        Collision detection with two different objects.
+        By checking their sides points were : 
+            top side is - pos.y
+            left side is - pos.x
+            bottom side is - pos.y + dim.h
+            right side is - pos.x + dim.w
+        Returns "a" and "b" if they touched, from "AA" and "BB" array.
+    */
     AA.forEach(a => {
         BB.forEach(b => {
             if (a.pos.x < b.pos.x + b.dim.w && a.pos.x + a.dim.w > b.pos.x &&
@@ -313,29 +323,38 @@ function overlap(AA, BB, callback) {
     });
 }
 function collision(AA, BB) {
-    // collision detection with different side of objects
-    // a from AA array stop because b from BB array is immovable
+    /*
+        Collision detection with different side of objects.
+        The "a" from "AA" array stop because "b" from "BB" array is immovable.
+    */
     const side = { top: false, bottom: false, left: false, right: false, type: undefined };
     AA.forEach(a => {
         BB.forEach(b => {
+            // Get the distance for the two objects
             const dx = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
             const dy = (a.pos.y + (a.dim.h / 2)) - (b.pos.y + (b.dim.h / 2));
-            // add the half widths and half heights of the objects
+
+            // Add the half widths and half heights of the objects.
             const widthHalf = (a.dim.w / 2) + (b.dim.w / 2);
             const heightHalf = (a.dim.h / 2) + (b.dim.h / 2);
-            // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
+
+            // If the "x" and "y" vector are less than the half width or half height, they we must be inside the object, causing a collision.
             if (Math.abs(dx) < widthHalf && Math.abs(dy) < heightHalf) {
-                // figures out on which side we are colliding (top, bottom, left, or right)
+
+                // Figures out on which side we are colliding (top, bottom, left, or right).
                 const crossWidth = widthHalf - Math.abs(dx);
                 const crossHeight = heightHalf - Math.abs(dy);
-                side.type = b.type;
+
+                // Pass the value of the tile to check if its painful or not.
+                side.type = b.tileValue;
+
                 if (crossWidth >= crossHeight) {
                     if (dy > 0) {
                         side.top = true;
                         a.pos.y += crossHeight;
                     } else {
                         side.bottom = true;
-                        a.pos.y -= crossHeight;// * 2; // bouncing
+                        a.pos.y -= crossHeight;
                     }
                 }
                 if ((crossWidth < crossHeight)) {
@@ -353,14 +372,15 @@ function collision(AA, BB) {
     return side;
 }
 function removeWorldOutBounds(AA) {
-    // collision detection with outside world boundaries 
-    // by checking their sides points
-    // were : 
-    //      top side is - pos.y
-    //      left side is - pos.x
-    //      bottom side is - pos.y + dim.h
-    //      right side is - pos.x + dim.w
-    // if a from AA array goes out of screen will be deleted
+    /*
+        Collision detection with outside world boundaries,
+        By checking their sides points were : 
+             top side is - pos.y
+            left side is - pos.x
+            bottom side is - pos.y + dim.h
+            right side is - pos.x + dim.w
+        If "a" from "AA" array goes out of screen will be deleted.
+    */
     AA.forEach((a, i) => {
         if (a.pos.x + a.dim.w < 0 || a.pos.x > canvas.width ||
             a.pos.y + a.dim.h < 0 || a.pos.y > canvas.height) {
@@ -369,14 +389,15 @@ function removeWorldOutBounds(AA) {
     });
 }
 function collideWorldBounds(AA) {
-    // collision detection with the world boundaries 
-    // by checking their sides points
-    // were : 
-    //      top side is - pos.y
-    //      left side is - pos.x
-    //      bottom side is - pos.y + dim.h
-    //      right side is - pos.x + dim.w
-    // a from AA array can't leave the screen
+    /*
+        Collision detection with the world boundaries.
+        By checking their sides points were : 
+            top side is - pos.y
+            left side is - pos.x
+            bottom side is - pos.y + dim.h
+            right side is - pos.x + dim.w
+        The "a" from "AA" array can't leave the screen.
+    */
     const side = { top: false, bottom: false, left: false, right: false };
     AA.forEach(a => {
         if (a.pos.y < 0) {
