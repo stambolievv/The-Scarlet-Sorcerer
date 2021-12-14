@@ -3,8 +3,8 @@ export default
         'sprites': {
             'player': {
                 'url': '/static/assets/wizard.png',
-                'frameWidth': 166, // width ÷ columns
-                'frameHeight': 136, // height ÷ rows
+                'frameWidth': 166,
+                'frameHeight': 136,
                 'animations': {
                     'ultimateLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 166, 'y': 0 }, { 'x': 332, 'y': 0 }, { 'x': 498, 'y': 0 }, { 'x': 664, 'y': 0 }, { 'x': 830, 'y': 0 }, { 'x': 996, 'y': 0 }, { 'x': 1162, 'y': 0 }] },
                     'ultimateRight': { 'loc': [{ 'x': 0, 'y': 136 }, { 'x': 166, 'y': 136 }, { 'x': 332, 'y': 136 }, { 'x': 498, 'y': 136 }, { 'x': 664, 'y': 136 }, { 'x': 830, 'y': 136 }, { 'x': 996, 'y': 136 }, { 'x': 1162, 'y': 136 }] },
@@ -53,10 +53,10 @@ export default
             'projectile': {},
             'tileset': {
                 'url': '/static/assets/tileset.png',
-                'frameWidth': 48, // width ÷ columns
-                'frameHeight': 48, // height ÷ rows
+                'frameWidth': 48,
+                'frameHeight': 48,
                 'columns': 18,
-                'ignoreFrame': [0],
+                'ignoreFrame': [],
                 'painfulFrame': [123, 144, 145, 146, 166, 167, 183, 184, 185],
                 'map': [
                     4, 1, 2, 3, 4, 5, 6, 21, 8, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 6, 21, 8, 5, 4, 1, 2,
