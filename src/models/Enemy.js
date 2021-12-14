@@ -14,10 +14,11 @@ export default class Enemy {
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%, 0.3)`;
+        ctx.fillStyle = 'black';
+        ctx.lineWidth = 2;
         ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-        ctx.closePath();
         ctx.fill();
+        ctx.closePath();
 
         ctx.font = '24px customFont';
         ctx.textAlign = 'right';
@@ -51,10 +52,10 @@ export default class Enemy {
             }
         }
 
-        // this.vel.x += this.gravity.x;
-        // this.vel.y += this.gravity.y;
-        // this.pos.x += this.vel.x;
-        // this.pos.y += this.vel.y;
-        // if (side.bottom) { this.vel.y = 0; }
+        this.vel.x += this.gravity.x;
+        this.vel.y += this.gravity.y;
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+        if (side.bottom) { this.vel.y = 0; }
     }
 }
