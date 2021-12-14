@@ -5,17 +5,17 @@ const fireRateTimer = new createTimer(true);
 const oxygenTimer = new createTimer(true);
 
 export default class Player {
-    constructor(data, sprite, position) {
+    constructor(data, sprite, painfulFrame, position) {
         this.data = data;
         this.sprite = sprite;
-        this.state = 'idle';
-        this.orientation = 'Right';
-        this.gameFrame = 0;
+        this.painfulFrame = painfulFrame;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
         this.dim = { w: 30, h: 50 };
         this.gravity = { x: 0, y: 0.5 };
         this.friction = { x: 0.9, y: 0.99 };
+        this.state = 'idle';
+        this.orientation = 'Right';
         this.grounded = false;
         this.jumping = false;
         this.stats = {
@@ -32,10 +32,12 @@ export default class Player {
             movementSpeed: 4,
             jumpBoost: 15
         };
+        this.gameFrame = 0;
     }
 
     draw(ctx) {
         const offset = this.orientation == 'Right' ? 1 : 2;
+
         const position = Math.floor(this.gameFrame / 5) % this.data.animations[(this.state + this.orientation)].loc.length;
         const frameX = this.data.animations[(this.state + this.orientation)].loc[position].x;
         const frameY = this.data.animations[(this.state + this.orientation)].loc[position].y;
@@ -45,10 +47,9 @@ export default class Player {
 
         if (ctx.DEBUG) {
             ctx.beginPath();
-            ctx.fillStyle = 'black';
             ctx.lineWidth = 2;
+            ctx.strokeStyle = 'black';
             ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-            ctx.fill();
             ctx.closePath();
         }
 
@@ -58,14 +59,14 @@ export default class Player {
         ctx.fillText('Player', ctx.canvas.width * 0.03, ctx.canvas.height * 0.05);
         ctx.font = '18px customFont';
         ctx.fillStyle = 'LightGreen';
-        ctx.fillText('Level: ' + this.stats.level, ctx.canvas.width * 0.03, ctx.canvas.height * 0.10);
-        ctx.fillText('HP: ' + this.stats.health, ctx.canvas.width * 0.03, ctx.canvas.height * 0.12);
-        ctx.fillText('Bonus HP: ' + this.stats.bonusHealth, ctx.canvas.width * 0.03, ctx.canvas.height * 0.14);
-        ctx.fillText('Oxygen: ' + this.stats.oxygen, ctx.canvas.width * 0.03, ctx.canvas.height * 0.16);
-        ctx.fillText('Mana: ' + this.stats.mana, ctx.canvas.width * 0.03, ctx.canvas.height * 0.18);
-        ctx.fillText('Fire Rate: ' + this.stats.fireRate, ctx.canvas.width * 0.03, ctx.canvas.height * 0.20);
-        ctx.fillText('Movement Speed: ' + this.stats.movementSpeed, ctx.canvas.width * 0.03, ctx.canvas.height * 0.22);
-        ctx.fillText('Jump Boost: ' + this.stats.jumpBoost, ctx.canvas.width * 0.03, ctx.canvas.height * 0.24);
+        ctx.fillText('Level: ' + this.stats.level, ctx.canvas.width * 0.04, ctx.canvas.height * 0.160);
+        ctx.fillText('HP: ' + this.stats.health, ctx.canvas.width * 0.04, ctx.canvas.height * 0.185);
+        ctx.fillText('Bonus HP: ' + this.stats.bonusHealth, ctx.canvas.width * 0.04, ctx.canvas.height * 0.210);
+        ctx.fillText('Oxygen: ' + this.stats.oxygen, ctx.canvas.width * 0.04, ctx.canvas.height * 0.235);
+        ctx.fillText('Mana: ' + this.stats.mana, ctx.canvas.width * 0.04, ctx.canvas.height * 0.260);
+        ctx.fillText('Fire Rate: ' + this.stats.fireRate.toFixed(1), ctx.canvas.width * 0.04, ctx.canvas.height * 0.285);
+        ctx.fillText('Movement Speed: ' + this.stats.movementSpeed.toFixed(1), ctx.canvas.width * 0.04, ctx.canvas.height * 0.310);
+        ctx.fillText('Jump Boost: ' + this.stats.jumpBoost.toFixed(1), ctx.canvas.width * 0.04, ctx.canvas.height * 0.335);
     }
 
     update(keysPressed, sideWorld, sideCollision) {
@@ -123,11 +124,11 @@ export default class Player {
         }
 
         this.grounded = false;
-        if (side.bottom) { this.grounded = true; this.jumping = false; }
+        if (side.bottom && !(side.left || side.right)) { this.grounded = true; this.jumping = false; }
         if (side.left || side.right) { this.vel.x = 0; }
         if (side.top) { this.vel.y *= -0.1; }
-        if (side.type == 'island' && side.bottom) { this.stats._onIsland = true; } else { this.stats._onIsland = false; }
 
+        if (this.painfulFrame.includes(side.type) && side.bottom) { this.stats._onIsland = true; } else { this.stats._onIsland = false; }
         if (!side.left && !side.top && !side.right && !side.bottom && !this.jumping) { this.state = 'fall'; }
 
         this.vel.x += this.gravity.x;
@@ -198,21 +199,21 @@ export default class Player {
 }
 
 
-// // Touch states
-//     touches: { left: false, right: false, up: false },
-//     // Movement states
+//     Movement states
 //     holdsRight: function() {
-//         return this.keyboard.right.isDown || this.keyboard.D.isDown || this.touches.right
+//         return this.keyboard.right.isDown || this.keyboard.D.isDown
 //     },
 //     holdsLeft: function() {
-//         return this.keyboard.left.isDown || this.keyboard.A.isDown || this.touches.left
+//         return this.keyboard.left.isDown || this.keyboard.A.isDown 
 //     },
 //     holdsUp: function() {
-//         return this.keyboard.space.isDown || this.keyboard.up.isDown || this.keyboard.W.isDown || this.touches.up
+//         return this.keyboard.space.isDown || this.keyboard.up.isDown || this.keyboard.W.isDown 
 //     },
-//     // Player stands
+
+//     Player stands
 //     playerStands: function() { return this.player.body.onFloor() || this.player.body.touching.down },
-//     // Collision with ground
+
+//      Collision with ground
 //     landPlayer: function() {
 //         if (this.playerState.jumping && this.playerStands()) {
 //             // Update state to running

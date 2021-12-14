@@ -6,22 +6,24 @@ import Perk from './models/Perk.js';
 import createTimer from './models/Timer.js';
 import FloatingMessage from './models/FloatingMessage.js';
 import data from './data/asset-pack.js';
+import { DISPLAY } from './data/constants.js';
 
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-ctx.DEBUG = true;
 canvas.width = 1280;
 canvas.height = 720;
+const ctx = canvas.getContext('2d', { alpha: false });
+ctx.DEBUG = false;
 
-// const customFont = new FontFace('customFont', 'url(/static/fonts/rubber-biscuit.bold.ttf)');
-// customFont.load().then((font) => { document.fonts.add(font); });
 
 const gameTimer = new createTimer();
+gameTimer.start();
+
 let scorePoints = 0;
 
 const display = {
     tilesheet: new Image(),
     player: new Image(),
+    perk: new Image(),
 };
 
 const platforms = [];
@@ -60,8 +62,7 @@ function initBackground() {
     ctx.closePath();
 
     //timer
-    gameTimer.start();
-    ctx.font = '16px customFont';
+    ctx.font = '24px customFont';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
     ctx.fillText('Timer: ' + gameTimer.output, canvas.width * 0.5, canvas.height * 0.05);
@@ -104,13 +105,13 @@ function platformsAnimation() {
         p.draw(ctx);
     });
 }
-
 // handle player
 function playerCreate() {
     const playerData = data.sprites.player;
-    display.player.src = playerData.url;
+    const painfulFrame = data.sprites.tileset.painfulFrame;
+    DISPLAY.player.src = playerData.url;
 
-    players.push(new Player(playerData, display.player, relativePosition(0.1, 0.65)));
+    players.push(new Player(playerData, DISPLAY.player, painfulFrame, relativePosition(0.1, 0.65)));
 }
 playerCreate();
 function playerAnimation() {
@@ -213,13 +214,15 @@ function projectilesAnimation() {
 }
 
 //handle perks
+window.perkCreate = perkCreate;
 function perkCreate() {
     const perksData = data.sprites.perk;
-    const rngPosition = Math.floor(Math.random() * 6);
-    const rngType = Math.floor(Math.random() * 4);
+    display.perk.src = perksData.url;
 
-    const spawnPoint = relativePosition(perksData.position[rngPosition].x, perksData.position[rngPosition].y);
-    perks.push(new Perk(spawnPoint, perksData.variety[rngType]));
+    const rng = Math.floor(Math.random() * 6);
+    const spawnPoint = relativePosition(perksData.position[rng].x, perksData.position[rng].y);
+
+    perks.push(new Perk(perksData, display.perk, spawnPoint));
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
@@ -238,15 +241,19 @@ function perkAnimation() {
         }
 
         if (perk.type.name == 'JB') {
-            player.stats.jumpBoost += 5;
+            player.stats.jumpBoost += 0.2;
         }
 
         if (perk.type.name == 'MS') {
-            player.stats.movementSpeed += 1;
+            player.stats.movementSpeed += 0.2;
         }
 
         if (perk.type.name == 'FR') {
-            player.stats.fireRate -= 0.5;
+            player.stats.fireRate -= 0.2;
+        }
+
+        if (perk.type.name == 'MANA') {
+            player.stats.mana += 1;
         }
 
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / canvas.width, y: (player.pos.y + player.dim.h / 2) / canvas.height };
@@ -342,13 +349,13 @@ function collision(AA, BB) {
             if (Math.abs(dx) < widthHalf && Math.abs(dy) < heightHalf) {
 
                 // Figures out on which side we are colliding (top, bottom, left, or right).
-                const crossWidth = widthHalf - Math.abs(dx);
+                const crossWidth = Math.ceil(widthHalf - Math.abs(dx)); //! ---------- 
                 const crossHeight = heightHalf - Math.abs(dy);
 
                 // Pass the value of the tile to check if its painful or not.
                 side.type = b.tileValue;
 
-                if (crossWidth >= crossHeight) {
+                if (crossWidth > crossHeight) {
                     if (dy > 0) {
                         side.top = true;
                         a.pos.y += crossHeight;
@@ -357,7 +364,7 @@ function collision(AA, BB) {
                         a.pos.y -= crossHeight;
                     }
                 }
-                if ((crossWidth < crossHeight)) {
+                if (crossWidth < crossHeight) {
                     if (dx > 0) {
                         side.left = true;
                         a.pos.x += crossWidth;
@@ -366,6 +373,7 @@ function collision(AA, BB) {
                         a.pos.x -= crossWidth;
                     }
                 }
+                // console.log(Math.abs(dx), side.right);
             }
         });
     });
