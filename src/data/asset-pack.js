@@ -24,7 +24,14 @@ export default
                     'runRight': { 'loc': [{ 'x': 0, 'y': 2040 }, { 'x': 166, 'y': 2040 }, { 'x': 332, 'y': 2040 }, { 'x': 498, 'y': 2040 }, { 'x': 664, 'y': 2040 }, { 'x': 830, 'y': 2040 }, { 'x': 996, 'y': 2040 }, { 'x': 1162, 'y': 2040 }] },
                 }
             },
-            'projectile': {},
+            'projectile': {
+                'url': '/static/assets/fireball.png',
+                'frameWidth': 17,
+                'frameHeight': 34,
+                'animations': {
+                    'projectile': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 17, 'y': 0 }, { 'x': 34, 'y': 0 }, { 'x': 51, 'y': 0 }, { 'x': 68, 'y': 0 }] },
+                }
+            },
             'enemy': {
                 'hyena': {
                     'url': '/static/pics/hyena.png',

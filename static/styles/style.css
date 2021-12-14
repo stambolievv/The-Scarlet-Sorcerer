@@ -18,3 +18,16 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+#container {
+  box-shadow: 1px 1px 30px gray, -1px -1px 30px gray;
+}
+
+#canvas {
+  width: 1280px;
+  height: 720px;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

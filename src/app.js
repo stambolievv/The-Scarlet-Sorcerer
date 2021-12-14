@@ -6,7 +6,6 @@ import Perk from './models/Perk.js';
 import createTimer from './models/Timer.js';
 import FloatingMessage from './models/FloatingMessage.js';
 import data from './data/asset-pack.js';
-import { DISPLAY } from './data/constants.js';
 
 const canvas = document.getElementById('game');
 canvas.width = 1280;
@@ -24,8 +23,8 @@ const display = {
     tilesheet: new Image(),
     player: new Image(),
     perk: new Image(),
+    projectile: new Image(),
 };
-
 const platforms = [];
 const players = [];
 const keysPressed = new Set();
@@ -109,9 +108,9 @@ function platformsAnimation() {
 function playerCreate() {
     const playerData = data.sprites.player;
     const painfulFrame = data.sprites.tileset.painfulFrame;
-    DISPLAY.player.src = playerData.url;
+    display.player.src = playerData.url;
 
-    players.push(new Player(playerData, DISPLAY.player, painfulFrame, relativePosition(0.1, 0.65)));
+    players.push(new Player(playerData, display.player, painfulFrame, relativePosition(0.1, 0.65)));
 }
 playerCreate();
 function playerAnimation() {
@@ -201,8 +200,13 @@ function enemiesAnimation() {
 
 // handle projectiles
 function projectilesCreate(mouseX, mouseY) {
-    const angle = Math.atan2(mouseY - players[0].pos.y, mouseX - players[0].pos.x);
-    projectiles.push(new Projectiles(players[0], angle));
+    const projectileData = data.sprites.projectile;
+    display.projectile.src = projectileData.url;
+
+    const orientation = mouseX < players[0].pos.x ? 'Right' : 'Left';
+    const angle = Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX);
+
+    projectiles.push(new Projectiles(projectileData, display.projectile, players[0], orientation, angle, mouseX, mouseY));
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
@@ -214,7 +218,6 @@ function projectilesAnimation() {
 }
 
 //handle perks
-window.perkCreate = perkCreate;
 function perkCreate() {
     const perksData = data.sprites.perk;
     display.perk.src = perksData.url;
@@ -309,7 +312,7 @@ function messagesAnimation() {
         });
 }
 
-// handle game physics
+// handle game mechanics
 function overlap(AA, BB, callback) {
     /*
         Collision detection with two different objects.

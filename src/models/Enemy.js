@@ -13,22 +13,24 @@ export default class Enemy {
     }
 
     draw(ctx) {
+
+        // if (ctx.DEBUG) {
         ctx.beginPath();
-        ctx.fillStyle = 'black';
         ctx.lineWidth = 2;
+        ctx.strokeStyle = 'black';
         ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-        ctx.fill();
         ctx.closePath();
+        // }
 
         ctx.font = '24px customFont';
         ctx.textAlign = 'right';
         ctx.fillStyle = 'white';
-        ctx.fillText('Enemy', ctx.canvas.width * 0.93, ctx.canvas.height * 0.05);
+        ctx.fillText('Enemy', ctx.canvas.width * 0.97, ctx.canvas.height * 0.05);
         ctx.font = '18px customFont';
         ctx.fillStyle = 'LightGreen';
-        ctx.fillText('HP: ' + this.stats.health, ctx.canvas.width * 0.93, ctx.canvas.height * 0.10);
-        ctx.fillText('BonusHP: ' + this.stats.bonusHealth, ctx.canvas.width * 0.93, ctx.canvas.height * 0.12);
-        ctx.fillText('Movement Speed: ' + Math.round((this.stats.movementSpeed) * 100) / 100, ctx.canvas.width * 0.93, ctx.canvas.height * 0.14);
+        ctx.fillText('HP: ' + this.stats.health, ctx.canvas.width * 0.97, ctx.canvas.height * 0.160);
+        ctx.fillText('BonusHP: ' + this.stats.bonusHealth, ctx.canvas.width * 0.97, ctx.canvas.height * 0.185);
+        ctx.fillText('Movement Speed: ' + this.stats.movementSpeed.toFixed(1), ctx.canvas.width * 0.97, ctx.canvas.height * 0.210);
     }
 
     update(offset, sideWorld, sideCollision) {
@@ -52,10 +54,10 @@ export default class Enemy {
             }
         }
 
-        this.vel.x += this.gravity.x;
-        this.vel.y += this.gravity.y;
-        this.pos.x += this.vel.x;
-        this.pos.y += this.vel.y;
-        if (side.bottom) { this.vel.y = 0; }
+        // this.vel.x += this.gravity.x;
+        // this.vel.y += this.gravity.y;
+        // this.pos.x += this.vel.x;
+        // this.pos.y += this.vel.y;
+        // if (side.bottom) { this.vel.y = 0; }
     }
 }
