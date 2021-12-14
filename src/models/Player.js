@@ -13,8 +13,8 @@ export default class Player {
         this.gameFrame = 0;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
-        this.dim = { w: 50, h: 90 };
-        this.gravity = { x: 0, y: 0.7 };
+        this.dim = { w: 30, h: 50 };
+        this.gravity = { x: 0, y: 0.5 };
         this.friction = { x: 0.9, y: 0.99 };
         this.grounded = false;
         this.jumping = false;
@@ -29,17 +29,17 @@ export default class Player {
             _onIsland: false,
             fireRate: 2,
             _canShoot: true,
-            movementSpeed: 5,
-            jumpBoost: 21
+            movementSpeed: 4,
+            jumpBoost: 15
         };
     }
 
     draw(ctx) {
-        const offset = this.orientation == 'Right' ? 0.8 : 1.5;
-        const position = Math.floor(this.gameFrame / 10) % this.data.animations[(this.state + this.orientation)].loc.length;
+        const offset = this.orientation == 'Right' ? 1 : 2;
+        const position = Math.floor(this.gameFrame / 5) % this.data.animations[(this.state + this.orientation)].loc.length;
         const frameX = this.data.animations[(this.state + this.orientation)].loc[position].x;
         const frameY = this.data.animations[(this.state + this.orientation)].loc[position].y;
-        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h / 2, this.data.frameWidth, this.data.frameHeight);
+        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.data.frameWidth * 0.7, this.data.frameHeight * 0.7);
         this.gameFrame++;
 
 
