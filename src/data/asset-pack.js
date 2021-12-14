@@ -24,6 +24,7 @@ export default
                     'runRight': { 'loc': [{ 'x': 0, 'y': 2040 }, { 'x': 166, 'y': 2040 }, { 'x': 332, 'y': 2040 }, { 'x': 498, 'y': 2040 }, { 'x': 664, 'y': 2040 }, { 'x': 830, 'y': 2040 }, { 'x': 996, 'y': 2040 }, { 'x': 1162, 'y': 2040 }] },
                 }
             },
+            'projectile': {},
             'enemy': {
                 'hyena': {
                     'url': '/static/pics/hyena.png',
@@ -33,31 +34,41 @@ export default
                     }
                 }
             },
-            'platform': {},
             'perk': {
+                'url': '/static/assets/perk.png',
+                'frameWidth': 24,
+                'frameHeight': 24,
                 'position': [
-                    { x: 0.40, y: 0.13 },
-                    { x: 0.20, y: 0.38 },
-                    { x: 0.85, y: 0.38 },
-                    { x: 0.48, y: 0.51 },
-                    { x: 0.08, y: 0.66 },
-                    { x: 0.71, y: 0.62 },
+                    { 'x': 0.40, 'y': 0.25 },
+                    { 'x': 0.05, 'y': 0.45 },
+                    { 'x': 0.93, 'y': 0.40 },
+                    { 'x': 0.55, 'y': 0.80 },
+                    { 'x': 0.04, 'y': 0.80 },
+                    { 'x': 0.90, 'y': 0.75 },
                 ],
                 'variety': [
-                    { name: 'BS', text: 'Bonus Heart +1', color: '#ff471a' },
-                    { name: 'JB', text: 'Jump Boost Increase', color: '#66ccff' },
-                    { name: 'MS', text: 'Movement Speed Increase', color: '#aaff80' },
-                    { name: 'FR', text: 'FireRate Increase', color: '#ffcc00' },
-                ]
+                    { 'name': 'BS', 'text': 'Bonus Heart +1', 'color': '#c83232' },
+                    { 'name': 'JB', 'text': 'Jump Boost \nIncrease +0.2', 'color': '#00fa6c' },
+                    { 'name': 'MS', 'text': 'Movement Speed \nIncrease +0.2', 'color': '#7f4cc7' },
+                    { 'name': 'FR', 'text': 'FireRate \nIncrease -0.2', 'color': '#ff8300' },
+                    { 'name': 'MANA', 'text': 'Mana \nIncrease +1', 'color': '#00ffff' },
+                ],
+                'animations': {
+                    'BS': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 24, 'y': 0 }, { 'x': 48, 'y': 0 }, { 'x': 72, 'y': 0 }] },
+                    'JB': { 'loc': [{ 'x': 0, 'y': 24 }, { 'x': 24, 'y': 24 }, { 'x': 48, 'y': 24 }, { 'x': 72, 'y': 24 }] },
+                    'MS': { 'loc': [{ 'x': 0, 'y': 48 }, { 'x': 24, 'y': 48 }, { 'x': 48, 'y': 48 }, { 'x': 72, 'y': 48 }] },
+                    'FR': { 'loc': [{ 'x': 0, 'y': 72 }, { 'x': 24, 'y': 72 }, { 'x': 48, 'y': 72 }, { 'x': 72, 'y': 72 }] },
+                    'MANA': { 'loc': [{ 'x': 0, 'y': 96 }, { 'x': 24, 'y': 96 }, { 'x': 48, 'y': 96 }, { 'x': 72, 'y': 96 }] },
+                }
             },
-            'projectile': {},
             'tileset': {
                 'url': '/static/assets/tileset.png',
                 'frameWidth': 48,
                 'frameHeight': 48,
                 'columns': 18,
                 'ignoreFrame': [],
-                'painfulFrame': [123, 144, 145, 146, 166, 167, 183, 184, 185],
+                'painfulFrame': [],
+                // 'painfulFrame': [123, 144, 145, 146, 166, 167, 183, 184, 185],
                 'map': [
                     4, 1, 2, 3, 4, 5, 6, 21, 8, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 6, 21, 8, 5, 4, 1, 2,
                     18, 19, 20, 21, 22, 23, 24, 173, 26, 27, 28, 29, 21, 19, 19, 21, 20, 19, 22, 23, 24, 173, 26, 27, 28, 29, 30,
