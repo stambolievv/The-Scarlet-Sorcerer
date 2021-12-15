@@ -1,38 +1,40 @@
 import Platform from './models/Platform.js';
 import Player from './models/Player.js';
-import Enemy from './models/Enemy.js';
+import { Bat, Skeleton, Saw } from './models/Enemy.js';
 import Projectiles from './models/Projectile.js';
 import Perk from './models/Perk.js';
 import createTimer from './models/Timer.js';
 import FloatingMessage from './models/FloatingMessage.js';
 import data from './data/asset-pack.js';
 
+/** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');
-canvas.width = 1280;
-canvas.height = 720;
 const ctx = canvas.getContext('2d', { alpha: false });
+const CANVAS_WIDTH = canvas.width = 1280;
+const CANVAS_HEIGHT = canvas.height = 720;
 ctx.DEBUG = false;
 
-
 const gameTimer = new createTimer();
-gameTimer.start();
-
-let scorePoints = 0;
+const spawnEnemies = new createTimer(true);
 
 const display = {
     tilesheet: new Image(),
     player: new Image(),
     perk: new Image(),
     projectile: new Image(),
+    enemy: {
+        bat: new Image(),
+        skeleton: new Image(),
+        saw: new Image(),
+    },
 };
+let scorePoints = 0;
 const platforms = [];
 const players = [];
 const keysPressed = new Set();
 const enemies = [];
 const enemyStats = {
-    health: 1,
-    bonusHealth: 0,
-    movementSpeed: 2,
+    speed: 2,
 };
 const projectiles = [];
 const perks = [];
@@ -50,24 +52,15 @@ function animate() {
     projectilesAnimation();
     perkAnimation();
     messagesAnimation();
+    textOnDisplay();
 }
 
 //handle background
 function initBackground() {
-    //background
     ctx.beginPath();
     ctx.fillStyle = 'hsl(200, 30%, 50%, 0.9)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.closePath();
-
-    //timer
-    ctx.font = '24px customFont';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'white';
-    ctx.fillText('Timer: ' + gameTimer.output, canvas.width * 0.5, canvas.height * 0.05);
-
-    //scorePoints
-    ctx.fillText('Score: ' + scorePoints, canvas.width * 0.5, canvas.height * 0.02);
 }
 
 //handle platforms
@@ -88,8 +81,8 @@ function platformsCreate() {
 
         /* This is the x and y location at which to draw the tile image we are cutting
             from the tileset to the canvas. */
-        const destinationX = (index % Math.round(canvas.width / tileset.frameWidth)) * tileset.frameWidth;
-        const destinationY = Math.floor(index / Math.round(canvas.width / tileset.frameWidth)) * tileset.frameHeight;
+        const destinationX = (index % Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameWidth;
+        const destinationY = Math.floor(index / Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameHeight;
 
         /* If value of the tile the tile is not in ignore array draw image to the canvas.
             The width and height of the tile is taken from the tileset object. */
@@ -160,42 +153,54 @@ function onClick(e) {
 }
 
 // handle enemies
+window.enemiesCreate = enemiesCreate;
 function enemiesCreate() {
-    handleScore();
+    const enemyData = data.sprites.enemies;
+    display.enemy.bat.src = enemyData.bat.url;
+    display.enemy.skeleton.src = enemyData.skeleton.url;
+    display.enemy.saw.src = enemyData.saw.url;
 
-    const spawnPoint = relativePosition(Math.random(), Math.random() * 0.5);
-    enemies.push(new Enemy(players[0], spawnPoint, enemyStats));
+    enemies.push(
+        // new Bat(enemyData.bat, display.enemy.bat, enemyStats, relativePosition(1, 1)),
+        // new Skeleton(enemyData.skeleton, display.enemy.skeleton, enemyStats, players[0], relativePosition(Math.random() * (0.8 - 0.2) + 0.2, Math.random() * (0.8 - 0.2) + 0.2)),
+        new Saw(enemyData.saw, display.enemy.saw, enemyStats, relativePosition(1, 1)),
+    );
 }
 enemiesCreate();
 function enemiesAnimation() {
-    if (enemies.length == 0) { enemiesCreate(); }
-
-    const offset = canvas.width * 0.1;
-    const sideWorld = collideWorldBounds(enemies);
-    const sideCollision = collision(enemies, platforms);
+    spawnEnemies.start();
+    if (enemies.length == 0 || spawnEnemies.output >= 15) {
+        spawnEnemies.reset();
+        enemiesCreate();
+    }
 
     enemies.forEach(e => {
+        const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
         e.draw(ctx);
-        e.update(offset, sideWorld, sideCollision);
+        e.update(sideCollision);
     });
 
     overlap(enemies, projectiles, (enemy, projectile) => {
+        if (enemy.type == 'saw') { return; }
+
         projectiles.splice(projectiles.indexOf(projectile), 1);
 
-        if (enemy.stats.bonusHealth > 0) {
-            enemy.stats.bonusHealth -= 1;
-        } else {
-            enemy.stats.health -= 1;
-        }
+        enemy.stats.health -= 1;
 
         if (enemy.stats.health == 0) {
-            scorePoints += 10;
+            if (enemy.type == 'bat') {
+                scorePoints += 5;
+            } else {
+                scorePoints += 10;
+            }
+
             enemies.splice(enemies.indexOf(enemy), 1);
-        } else {
-            const spawnPoint = relativePosition(Math.random(), Math.random() * 0.2);
-            enemy.pos = { x: spawnPoint.x, y: spawnPoint.y };
         }
+
+        handleScore();
     });
+
+    removeWorldOutBounds(enemies);
 }
 
 // handle projectiles
@@ -203,10 +208,9 @@ function projectilesCreate(mouseX, mouseY) {
     const projectileData = data.sprites.projectile;
     display.projectile.src = projectileData.url;
 
-    const orientation = mouseX < players[0].pos.x ? 'Right' : 'Left';
     const angle = Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX);
 
-    projectiles.push(new Projectiles(projectileData, display.projectile, players[0], orientation, angle, mouseX, mouseY));
+    projectiles.push(new Projectiles(projectileData, display.projectile, players[0], angle));
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
@@ -259,7 +263,7 @@ function perkAnimation() {
             player.stats.mana += 1;
         }
 
-        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / canvas.width, y: (player.pos.y + player.dim.h / 2) / canvas.height };
+        const playerCenter = { x: (player.pos.x + player.dim.w / 2) / CANVAS_WIDTH, y: (player.pos.y + player.dim.h / 2) / CANVAS_HEIGHT };
         messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
 
         perks.splice(perks.indexOf(perk), 1);
@@ -268,9 +272,9 @@ function perkAnimation() {
 
 // handle score
 function handleScore() {
-    if (scorePoints % 10 == 0 && scorePoints % 100 != 0) {
-        enemyStats.movementSpeed += 0.1;
-        messageCreate('Enemy movement speed increase', 50);
+    if (scorePoints % 20 == 0 && scorePoints % 100 != 0) {
+        enemyStats.speed += 0.1;
+        messageCreate('Enemy speed increase', 50);
     }
 
     if (scorePoints % 30 == 0 && scorePoints % 100 != 0) {
@@ -303,13 +307,24 @@ function messagesAnimation() {
         .sort((a, b) => b.priority - a.priority)
         .forEach(({ text }, i) => {
             if (text.fixed) {
-                const offset = canvas.height * 0.3 - i * 30;
+                const offset = CANVAS_HEIGHT * 0.3 - i * 30;
                 text.pos.y = offset;
             }
             text.draw(ctx);
             text.update();
             if (text.lifeSpan > 200) { textMessages.splice(i, 1); }
         });
+}
+
+// handle text
+function textOnDisplay() {
+    //timer and score
+    gameTimer.start();
+    ctx.font = '24px customFont';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Timer: ' + gameTimer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
+    ctx.fillText('Score: ' + scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
 }
 
 // handle game mechanics
@@ -393,8 +408,8 @@ function removeWorldOutBounds(AA) {
         If "a" from "AA" array goes out of screen will be deleted.
     */
     AA.forEach((a, i) => {
-        if (a.pos.x + a.dim.w < 0 || a.pos.x > canvas.width ||
-            a.pos.y + a.dim.h < 0 || a.pos.y > canvas.height) {
+        if (a.pos.x + a.dim.w < 0 || a.pos.x > CANVAS_WIDTH ||
+            a.pos.y + a.dim.h < 0 || a.pos.y > CANVAS_HEIGHT) {
             AA.splice(i, 1);
         }
     });
@@ -416,9 +431,9 @@ function collideWorldBounds(AA) {
             a.pos.y = 0;
             a.vel.y = 0;
         }
-        if (a.pos.y + a.dim.h > canvas.height) {
+        if (a.pos.y + a.dim.h > CANVAS_HEIGHT) {
             side.bottom = true;
-            a.pos.y = canvas.height - a.dim.h;
+            a.pos.y = CANVAS_HEIGHT - a.dim.h;
             a.vel.y = 0;
         }
         if (a.pos.x < 0) {
@@ -426,16 +441,16 @@ function collideWorldBounds(AA) {
             a.pos.x = 0;
             a.vel.x = 0;
         }
-        if (a.pos.x + a.dim.w > canvas.width) {
+        if (a.pos.x + a.dim.w > CANVAS_WIDTH) {
             side.right = true;
-            a.pos.x = canvas.width - a.dim.w;
+            a.pos.x = CANVAS_WIDTH - a.dim.w;
             a.vel.x = 0;
         }
     });
     return side;
 }
 function relativePosition(posX, posY) {
-    return { x: posX * canvas.width, y: posY * canvas.height };
+    return { x: posX * CANVAS_WIDTH, y: posY * CANVAS_HEIGHT };
 }
 
 window.addEventListener('keydown', keyPress);

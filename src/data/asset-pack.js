@@ -32,12 +32,32 @@ export default
                     'projectile': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 17, 'y': 0 }, { 'x': 34, 'y': 0 }, { 'x': 51, 'y': 0 }, { 'x': 68, 'y': 0 }] },
                 }
             },
-            'enemy': {
-                'hyena': {
-                    'url': '/static/pics/hyena.png',
-                    'frameWidth': 0,
-                    'frameHeight': 0,
+            'enemies': {
+                'bat': {
+                    'url': '/static/assets/bat.png',
+                    'frameWidth': 64,
+                    'frameHeight': 64,
                     'animations': {
+                        'batLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 64, 'y': 0 }, { 'x': 128, 'y': 0 }] },
+                        'batRight': { 'loc': [{ 'x': 0, 'y': 64 }, { 'x': 64, 'y': 64 }, { 'x': 128, 'y': 64 }] },
+                    }
+                },
+                'skeleton': {
+                    'url': '/static/assets/skeleton.png',
+                    'frameWidth': 32,
+                    'frameHeight': 32,
+                    'animations': {
+                        'skeletonLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 32, 'y': 0 }, { 'x': 64, 'y': 0 }] },
+                        'skeletonRight': { 'loc': [{ 'x': 0, 'y': 32 }, { 'x': 32, 'y': 32 }, { 'x': 64, 'y': 32 }] },
+                    }
+                },
+                'saw': {
+                    'url': '/static/assets/saw.png',
+                    'frameWidth': 50,
+                    'frameHeight': 50,
+                    'animations': {
+                        'sawLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 50, 'y': 0 }, { 'x': 100, 'y': 0 }] },
+                        'sawRight': { 'loc': [{ 'x': 0, 'y': 50 }, { 'x': 50, 'y': 50 }, { 'x': 100, 'y': 50 }] },
                     }
                 }
             },
@@ -48,10 +68,10 @@ export default
                 'position': [
                     { 'x': 0.40, 'y': 0.25 },
                     { 'x': 0.05, 'y': 0.45 },
-                    { 'x': 0.93, 'y': 0.40 },
+                    { 'x': 0.95, 'y': 0.40 },
                     { 'x': 0.55, 'y': 0.80 },
-                    { 'x': 0.04, 'y': 0.80 },
-                    { 'x': 0.90, 'y': 0.75 },
+                    { 'x': 0.05, 'y': 0.80 },
+                    { 'x': 0.90, 'y': 0.73 },
                 ],
                 'variety': [
                     { 'name': 'BS', 'text': 'Bonus Heart +1', 'color': '#c83232' },
@@ -74,12 +94,11 @@ export default
                 'frameHeight': 48,
                 'columns': 18,
                 'ignoreFrame': [],
-                'painfulFrame': [],
-                // 'painfulFrame': [123, 144, 145, 146, 166, 167, 183, 184, 185],
+                'painfulFrame': [123, 144, 145, 146, 166, 167, 183, 184, 185],
                 'map': [
                     4, 1, 2, 3, 4, 5, 6, 21, 8, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 6, 21, 8, 5, 4, 1, 2,
-                    18, 19, 20, 21, 22, 23, 24, 173, 26, 27, 28, 29, 21, 19, 19, 21, 20, 19, 22, 23, 24, 173, 26, 27, 28, 29, 30,
-                    36, 37, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 47, 48,
+                    18, 19, 20, 21, 22, 23, 24, 174, 26, 27, 28, 29, 21, 19, 19, 21, 20, 19, 22, 23, 24, 174, 26, 27, 28, 29, 30,
+                    36, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 48,
                     54, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 66,
                     54, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 66,
                     54, false, false, false, false, false, false, 144, 145, 145, 145, 145, 145, 145, 146, false, false, false, false, false, false, false, false, false, false, false, 66,

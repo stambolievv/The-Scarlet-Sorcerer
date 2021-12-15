@@ -1,63 +1,100 @@
-export default class Enemy {
-    constructor(player, position, stats) {
-        this.player = player;
+class Enemy {
+    constructor(data, sprite, stats, position) {
+        this.data = data;
+        this.sprite = sprite;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
-        this.dim = { w: 80, h: 50 };
+        this.dim = { w: this.data.frameWidth * 0.7, h: this.data.frameHeight * 0.7 };
         this.gravity = { x: 0, y: 0.1 };
+        this.orientation = Math.random() < 0.45 ? 'Left' : 'Right';
+        this.type = this.constructor.name.toLocaleLowerCase();
         this.stats = {
-            health: stats.health,
-            bonusHealth: stats.bonusHealth,
-            movementSpeed: stats.movementSpeed,
+            health: 1,
+            speed: stats.speed,
         };
+        this.gameFrame = 0;
     }
 
     draw(ctx) {
+        const position = Math.floor(this.gameFrame / 5) % this.data.animations[(this.type + this.orientation)].loc.length;
+        const frameX = this.data.animations[(this.type + this.orientation)].loc[position].x;
+        const frameY = this.data.animations[(this.type + this.orientation)].loc[position].y;
 
-        // if (ctx.DEBUG) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'black';
-        ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-        ctx.closePath();
-        // }
+        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * 0.3, this.pos.y - this.dim.h * 0.3, this.data.frameWidth, this.data.frameHeight);
 
-        ctx.font = '24px customFont';
-        ctx.textAlign = 'right';
-        ctx.fillStyle = 'white';
-        ctx.fillText('Enemy', ctx.canvas.width * 0.97, ctx.canvas.height * 0.05);
-        ctx.font = '18px customFont';
-        ctx.fillStyle = 'LightGreen';
-        ctx.fillText('HP: ' + this.stats.health, ctx.canvas.width * 0.97, ctx.canvas.height * 0.160);
-        ctx.fillText('BonusHP: ' + this.stats.bonusHealth, ctx.canvas.width * 0.97, ctx.canvas.height * 0.185);
-        ctx.fillText('Movement Speed: ' + this.stats.movementSpeed.toFixed(1), ctx.canvas.width * 0.97, ctx.canvas.height * 0.210);
+        this.gameFrame++;
+
+        if (ctx.DEBUG) {
+            ctx.beginPath();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+            ctx.closePath();
+        }
+    }
+}
+
+
+export class Bat extends Enemy {
+    constructor(data, sprite, stats, position) {
+        super(data, sprite, stats, position);
+        this.prop = this.orientation == 'Left' ? { spawn: 1, movement: -1 } : { spawn: 0, movement: 1 };
+        this.pos.x = this.pos.x * this.prop.spawn;
+        this.pos.y = Math.random() * (this.pos.y - this.dim.h);
     }
 
-    update(offset, sideWorld, sideCollision) {
-        const side = {
-            top: sideWorld.top || sideCollision.top,
-            bottom: sideWorld.bottom || sideCollision.bottom,
-            left: sideWorld.left || sideCollision.left,
-            right: sideWorld.right || sideCollision.right
-        };
+    update() {
+        this.pos.x += this.prop.movement * (Math.random() * this.stats.speed);
+        this.pos.y += Math.sin(Math.random() * 4 - 5);
+    }
+}
 
-        if (side.left || this.pos.x < this.player.pos.x - offset) {
-            this.vel.x = this.vel.x > this.stats.movementSpeed ? this.stats.movementSpeed : this.vel.x += 0.1;
-        } else if (side.right || this.pos.x > this.player.pos.x + offset) {
-            this.vel.x = this.vel.x < -this.stats.movementSpeed ? -this.stats.movementSpeed : this.vel.x -= 0.1;
+export class Skeleton extends Enemy {
+    constructor(data, sprite, stats, player, position) {
+        super(data, sprite, stats, position);
+        this.player = player;
+    }
+
+    update(side) {
+
+        if (side.left || this.pos.x < this.player.pos.x) {
+            this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
+            this.orientation = 'Right';
+        } else if (side.right || this.pos.x > this.player.pos.x) {
+            this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
+            this.orientation = 'Left';
         } else {
-            // fixing the bug when player is close to border of the screen, enemy stop moving
+            // fixing the bug when player is close to border of the screen and enemy stop moving
             if (this.vel.x >= 0.1) {
-                this.vel.x = this.vel.x > this.stats.movementSpeed ? this.stats.movementSpeed : this.vel.x += 0.1;
+                this.orientation = 'Right';
+                this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
             } else {
-                this.vel.x = this.vel.x < -this.stats.movementSpeed ? -this.stats.movementSpeed : this.vel.x -= 0.1;
+                this.orientation = 'Left';
+                this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
             }
         }
 
-        // this.vel.x += this.gravity.x;
-        // this.vel.y += this.gravity.y;
-        // this.pos.x += this.vel.x;
-        // this.pos.y += this.vel.y;
-        // if (side.bottom) { this.vel.y = 0; }
+        this.vel.x += this.gravity.x;
+        this.vel.y += this.gravity.y;
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+        if (side.left) { this.vel.x += 2.5; }
+        if (side.right) { this.vel.x -= 2.5; }
+        if (side.bottom) { this.vel.y = 0; }
+    }
+}
+
+export class Saw extends Enemy {
+    constructor(data, sprite, stats, position) {
+        super(data, sprite, stats, position);
+        this.prop = this.orientation == 'Left' ? { spawn: 1, movement: -1 } : { spawn: 0, movement: 1 };
+        this.pos.x = this.pos.x * this.prop.spawn;
+        this.pos.y = Math.random() * (this.pos.y - this.dim.h);
+    }
+
+    update() {
+        this.pos.x += this.prop.movement * 10;
+        this.vel.y += this.gravity.y / 2;
+        this.pos.y += this.vel.y;
     }
 }

@@ -1,6 +1,6 @@
 // Declare sprite sheet width and height.
-const frameWidth = 166; // height ÷ rows
-const frameHeight = 136; // width ÷ columns 
+const frameWidth = 50; // height ÷ rows
+const frameHeight = 50; // width ÷ columns 
 
 // buffer array 
 const spriteAnimation = [];
@@ -8,22 +8,7 @@ const spriteAnimation = [];
 // Manually add each animation name and frames length.
 // The name should be something conventional.
 const animationState = [
-    { name: 'ultimateLeft', frames: 8 },
-    { name: 'ultimateRight', frames: 8 },
-    { name: 'attackLeft', frames: 8 },
-    { name: 'attackRight', frames: 8 },
-    { name: 'deathLeft', frames: 7 },
-    { name: 'deathRight', frames: 7 },
-    { name: 'fallLeft', frames: 2 },
-    { name: 'fallRight', frames: 2 },
-    { name: 'hitLeft', frames: 4 },
-    { name: 'hitRight', frames: 4 },
-    { name: 'idleLeft', frames: 6 },
-    { name: 'idleRight', frames: 6 },
-    { name: 'jumpLeft', frames: 2 },
-    { name: 'jumpRight', frames: 2 },
-    { name: 'runLeft', frames: 8 },
-    { name: 'runRight', frames: 8 }
+    { name: 'blade', frames: 3 },
 ];
 
 // For each object in "animationState" array
