@@ -27,7 +27,7 @@ export default class Player {
             oxygen: 3,
             _outOfOxygen: false,
             _onIsland: false,
-            fireRate: 0.002,
+            fireRate: -20.002,
             _canShoot: true,
             movementSpeed: 4,
             jumpBoost: 15

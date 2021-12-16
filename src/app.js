@@ -29,6 +29,7 @@ const display = {
         bat: new Image(),
         skeleton: new Image(),
         saw: new Image(),
+        claw: new Image(),
     },
 };
 let scorePoints = 0;
@@ -42,8 +43,6 @@ const enemyStats = {
 const projectiles = [];
 const perks = [];
 const textMessages = [];
-
-
 
 function animate(timestamp) {
     const deltaTime = timestamp - lastTime;
@@ -185,9 +184,9 @@ function enemiesCreate(...types) {
 }
 // enemiesCreate();
 function enemiesAnimation() {
-    if (elapsed % 2 == 0) { enemiesCreate('saw'); }
-    if (elapsed % 5 == 0) { enemiesCreate('bat'); }
-    if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
+    if (elapsed % 12 == 0) { enemiesCreate('saw'); }
+    if (elapsed % 6 == 0) { enemiesCreate('bat'); }
+    if (elapsed % 8 == 0) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
         const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;

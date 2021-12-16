@@ -63,7 +63,7 @@ export class Skeleton extends Enemy {
             this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
             this.orientation = 'Left';
         } else {
-            // fixing the bug when player is close to border of the screen and enemy stop moving
+            // Fixing the bug when player is close to the border of the screen and enemy stop moving.
             if (this.vel.x >= 0.1) {
                 this.orientation = 'Right';
                 this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
