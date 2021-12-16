@@ -9,14 +9,20 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  width: 100%;
+}
+
 body {
-  background-color: #333;
-  overflow: hidden;
+  background-color: #333333;
+  color: #ffffff;
   font-family: "customFont";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  align-content: space-around;
+  display: grid;
+  justify-content: center;
+  min-height: 100%;
+  width: 100%;
 }
 
 #container {
@@ -24,7 +30,7 @@ body {
 }
 
 #canvas {
-  width: 1280px;
+  width: 1296px;
   height: 720px;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
