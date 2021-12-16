@@ -1,7 +1,8 @@
 class Enemy {
-    constructor(data, sprite, stats, position) {
+    constructor(data, sprite, player, stats, position) {
         this.data = data;
         this.sprite = sprite;
+        this.player = player;
         this.pos = { x: position.x, y: position.y };
         this.vel = { x: 0, y: 0 };
         this.dim = { w: this.data.frameWidth * 0.7, h: this.data.frameHeight * 0.7 };
@@ -12,17 +13,14 @@ class Enemy {
             health: 1,
             speed: stats.speed,
         };
-        this.gameFrame = 0;
     }
 
-    draw(ctx) {
-        const position = Math.floor(this.gameFrame / 5) % this.data.animations[(this.type + this.orientation)].loc.length;
+    draw(ctx, elapsed) {
+        const position = Math.floor(elapsed * 0.01) % this.data.animations[(this.type + this.orientation)].loc.length;
         const frameX = this.data.animations[(this.type + this.orientation)].loc[position].x;
         const frameY = this.data.animations[(this.type + this.orientation)].loc[position].y;
 
         ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * 0.3, this.pos.y - this.dim.h * 0.3, this.data.frameWidth, this.data.frameHeight);
-
-        this.gameFrame++;
 
         if (ctx.DEBUG) {
             ctx.beginPath();
@@ -36,11 +34,11 @@ class Enemy {
 
 
 export class Bat extends Enemy {
-    constructor(data, sprite, stats, position) {
-        super(data, sprite, stats, position);
-        this.prop = this.orientation == 'Left' ? { spawn: 1, movement: -1 } : { spawn: 0, movement: 1 };
-        this.pos.x = this.pos.x * this.prop.spawn;
-        this.pos.y = Math.random() * (this.pos.y - this.dim.h);
+    constructor(data, sprite, player, stats, position) {
+        super(data, sprite, player, stats, position);
+        this.prop = this.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
+        this.pos.x = this.prop.spawn;
+        this.pos.y *= (Math.random() * (0.7 - 0.1) + 0.1);
     }
 
     update() {
@@ -50,9 +48,10 @@ export class Bat extends Enemy {
 }
 
 export class Skeleton extends Enemy {
-    constructor(data, sprite, stats, player, position) {
-        super(data, sprite, stats, position);
-        this.player = player;
+    constructor(data, sprite, player, stats, position) {
+        super(data, sprite, player, stats, position);
+        this.pos.x *= Math.random() * (0.9 - 0.1) + 0.1;
+        this.pos.y *= Math.random() * (0.3 - 0.15) + 0.15;
     }
 
     update(side) {
@@ -85,11 +84,11 @@ export class Skeleton extends Enemy {
 }
 
 export class Saw extends Enemy {
-    constructor(data, sprite, stats, position) {
-        super(data, sprite, stats, position);
-        this.prop = this.orientation == 'Left' ? { spawn: 1, movement: -1 } : { spawn: 0, movement: 1 };
-        this.pos.x = this.pos.x * this.prop.spawn;
-        this.pos.y = Math.random() * (this.pos.y - this.dim.h);
+    constructor(data, sprite, player, stats, position) {
+        super(data, sprite, player, stats, position);
+        this.prop = this.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
+        this.pos.x = this.prop.spawn;
+        this.pos.y *= Math.random() * (0.7 - 0.1) + 0.1;
     }
 
     update() {

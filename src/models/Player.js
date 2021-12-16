@@ -32,18 +32,16 @@ export default class Player {
             movementSpeed: 4,
             jumpBoost: 15
         };
-        this.gameFrame = 0;
     }
 
-    draw(ctx) {
+    draw(ctx, elapsed) {
         const offset = this.orientation == 'Right' ? 1 : 2;
 
-        const position = Math.floor(this.gameFrame / 5) % this.data.animations[(this.state + this.orientation)].loc.length;
+        const position = Math.floor(elapsed * 0.01) % this.data.animations[(this.state + this.orientation)].loc.length;
         const frameX = this.data.animations[(this.state + this.orientation)].loc[position].x;
         const frameY = this.data.animations[(this.state + this.orientation)].loc[position].y;
-        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.data.frameWidth * 0.7, this.data.frameHeight * 0.7);
-        this.gameFrame++;
 
+        ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.data.frameWidth * 0.7, this.data.frameHeight * 0.7);
 
         if (ctx.DEBUG) {
             ctx.beginPath();
@@ -129,7 +127,7 @@ export default class Player {
         if (side.top) { this.vel.y *= -0.1; }
 
         if (this.painfulFrame.includes(side.type) && side.bottom) { this.stats._onIsland = true; } else { this.stats._onIsland = false; }
-        if (!side.left && !side.top && !side.right && !side.bottom && !this.jumping) { this.state = 'fall'; }
+        if (!(side.left || side.top || side.right || side.bottom || this.jumping)) { this.state = 'fall'; }
 
         this.vel.x += this.gravity.x;
         this.vel.y += this.gravity.y;

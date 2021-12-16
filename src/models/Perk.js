@@ -6,18 +6,15 @@ export default class Perk {
         this.dim = { w: 24, h: 24 };
         this.type = this.data.variety[Math.floor(Math.random() * this.data.variety.length)];
         this.theta = 0;
-        this.gameFrame = 0;
     }
 
-    draw(ctx) {
+    draw(ctx, elapsed) {
 
-        const position = Math.floor(this.gameFrame / 15) % this.data.animations[this.type.name].loc.length;
+        const position = Math.floor(elapsed * 0.01) % this.data.animations[this.type.name].loc.length;
         const frameX = this.data.animations[this.type.name].loc[position].x;
         const frameY = this.data.animations[this.type.name].loc[position].y;
 
         ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, this.pos.x, this.pos.y, this.data.frameWidth, this.data.frameHeight);
-
-        this.gameFrame++;
 
         if (ctx.DEBUG) {
             ctx.beginPath();

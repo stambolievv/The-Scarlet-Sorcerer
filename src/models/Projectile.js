@@ -6,11 +6,10 @@ export default class Projectiles {
         this.vel = { x: 3, y: 3 };
         this.dim = { w: this.data.frameWidth, h: this.data.frameHeight / 2 };
         this.angle = angle;
-        this.gameFrame = 0;
     }
 
-    draw(ctx) {
-        const position = Math.floor(this.gameFrame / 10) % this.data.animations['projectile'].loc.length;
+    draw(ctx, elapsed) {
+        const position = Math.floor(elapsed * 0.01) % this.data.animations['projectile'].loc.length;
         const frameX = this.data.animations['projectile'].loc[position].x;
         const frameY = this.data.animations['projectile'].loc[position].y;
 
@@ -18,8 +17,6 @@ export default class Projectiles {
         ctx.rotate(this.angle - Math.PI / 2);
         ctx.drawImage(this.sprite, frameX, frameY, this.data.frameWidth, this.data.frameHeight, -this.dim.w / 2, -this.dim.h / 2, this.data.frameWidth, this.data.frameHeight);
         ctx.resetTransform();
-
-        this.gameFrame++;
 
         if (ctx.DEBUG) {
             ctx.beginPath();

@@ -10,12 +10,15 @@ import data from './data/asset-pack.js';
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false });
-const CANVAS_WIDTH = canvas.width = 1280;
+canvas.imageSmoothingEnabled = false;
+const CANVAS_WIDTH = canvas.width = 1296;
 const CANVAS_HEIGHT = canvas.height = 720;
 ctx.DEBUG = false;
 
 const gameTimer = new createTimer();
-const spawnEnemies = new createTimer(true);
+
+let lastTime = 0;
+let elapsed = 0;
 
 const display = {
     tilesheet: new Image(),
@@ -42,8 +45,10 @@ const textMessages = [];
 
 
 
-function animate() {
-    requestAnimationFrame(animate);
+function animate(timestamp) {
+    const deltaTime = timestamp - lastTime;
+    elapsed += deltaTime;
+    lastTime = timestamp;
 
     initBackground();
     platformsAnimation();
@@ -53,6 +58,8 @@ function animate() {
     perkAnimation();
     messagesAnimation();
     textOnDisplay();
+
+    requestAnimationFrame(animate);
 }
 
 //handle background
@@ -70,25 +77,24 @@ function platformsCreate() {
 
     for (let index = tileset.map.length - 1; index > -1; --index) {
 
-        /* We get the value of each tile in the map which corresponds to the tile
+        /* Get the value of each tile in the map which corresponds to the tile
             graphic index in the tileset. */
         const tileValue = tileset.map[index];
 
-        /* This is the x and y location at which to cut the tile
+        /* If value of the tile the tile is in the ignore array skip it */
+        if (tileset.ignoreFrame.includes(tileValue)) { continue; }
+
+        /* This is the "x" and "y" location at which to cut the tile
             image out of the tileset. */
         const sourceX = (tileValue % tileset.columns) * tileset.frameWidth;
         const sourceY = Math.floor(tileValue / tileset.columns) * tileset.frameHeight;
 
-        /* This is the x and y location at which to draw the tile image we are cutting
+        /* This is the "x" and "y" location at which to draw the tile image we are cutting
             from the tileset to the canvas. */
         const destinationX = (index % Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameWidth;
         const destinationY = Math.floor(index / Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameHeight;
 
-        /* If value of the tile the tile is not in ignore array draw image to the canvas.
-            The width and height of the tile is taken from the tileset object. */
-        if (tileValue && !tileset.ignoreFrame.includes(tileValue)) {
-            platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
-        }
+        platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
     }
 }
 platformsCreate();
@@ -111,7 +117,7 @@ function playerAnimation() {
     const sideCollision = collision(players, platforms);
 
     players.forEach(p => {
-        p.draw(ctx);
+        p.draw(ctx, elapsed);
         p.update(keysPressed, sideWorld, sideCollision);
         p.handleStats();
         if (p.stats._outOfOxygen) {
@@ -153,30 +159,39 @@ function onClick(e) {
 }
 
 // handle enemies
-window.enemiesCreate = enemiesCreate;
-function enemiesCreate() {
+function enemiesCreate(...types) {
     const enemyData = data.sprites.enemies;
+
     display.enemy.bat.src = enemyData.bat.url;
     display.enemy.skeleton.src = enemyData.skeleton.url;
     display.enemy.saw.src = enemyData.saw.url;
 
-    enemies.push(
-        // new Bat(enemyData.bat, display.enemy.bat, enemyStats, relativePosition(1, 1)),
-        // new Skeleton(enemyData.skeleton, display.enemy.skeleton, enemyStats, players[0], relativePosition(Math.random() * (0.8 - 0.2) + 0.2, Math.random() * (0.8 - 0.2) + 0.2)),
-        new Saw(enemyData.saw, display.enemy.saw, enemyStats, relativePosition(1, 1)),
-    );
-}
-enemiesCreate();
-function enemiesAnimation() {
-    spawnEnemies.start();
-    if (enemies.length == 0 || spawnEnemies.output >= 15) {
-        spawnEnemies.reset();
-        enemiesCreate();
+    const spawnPoint = relativePosition(1, 1);
+
+    for (const type of types) {
+        if (type == 'bat') {
+            enemies.push(new Bat(enemyData.bat, display.enemy.bat, players[0], enemyStats, spawnPoint));
+            continue;
+        }
+        if (type == 'skeleton') {
+            enemies.push(new Skeleton(enemyData.skeleton, display.enemy.skeleton, players[0], enemyStats, spawnPoint));
+            continue;
+        }
+        if (type == 'saw') {
+            enemies.push(new Saw(enemyData.saw, display.enemy.saw, players[0], enemyStats, spawnPoint));
+            continue;
+        }
     }
+}
+// enemiesCreate();
+function enemiesAnimation() {
+    if (elapsed % 2 == 0) { enemiesCreate('saw'); }
+    if (elapsed % 5 == 0) { enemiesCreate('bat'); }
+    if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
         const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
-        e.draw(ctx);
+        e.draw(ctx, elapsed);
         e.update(sideCollision);
     });
 
@@ -214,7 +229,7 @@ function projectilesCreate(mouseX, mouseY) {
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
-        p.draw(ctx);
+        p.draw(ctx, elapsed);
         p.update();
     });
 
@@ -233,7 +248,7 @@ function perkCreate() {
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
-        p.draw(ctx);
+        p.draw(ctx, elapsed);
         p.update();
         if (p.theta > 50) { perks.splice(i, 1); }
     });
@@ -281,11 +296,6 @@ function handleScore() {
         players[0].stats.level += 1;
         perkCreate();
         messageCreate('New Perk spawned for 15 sec', 70, 22);
-    }
-
-    if (scorePoints % 50 == 0 && scorePoints % 100 != 0) {
-        enemyStats.bonusHealth += 1;
-        messageCreate('Enemy hit points increase', 60);
     }
 
     if (scorePoints == 100 || scorePoints == 200) {
@@ -456,4 +466,4 @@ function relativePosition(posX, posY) {
 window.addEventListener('keydown', keyPress);
 window.addEventListener('keyup', keyPress);
 window.addEventListener('click', onClick);
-window.addEventListener('load', animate);
+window.addEventListener('load', animate(0));
