@@ -1,3 +1,4 @@
+import { gameSettings, audio } from '../properties.js';
 import createTimer from './Timer.js';
 
 const manaTimer = new createTimer(true);
@@ -89,6 +90,10 @@ export default class Player {
                 if (!side.left && this.vel.x > -this.stats.movementSpeed) {
                     this.vel.x--;
                 }
+                if (side.bottom) {
+                    audio.footsteps.volume = gameSettings.masterVolume;
+                    audio.footsteps.play();
+                }
                 this.orientation = 'Left';
                 this.state = 'run';
             },
@@ -101,6 +106,10 @@ export default class Player {
             KeyD: () => {
                 if (!side.right && this.vel.x < this.stats.movementSpeed) {
                     this.vel.x++;
+                }
+                if (side.bottom) {
+                    audio.footsteps.volume = gameSettings.masterVolume;
+                    audio.footsteps.play();
                 }
                 this.orientation = 'Right';
                 this.state = 'run';
@@ -122,7 +131,10 @@ export default class Player {
         }
 
         this.grounded = false;
-        if (side.bottom && !(side.left || side.right)) { this.grounded = true; this.jumping = false; }
+        if (side.bottom && !(side.left || side.right)) {
+            this.grounded = true;
+            this.jumping = false;
+        }
         if (side.left || side.right) { this.vel.x = 0; }
         if (side.top) { this.vel.y *= -0.1; }
 

@@ -1,53 +1,30 @@
+import { gameSettings, images, audio, spritesheets, platforms, players, projectiles, perks, keysPressed, enemies, enemyStats, textMessages, } from './properties.js';
 import Platform from './models/Platform.js';
 import Player from './models/Player.js';
 import { Bat, Skeleton, Saw } from './models/Enemy.js';
 import Projectiles from './models/Projectile.js';
 import Perk from './models/Perk.js';
-import createTimer from './models/Timer.js';
 import FloatingMessage from './models/FloatingMessage.js';
-import data from './data/asset-pack.js';
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d', { alpha: false });
-canvas.imageSmoothingEnabled = false;
 const CANVAS_WIDTH = canvas.width = 1296;
 const CANVAS_HEIGHT = canvas.height = 720;
-ctx.DEBUG = false;
 
-const gameTimer = new createTimer();
+const ctx = canvas.getContext('2d', { alpha: false });
+ctx.imageSmoothingEnabled = false;
+ctx.DEBUG = false;
 
 let lastTime = 0;
 let elapsed = 0;
 
-const display = {
-    tilesheet: new Image(),
-    player: new Image(),
-    perk: new Image(),
-    projectile: new Image(),
-    enemy: {
-        bat: new Image(),
-        skeleton: new Image(),
-        saw: new Image(),
-        claw: new Image(),
-    },
-};
-let scorePoints = 0;
-const platforms = [];
-const players = [];
-const keysPressed = new Set();
-const enemies = [];
-const enemyStats = {
-    speed: 2,
-};
-const projectiles = [];
-const perks = [];
-const textMessages = [];
+audio.background.volume = gameSettings.masterVolume;
+audio.background.play();
 
 function animate(timestamp) {
     const deltaTime = timestamp - lastTime;
-    elapsed += deltaTime;
     lastTime = timestamp;
+    elapsed += deltaTime;
 
     initBackground();
     platformsAnimation();
@@ -60,7 +37,6 @@ function animate(timestamp) {
 
     requestAnimationFrame(animate);
 }
-
 //handle background
 function initBackground() {
     ctx.beginPath();
@@ -71,8 +47,7 @@ function initBackground() {
 
 //handle platforms
 function platformsCreate() {
-    const tileset = data.sprites.tileset;
-    display.tilesheet.src = tileset.url;
+    const tileset = spritesheets.tileset;
 
     for (let index = tileset.map.length - 1; index > -1; --index) {
 
@@ -93,7 +68,7 @@ function platformsCreate() {
         const destinationX = (index % Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameWidth;
         const destinationY = Math.floor(index / Math.round(CANVAS_WIDTH / tileset.frameWidth)) * tileset.frameHeight;
 
-        platforms.push(new Platform(display.tilesheet, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
+        platforms.push(new Platform(images.tileset, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
     }
 }
 platformsCreate();
@@ -104,11 +79,10 @@ function platformsAnimation() {
 }
 // handle player
 function playerCreate() {
-    const playerData = data.sprites.player;
-    const painfulFrame = data.sprites.tileset.painfulFrame;
-    display.player.src = playerData.url;
+    const playerData = spritesheets.player;
+    const painfulFrame = spritesheets.tileset.painfulFrame;
 
-    players.push(new Player(playerData, display.player, painfulFrame, relativePosition(0.1, 0.65)));
+    players.push(new Player(playerData, images.player, painfulFrame, relativePosition(0.1, 0.65)));
 }
 playerCreate();
 function playerAnimation() {
@@ -126,6 +100,9 @@ function playerAnimation() {
 
     overlap(players, enemies, (player, enemy) => {
         enemies.splice(enemies.indexOf(enemy), 1);
+        audio.enemyKill.play();
+        audio.enemyKill.volume = gameSettings.masterVolume;
+
         if (player.stats.bonusHealth > 0) {
             player.stats.bonusHealth -= 1;
         } else {
@@ -159,34 +136,30 @@ function onClick(e) {
 
 // handle enemies
 function enemiesCreate(...types) {
-    const enemyData = data.sprites.enemies;
-
-    display.enemy.bat.src = enemyData.bat.url;
-    display.enemy.skeleton.src = enemyData.skeleton.url;
-    display.enemy.saw.src = enemyData.saw.url;
-
     const spawnPoint = relativePosition(1, 1);
-
     for (const type of types) {
         if (type == 'bat') {
-            enemies.push(new Bat(enemyData.bat, display.enemy.bat, players[0], enemyStats, spawnPoint));
+            enemies.push(new Bat(spritesheets.bat, images.bat, players[0], enemyStats, spawnPoint));
             continue;
         }
         if (type == 'skeleton') {
-            enemies.push(new Skeleton(enemyData.skeleton, display.enemy.skeleton, players[0], enemyStats, spawnPoint));
+            enemies.push(new Skeleton(spritesheets.skeleton, images.skeleton, players[0], enemyStats, spawnPoint));
             continue;
         }
         if (type == 'saw') {
-            enemies.push(new Saw(enemyData.saw, display.enemy.saw, players[0], enemyStats, spawnPoint));
+            enemies.push(new Saw(spritesheets.saw, images.saw, players[0], enemyStats, spawnPoint));
             continue;
         }
     }
 }
 // enemiesCreate();
 function enemiesAnimation() {
-    if (elapsed % 12 == 0) { enemiesCreate('saw'); }
-    if (elapsed % 6 == 0) { enemiesCreate('bat'); }
-    if (elapsed % 8 == 0) { enemiesCreate('skeleton'); }
+    const interval = Math.round(elapsed % gameSettings.scorePoints);
+    // console.log(Math.round(elapsed % gameSettings.scorePoints), '--', Math.round(elapsed % interval));
+    if (enemies.length == 0) { enemiesCreate('bat', 'bat', 'skeleton'); }
+    if (Math.round(elapsed % interval) == 50) { enemiesCreate('saw'); }
+    if (Math.round(elapsed % interval) == 70) { enemiesCreate('bat'); }
+    if (Math.round(elapsed % interval) == 90) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
         const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
@@ -202,14 +175,12 @@ function enemiesAnimation() {
         enemy.stats.health -= 1;
 
         if (enemy.stats.health == 0) {
-            if (enemy.type == 'bat') {
-                scorePoints += 5;
-            } else {
-                scorePoints += 10;
-            }
-
+            gameSettings.scorePoints += enemy.data.pointsForDeath;
             enemies.splice(enemies.indexOf(enemy), 1);
         }
+
+        audio.enemyKill.play();
+        audio.enemyKill.volume = gameSettings.masterVolume;
 
         handleScore();
     });
@@ -219,12 +190,11 @@ function enemiesAnimation() {
 
 // handle projectiles
 function projectilesCreate(mouseX, mouseY) {
-    const projectileData = data.sprites.projectile;
-    display.projectile.src = projectileData.url;
+    const projectileData = spritesheets.projectile;
 
     const angle = Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX);
 
-    projectiles.push(new Projectiles(projectileData, display.projectile, players[0], angle));
+    projectiles.push(new Projectiles(projectileData, images.projectile, players[0], angle));
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
@@ -237,13 +207,12 @@ function projectilesAnimation() {
 
 //handle perks
 function perkCreate() {
-    const perksData = data.sprites.perk;
-    display.perk.src = perksData.url;
+    const perksData = spritesheets.perk;
 
     const rng = Math.floor(Math.random() * 6);
     const spawnPoint = relativePosition(perksData.position[rng].x, perksData.position[rng].y);
 
-    perks.push(new Perk(perksData, display.perk, spawnPoint));
+    perks.push(new Perk(perksData, images.perk, spawnPoint));
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
@@ -279,6 +248,8 @@ function perkAnimation() {
 
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / CANVAS_WIDTH, y: (player.pos.y + player.dim.h / 2) / CANVAS_HEIGHT };
         messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
+        audio.collect.play();
+        audio.collect.volume = gameSettings.masterVolume;
 
         perks.splice(perks.indexOf(perk), 1);
     });
@@ -286,22 +257,22 @@ function perkAnimation() {
 
 // handle score
 function handleScore() {
-    if (scorePoints % 20 == 0 && scorePoints % 100 != 0) {
+    if (gameSettings.scorePoints % 20 == 0 && gameSettings.scorePoints % 100 != 0) {
         enemyStats.speed += 0.1;
         messageCreate('Enemy speed increase', 50);
     }
 
-    if (scorePoints % 30 == 0 && scorePoints % 100 != 0) {
+    if (gameSettings.scorePoints % 30 == 0 && gameSettings.scorePoints % 100 != 0) {
         players[0].stats.level += 1;
         perkCreate();
         messageCreate('New Perk spawned for 15 sec', 70, 22);
     }
 
-    if (scorePoints == 100 || scorePoints == 200) {
+    if (gameSettings.scorePoints == 100 || gameSettings.scorePoints == 200) {
         messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
     }
 
-    if (scorePoints == 300) {
+    if (gameSettings.scorePoints == 300) {
         messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
     }
 }
@@ -328,12 +299,12 @@ function messagesAnimation() {
 // handle text
 function textOnDisplay() {
     //timer and score
-    gameTimer.start();
+    gameSettings.timer.start();
     ctx.font = '24px customFont';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
-    ctx.fillText('Timer: ' + gameTimer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
-    ctx.fillText('Score: ' + scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
+    ctx.fillText('Timer: ' + gameSettings.timer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
+    ctx.fillText('Score: ' + gameSettings.scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
 }
 
 // handle game mechanics
