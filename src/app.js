@@ -152,8 +152,8 @@ function enemiesCreate(...types) {
         }
     }
 }
-// enemiesCreate();
 function enemiesAnimation() {
+    //! refactoring later
     const interval = Math.round(elapsed % gameSettings.scorePoints);
     // console.log(Math.round(elapsed % gameSettings.scorePoints), '--', Math.round(elapsed % interval));
     if (enemies.length == 0) { enemiesCreate('bat', 'bat', 'skeleton'); }

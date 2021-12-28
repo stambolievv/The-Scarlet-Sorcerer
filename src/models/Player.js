@@ -23,12 +23,12 @@ export default class Player {
             level: 1,
             health: 3,
             bonusHealth: 2,
-            mana: 500,
+            mana: 5,
             _manaReg: 5,
             oxygen: 3,
             _outOfOxygen: false,
             _onIsland: false,
-            fireRate: -20.002,
+            fireRate: 2,
             _canShoot: true,
             movementSpeed: 4,
             jumpBoost: 15
@@ -207,28 +207,3 @@ export default class Player {
         }
     }
 }
-
-
-//     Movement states
-//     holdsRight: function() {
-//         return this.keyboard.right.isDown || this.keyboard.D.isDown
-//     },
-//     holdsLeft: function() {
-//         return this.keyboard.left.isDown || this.keyboard.A.isDown 
-//     },
-//     holdsUp: function() {
-//         return this.keyboard.space.isDown || this.keyboard.up.isDown || this.keyboard.W.isDown 
-//     },
-
-//     Player stands
-//     playerStands: function() { return this.player.body.onFloor() || this.player.body.touching.down },
-
-//      Collision with ground
-//     landPlayer: function() {
-//         if (this.playerState.jumping && this.playerStands()) {
-//             // Update state to running
-//             this.playerState.jumping = false
-//             // Update player animation
-//             playerSpriteStand()
-//         }
-//     },
