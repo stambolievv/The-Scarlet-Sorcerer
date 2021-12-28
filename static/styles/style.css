@@ -1,6 +1,6 @@
 @font-face {
   font-family: "customFont";
-  src: url("/static/fonts/rubber-biscuit.bold.ttf") format("truetype");
+  src: url("./static/fonts/rubber-biscuit.bold.ttf") format("truetype");
 }
 
 * {

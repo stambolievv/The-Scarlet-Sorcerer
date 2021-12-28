@@ -3,7 +3,7 @@ export default
         'spritesheets': {
             // map
             'tileset': {
-                'src': '/static/assets/tileset.png',
+                'src': './static/assets/tileset.png',
                 'frameWidth': 48,
                 'frameHeight': 48,
                 'columns': 18,
@@ -31,7 +31,7 @@ export default
             },
             // player
             'player': {
-                'src': '/static/assets/wizard.png',
+                'src': './static/assets/wizard.png',
                 'frameWidth': 166,
                 'frameHeight': 136,
                 'animations': {
@@ -54,7 +54,7 @@ export default
                 }
             },
             'projectile': {
-                'src': '/static/assets/fireball.png',
+                'src': './static/assets/fireball.png',
                 'frameWidth': 17,
                 'frameHeight': 34,
                 'animations': {
@@ -62,7 +62,7 @@ export default
                 }
             },
             'perk': {
-                'src': '/static/assets/perk.png',
+                'src': './static/assets/perk.png',
                 'frameWidth': 24,
                 'frameHeight': 24,
                 'position': [
@@ -90,7 +90,7 @@ export default
             },
             // enemies
             'bat': {
-                'src': '/static/assets/bat.png',
+                'src': './static/assets/bat.png',
                 'frameWidth': 64,
                 'frameHeight': 64,
                 'pointsForDeath': 5,
@@ -100,7 +100,7 @@ export default
                 }
             },
             'skeleton': {
-                'src': '/static/assets/skeleton.png',
+                'src': './static/assets/skeleton.png',
                 'frameWidth': 32,
                 'frameHeight': 32,
                 'pointsForDeath': 10,
@@ -110,7 +110,7 @@ export default
                 }
             },
             'saw': {
-                'src': '/static/assets/saw.png',
+                'src': './static/assets/saw.png',
                 'frameWidth': 50,
                 'frameHeight': 50,
                 'pointsForDeath': 0,
@@ -122,25 +122,25 @@ export default
         },
         'audio': {
             'background': {
-                'src': '/static/audio/background.wav',
+                'src': './static/audio/background.wav',
                 'loop': true
             },
             'danger': {
-                'src': '/static/audio/danger.wav',
+                'src': './static/audio/danger.wav',
                 'loop': true
             },
             'collect': {
-                'src': '/static/audio/collect.wav',
+                'src': './static/audio/collect.wav',
                 'loop': false
 
             },
             'footsteps': {
-                'src': '/static/audio/footsteps.wav',
+                'src': './static/audio/footsteps.wav',
                 'loop': false
 
             },
             'enemyKill': {
-                'src': '/static/audio/enemyKill.wav',
+                'src': './static/audio/enemyKill.wav',
                 'loop': false
             },
         }
