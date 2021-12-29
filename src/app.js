@@ -154,12 +154,9 @@ function enemiesCreate(...types) {
 }
 function enemiesAnimation() {
     //! refactoring later
-    const interval = Math.round(elapsed % gameSettings.scorePoints);
-    // console.log(Math.round(elapsed % gameSettings.scorePoints), '--', Math.round(elapsed % interval));
-    if (enemies.length == 0) { enemiesCreate('bat', 'bat', 'skeleton'); }
-    if (Math.round(elapsed % interval) == 50) { enemiesCreate('saw'); }
-    if (Math.round(elapsed % interval) == 70) { enemiesCreate('bat'); }
-    if (Math.round(elapsed % interval) == 90) { enemiesCreate('skeleton'); }
+    if (elapsed % 4 == 0) { enemiesCreate('saw'); }
+    if (elapsed % 8 == 0) { enemiesCreate('bat'); }
+    if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
         const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
