@@ -13,7 +13,6 @@ function loadFiles(source) {
                 media.images[name] = new Image();
                 media.images[name].onload = onLoad();
                 media.images[name].src = prop.src;
-                console.log(media.images[name]);
             }
             if (type == 'audio') {
                 media.audio[name] = new Audio(prop.src);
