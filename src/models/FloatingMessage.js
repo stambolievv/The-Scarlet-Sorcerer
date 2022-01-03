@@ -15,7 +15,7 @@ export default class FloatingMessage {
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = this.color;
         ctx.textAlign = 'center';
-        ctx.font = this.size + 'px customFont';
+        ctx.font = this.size + 'px rubber';
 
         for (let i = 0; i < lines.length; i++) {
             ctx.fillText(lines[i], this.pos.x, this.pos.y + (i * this.size));
