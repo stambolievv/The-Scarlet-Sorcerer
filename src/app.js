@@ -1,6 +1,7 @@
-import { gameSettings, images, audio, spritesheets, platforms, players, projectiles, perks, keysPressed, enemies, enemyStats, textMessages, } from './properties.js';
+import { gameSettings, gui, background, images, audio, spritesheets, platforms, players, interfaces, projectiles, perks, keysPressed, enemies, enemyStats, textMessages, } from './properties.js';
 import Platform from './models/Platform.js';
 import Player from './models/Player.js';
+import GUI from './models/GUI.js';
 import { Bat, Skeleton, Saw } from './models/Enemy.js';
 import Projectiles from './models/Projectile.js';
 import Perk from './models/Perk.js';
@@ -18,7 +19,6 @@ ctx.DEBUG = false;
 let lastTime = 0;
 let elapsed = 0;
 
-audio.background.volume = gameSettings.masterVolume;
 audio.background.play();
 
 function animate(timestamp) {
@@ -26,23 +26,25 @@ function animate(timestamp) {
     lastTime = timestamp;
     elapsed += deltaTime;
 
-    initBackground();
+    backgroundParallax(background);
     platformsAnimation();
     playerAnimation();
+    guiAnimation();
     enemiesAnimation();
     projectilesAnimation();
     perkAnimation();
     messagesAnimation();
     textOnDisplay();
+    soundVolume(audio, gameSettings.masterVolume);
 
     requestAnimationFrame(animate);
 }
 //handle background
-function initBackground() {
-    ctx.beginPath();
-    ctx.fillStyle = 'hsl(200, 30%, 50%, 0.9)';
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.closePath();
+function backgroundParallax(background) {
+    Object.values(background).forEach(layer => {
+        const posX = layer.moving ? (Math.trunc(players[0].pos.x * -0.1)) : 0;
+        ctx.drawImage(layer, posX, 0, layer.width, layer.height);
+    });
 }
 
 //handle platforms
@@ -79,10 +81,13 @@ function platformsAnimation() {
 }
 // handle player
 function playerCreate() {
-    const playerData = spritesheets.player;
-    const painfulFrame = spritesheets.tileset.painfulFrame;
+    const playerData = {
+        prop: spritesheets.player,
+        sprite: images.player,
+        painfulFrame: spritesheets.tileset.painfulFrame
+    };
 
-    players.push(new Player(playerData, images.player, painfulFrame, relativePosition(0.1, 0.65)));
+    players.push(new Player(playerData, relativePosition(0.1, 0.65)));
 }
 playerCreate();
 function playerAnimation() {
@@ -101,13 +106,27 @@ function playerAnimation() {
     overlap(players, enemies, (player, enemy) => {
         enemies.splice(enemies.indexOf(enemy), 1);
         audio.enemyKill.play();
-        audio.enemyKill.volume = gameSettings.masterVolume;
 
         if (player.stats.bonusHealth > 0) {
             player.stats.bonusHealth -= 1;
         } else {
             player.stats.health -= 1;
         }
+    });
+}
+function guiCreate() {
+    const guiData = {
+        sprites: gui,
+        player: players[0]
+    };
+
+    interfaces.push(new GUI(guiData, relativePosition(1, 1)));
+}
+guiCreate();
+function guiAnimation() {
+    interfaces[0].elements.forEach(d => {
+        d.draw(ctx);
+        d.update(players[0].stats);
     });
 }
 function keyPress(e) {
@@ -137,17 +156,25 @@ function onClick(e) {
 // handle enemies
 function enemiesCreate(...types) {
     const spawnPoint = relativePosition(1, 1);
+
     for (const type of types) {
+        const enemyData = {
+            prop: spritesheets[type],
+            sprite: images[type],
+            player: players[0],
+            stats: enemyStats
+        };
+
         if (type == 'bat') {
-            enemies.push(new Bat(spritesheets.bat, images.bat, players[0], enemyStats, spawnPoint));
+            enemies.push(new Bat(enemyData, spawnPoint));
             continue;
         }
         if (type == 'skeleton') {
-            enemies.push(new Skeleton(spritesheets.skeleton, images.skeleton, players[0], enemyStats, spawnPoint));
+            enemies.push(new Skeleton(enemyData, spawnPoint));
             continue;
         }
         if (type == 'saw') {
-            enemies.push(new Saw(spritesheets.saw, images.saw, players[0], enemyStats, spawnPoint));
+            enemies.push(new Saw(enemyData, spawnPoint));
             continue;
         }
     }
@@ -172,12 +199,11 @@ function enemiesAnimation() {
         enemy.stats.health -= 1;
 
         if (enemy.stats.health == 0) {
-            gameSettings.scorePoints += enemy.data.pointsForDeath;
+            gameSettings.scorePoints += enemy.prop.pointsForDeath;
             enemies.splice(enemies.indexOf(enemy), 1);
         }
 
         audio.enemyKill.play();
-        audio.enemyKill.volume = gameSettings.masterVolume;
 
         handleScore();
     });
@@ -187,11 +213,14 @@ function enemiesAnimation() {
 
 // handle projectiles
 function projectilesCreate(mouseX, mouseY) {
-    const projectileData = spritesheets.projectile;
+    const projectileData = {
+        prop: spritesheets.projectile,
+        sprite: images.projectile,
+        player: players[0],
+        angle: Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX)
+    };
 
-    const angle = Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX);
-
-    projectiles.push(new Projectiles(projectileData, images.projectile, players[0], angle));
+    projectiles.push(new Projectiles(projectileData));
 }
 function projectilesAnimation() {
     projectiles.forEach(p => {
@@ -204,12 +233,15 @@ function projectilesAnimation() {
 
 //handle perks
 function perkCreate() {
-    const perksData = spritesheets.perk;
+    const perksData = {
+        prop: spritesheets.perk,
+        sprite: images.perk
+    };
 
-    const rng = Math.floor(Math.random() * 6);
-    const spawnPoint = relativePosition(perksData.position[rng].x, perksData.position[rng].y);
+    const rng = random(0, 5);
+    const spawnPoint = relativePosition(perksData.prop.position[rng].x, perksData.prop.position[rng].y);
 
-    perks.push(new Perk(perksData, images.perk, spawnPoint));
+    perks.push(new Perk(perksData, spawnPoint));
 }
 function perkAnimation() {
     perks.forEach((p, i) => {
@@ -246,7 +278,6 @@ function perkAnimation() {
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / CANVAS_WIDTH, y: (player.pos.y + player.dim.h / 2) / CANVAS_HEIGHT };
         messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
         audio.collect.play();
-        audio.collect.volume = gameSettings.masterVolume;
 
         perks.splice(perks.indexOf(perk), 1);
     });
@@ -297,11 +328,16 @@ function messagesAnimation() {
 function textOnDisplay() {
     //timer and score
     gameSettings.timer.start();
-    ctx.font = '24px customFont';
+    ctx.font = '24px rubber';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'white';
     ctx.fillText('Timer: ' + gameSettings.timer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
     ctx.fillText('Score: ' + gameSettings.scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
+}
+
+//handle sounds
+function soundVolume(sounds, masterVolume) {
+    Object.values(sounds).forEach(s => s.volume = masterVolume);
 }
 
 // handle game mechanics
@@ -428,6 +464,11 @@ function collideWorldBounds(AA) {
 }
 function relativePosition(posX, posY) {
     return { x: posX * CANVAS_WIDTH, y: posY * CANVAS_HEIGHT };
+}
+function random(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 window.addEventListener('keydown', keyPress);

@@ -7,7 +7,7 @@ let result = '';
 
 data.forEach((id, index) => {
 
-    if (id == 0) { id = false; }
+    if (id == 0) { id = -1; }
 
     if (id != 0) { id -= 1; }
 
