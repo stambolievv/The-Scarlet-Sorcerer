@@ -136,7 +136,7 @@ function keyPress(e) {
     }
 }
 function onClick(e) {
-    if (players[0].stats.mana > 0) {
+    if (players[0].stats.mana > 20) {
         if (players[0].state.canShoot) {
             players[0].state.canShoot = false;
             players[0].stats.mana -= 20;
@@ -147,7 +147,6 @@ function onClick(e) {
     } else {
         messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
     }
-
 }
 
 // handle enemies
@@ -178,12 +177,12 @@ function enemiesCreate(...types) {
 }
 function enemiesAnimation() {
     //! refactoring later
-    // if (elapsed % 4 == 0) { enemiesCreate('saw'); }
-    // if (elapsed % 8 == 0) { enemiesCreate('bat'); }
-    // if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
+    if (elapsed % 4 == 0) { enemiesCreate('saw'); }
+    if (elapsed % 8 == 0) { enemiesCreate('bat'); }
+    if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
-        const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
+        const sideCollision = e.animation.type == 'skeleton' ? collision([e], platforms) : undefined;
         e.draw(ctx, elapsed);
         e.update(sideCollision);
     });
@@ -269,7 +268,7 @@ function perkAnimation() {
         }
 
         if (perk.type.name == 'MANA') {
-            player.stats.mana += 1;
+            player.stats.manaReg += 0.01;
         }
 
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / CANVAS_WIDTH, y: (player.pos.y + player.dim.h / 2) / CANVAS_HEIGHT };

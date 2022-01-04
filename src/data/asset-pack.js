@@ -134,7 +134,7 @@ export default
                     { 'name': 'JB', 'text': 'Jump Boost \nIncrease +0.2', 'color': '#00fa6c' },
                     { 'name': 'MS', 'text': 'Movement Speed \nIncrease +0.2', 'color': '#7f4cc7' },
                     { 'name': 'FR', 'text': 'FireRate \nIncrease -0.2', 'color': '#ff8300' },
-                    { 'name': 'MANA', 'text': 'Mana \nIncrease +1', 'color': '#00ffff' },
+                    { 'name': 'MANA', 'text': 'Mana Regeneration \nIncrease +1', 'color': '#00ffff' },
                 ],
                 'animations': {
                     'BS': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 24, 'y': 0 }, { 'x': 48, 'y': 0 }, { 'x': 72, 'y': 0 }] },
