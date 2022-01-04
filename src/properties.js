@@ -4,7 +4,7 @@ import createTimer from './models/Timer.js';
 
 export const gameSettings = {
     timer: new createTimer(),
-    masterVolume: 0,
+    masterVolume: 0.1,
     scorePoints: 0,
 };
 export const { gui, background, images, audio } = loadFiles(data);

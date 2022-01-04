@@ -1,7 +1,7 @@
 import { gameSettings, gui, background, images, audio, spritesheets, platforms, players, interfaces, projectiles, perks, keysPressed, enemies, enemyStats, textMessages, } from './properties.js';
 import Platform from './models/Platform.js';
 import Player from './models/Player.js';
-import GUI from './models/GUI.js';
+import * as GUI from './models/GUI.js';
 import { Bat, Skeleton, Saw } from './models/Enemy.js';
 import Projectiles from './models/Projectile.js';
 import Perk from './models/Perk.js';
@@ -97,8 +97,8 @@ function playerAnimation() {
     players.forEach(p => {
         p.draw(ctx, elapsed);
         p.update(keysPressed, sideWorld, sideCollision);
-        p.handleStats();
-        if (p.stats._outOfOxygen) {
+        p.handleStats(elapsed);
+        if (p.state.outOfOxygen) {
             messageCreate('Out of oxygen. You are taking damage', 90, 32, 'red');
         }
     });
@@ -115,18 +115,15 @@ function playerAnimation() {
     });
 }
 function guiCreate() {
-    const guiData = {
-        sprites: gui,
-        player: players[0]
-    };
-
-    interfaces.push(new GUI(guiData, relativePosition(1, 1)));
+    Object.values(GUI).forEach(i => {
+        interfaces.push(new i(gui, players[0].stats, relativePosition(1, 1)));
+    });
 }
 guiCreate();
 function guiAnimation() {
-    interfaces[0].elements.forEach(d => {
-        d.draw(ctx);
-        d.update(players[0].stats);
+    interfaces.forEach(i => {
+        i.draw(ctx);
+        i.update();
     });
 }
 function keyPress(e) {
@@ -140,10 +137,10 @@ function keyPress(e) {
 }
 function onClick(e) {
     if (players[0].stats.mana > 0) {
-        if (players[0].stats._canShoot) {
-            players[0].stats._canShoot = false;
-            players[0].stats.mana--;
-            players[0].state = 'attack';
+        if (players[0].state.canShoot) {
+            players[0].state.canShoot = false;
+            players[0].stats.mana -= 20;
+            players[0].animation.state = 'attack';
 
             projectilesCreate(e.offsetX, e.offsetY);
         }
@@ -181,9 +178,9 @@ function enemiesCreate(...types) {
 }
 function enemiesAnimation() {
     //! refactoring later
-    if (elapsed % 4 == 0) { enemiesCreate('saw'); }
-    if (elapsed % 8 == 0) { enemiesCreate('bat'); }
-    if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
+    // if (elapsed % 4 == 0) { enemiesCreate('saw'); }
+    // if (elapsed % 8 == 0) { enemiesCreate('bat'); }
+    // if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
 
     enemies.forEach(e => {
         const sideCollision = e.type == 'skeleton' ? collision([e], platforms) : undefined;
@@ -192,7 +189,7 @@ function enemiesAnimation() {
     });
 
     overlap(enemies, projectiles, (enemy, projectile) => {
-        if (enemy.type == 'saw') { return; }
+        if (enemy.animation.type == 'saw') { return; }
 
         projectiles.splice(projectiles.indexOf(projectile), 1);
 
@@ -277,6 +274,7 @@ function perkAnimation() {
 
         const playerCenter = { x: (player.pos.x + player.dim.w / 2) / CANVAS_WIDTH, y: (player.pos.y + player.dim.h / 2) / CANVAS_HEIGHT };
         messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
+        player.stats.perks += 1;
         audio.collect.play();
 
         perks.splice(perks.indexOf(perk), 1);
@@ -290,7 +288,7 @@ function handleScore() {
         messageCreate('Enemy speed increase', 50);
     }
 
-    if (gameSettings.scorePoints % 30 == 0 && gameSettings.scorePoints % 100 != 0) {
+    if (gameSettings.scorePoints % 25 == 0 && gameSettings.scorePoints % 100 != 0) {
         players[0].stats.level += 1;
         perkCreate();
         messageCreate('New Perk spawned for 15 sec', 70, 22);
@@ -333,6 +331,7 @@ function textOnDisplay() {
     ctx.fillStyle = 'white';
     ctx.fillText('Timer: ' + gameSettings.timer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
     ctx.fillText('Score: ' + gameSettings.scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
+    // gameSettings.menu = ctx.fillText('Settings', CANVAS_WIDTH * 0.9, CANVAS_HEIGHT * 0.05);
 }
 
 //handle sounds

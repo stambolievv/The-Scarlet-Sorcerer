@@ -1,7 +1,6 @@
-import { audio } from '../properties.js';
+import { gameSettings, audio } from '../properties.js';
 import createTimer from './Timer.js';
 
-const manaTimer = new createTimer(true);
 const fireRateTimer = new createTimer(true);
 const oxygenTimer = new createTimer(true);
 
@@ -15,32 +14,41 @@ export default class Player {
         this.dim = { w: 30, h: 50 };
         this.gravity = { x: 0, y: 0.5 };
         this.friction = { x: 0.9, y: 0.99 };
-        this.state = 'idle';
-        this.orientation = 'Right';
-        this.grounded = false;
-        this.jumping = false;
+        this.animation = {
+            state: 'idle',
+            orientation: 'Right'
+        };
+        this.state = {
+            grounded: false,
+            jumping: false,
+            outOfOxygen: false,
+            onIsland: false,
+            canShoot: true
+        };
         this.stats = {
             level: 1,
+            perks: 0,
             health: 3,
+            maxHealth: 3,
             bonusHealth: 2,
-            mana: 5,
-            _manaReg: 5,
-            oxygen: 3,
-            _outOfOxygen: false,
-            _onIsland: false,
-            fireRate: 2,
-            _canShoot: true,
+            maxBonusHealth: 5,
+            mana: 100,
+            maxMana: 100,
+            manaReg: 0.02,
+            oxygen: 300,
+            maxOxygen: 300,
+            jumpBoost: 15,
             movementSpeed: 4,
-            jumpBoost: 15
+            fireRate: 3
         };
     }
 
     draw(ctx, elapsed) {
-        const offset = this.orientation == 'Right' ? 1 : 2;
+        const offset = this.animation.orientation == 'Right' ? 1 : 2;
 
-        const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.state + this.orientation)].loc.length;
-        const frameX = this.prop.animations[(this.state + this.orientation)].loc[position].x;
-        const frameY = this.prop.animations[(this.state + this.orientation)].loc[position].y;
+        const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.animation.state + this.animation.orientation)].loc.length;
+        const frameX = this.prop.animations[(this.animation.state + this.animation.orientation)].loc[position].x;
+        const frameY = this.prop.animations[(this.animation.state + this.animation.orientation)].loc[position].y;
 
         ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.prop.frameWidth * 0.7, this.prop.frameHeight * 0.7);
 
@@ -51,13 +59,6 @@ export default class Player {
             ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
             ctx.closePath();
         }
-        ctx.textAlign = 'right';
-        ctx.font = '18px rubber';
-        ctx.fillStyle = 'LightGreen';
-        ctx.fillText('Level: ' + this.stats.level, ctx.canvas.width * 0.9, ctx.canvas.height * 0.160);
-        ctx.fillText('Fire Rate: ' + this.stats.fireRate.toFixed(1), ctx.canvas.width * 0.9, ctx.canvas.height * 0.285);
-        ctx.fillText('Movement Speed: ' + this.stats.movementSpeed.toFixed(1), ctx.canvas.width * 0.9, ctx.canvas.height * 0.310);
-        ctx.fillText('Jump Boost: ' + this.stats.jumpBoost.toFixed(1), ctx.canvas.width * 0.9, ctx.canvas.height * 0.335);
     }
 
     update(keysPressed, sideWorld, sideCollision) {
@@ -71,34 +72,34 @@ export default class Player {
         const keys = [...keysPressed];
         const controller = {
             KeyW: () => {
-                if (!this.jumping && this.grounded) {
-                    this.jumping = true;
-                    this.grounded = false;
+                if (!this.state.jumping && this.state.grounded) {
+                    this.state.jumping = true;
+                    this.state.grounded = false;
                     this.vel.y -= this.stats.jumpBoost;
                 }
-                this.state = this.grounded ? 'idle' : 'jump';
+                this.animation.state = this.state.grounded ? 'idle' : 'jump';
             },
             KeyA: () => {
                 if (!side.left && this.vel.x > -this.stats.movementSpeed) {
                     this.vel.x--;
                 }
                 if (side.bottom) { audio.footsteps.play(); }
-                this.orientation = 'Left';
-                this.state = 'run';
+                this.animation.orientation = 'Left';
+                this.animation.state = 'run';
             },
             KeyS: () => {
                 if (!side.bottom && this.vel.y < this.stats.jumpBoost) {
                     this.vel.y++;
                 }
-                this.state = this.grounded ? 'idle' : 'fall';
+                this.animation.state = this.state.grounded ? 'idle' : 'fall';
             },
             KeyD: () => {
                 if (!side.right && this.vel.x < this.stats.movementSpeed) {
                     this.vel.x++;
                 }
                 if (side.bottom) { audio.footsteps.play(); }
-                this.orientation = 'Right';
-                this.state = 'run';
+                this.animation.orientation = 'Right';
+                this.animation.state = 'run';
             },
             Space: () => { controller.KeyW(); },
             ArrowUp: () => { controller.KeyW(); },
@@ -113,19 +114,19 @@ export default class Player {
                 // console.error('Not a functional key is pressed!');
             }
         } else {
-            this.state = 'idle';
+            this.animation.state = 'idle';
         }
 
-        this.grounded = false;
+        this.state.grounded = false;
         if (side.bottom && !(side.left || side.right)) {
-            this.grounded = true;
-            this.jumping = false;
+            this.state.grounded = true;
+            this.state.jumping = false;
         }
         if (side.left || side.right) { this.vel.x = 0; }
         if (side.top) { this.vel.y *= -0.1; }
 
-        if (this.painfulFrame.includes(side.type) && side.bottom) { this.stats._onIsland = true; } else { this.stats._onIsland = false; }
-        if (!(side.left || side.top || side.right || side.bottom || this.jumping)) { this.state = 'fall'; }
+        if (this.painfulFrame.includes(side.type) && side.bottom) { this.state.onIsland = true; } else { this.state.onIsland = false; }
+        if (!(side.left || side.top || side.right || side.bottom || this.state.jumping)) { this.animation.state = 'fall'; }
 
         this.vel.x += this.gravity.x;
         this.vel.y += this.gravity.y;
@@ -135,15 +136,15 @@ export default class Player {
         this.pos.y += this.vel.y;
 
         if (Math.abs(this.vel.x) < 0.1) { this.vel.x = 0; }
-        if (this.grounded) { this.vel.y = 0; }
+        if (this.state.grounded) { this.vel.y = 0; }
     }
 
     handleStats() {
         // handle fireRate 
-        if (!this.stats._canShoot) {
+        if (!this.state.canShoot) {
             fireRateTimer.start();
-            if (fireRateTimer.output / 2 >= this.stats.fireRate) {
-                this.stats._canShoot = true;
+            if (fireRateTimer.output >= this.stats.fireRate) {
+                this.state.canShoot = true;
                 fireRateTimer.reset();
             }
         } else {
@@ -151,46 +152,32 @@ export default class Player {
         }
 
         // handle oxygen
-        if (this.stats.oxygen < 3 && !this.stats._onIsland) {
+        if (this.stats.oxygen < 300 && !this.state.onIsland) {
+            this.stats.oxygen += 0.5;
+            this.state.outOfOxygen = false;
+        } else if (this.stats.oxygen > 0 && this.state.onIsland) {
+            this.stats.oxygen -= 0.5;
+            this.state.outOfOxygen = false;
+        } else if (this.stats.oxygen == 0 && this.state.onIsland) {
             oxygenTimer.start();
-            if (oxygenTimer.output > 3) {
-                this.stats.oxygen += 1;
-                oxygenTimer.reset();
-            }
-            this.stats._outOfOxygen = false;
-        } else if (this.stats.oxygen > 0 && this.stats._onIsland) {
-            oxygenTimer.start();
-            if (oxygenTimer.output > 3) {
-                this.stats.oxygen -= 1;
-                oxygenTimer.reset();
-            }
-            this.stats._outOfOxygen = false;
-        } else if (this.stats.oxygen == 0 && this.stats._onIsland) {
-            oxygenTimer.start();
-            this.stats._outOfOxygen = false;
+            this.state.outOfOxygen = false;
             if (oxygenTimer.output > 3) {
                 if (this.stats.bonusHealth > 0) {
                     this.stats.bonusHealth -= 1;
                 } else {
                     this.stats.health -= 1;
                 }
+                this.state.outOfOxygen = true;
                 oxygenTimer.reset();
-                this.stats._outOfOxygen = true;
             }
         } else {
+            this.state.outOfOxygen = false;
             oxygenTimer.reset();
-            this.stats._outOfOxygen = false;
         }
 
         // handle mana
-        if (this.stats.mana < 5) {
-            manaTimer.start();
-            if (manaTimer.output > this.stats._manaReg) {
-                this.stats.mana++;
-                manaTimer.reset();
-            }
-        } else {
-            manaTimer.reset();
+        if (this.stats.mana <= 100) {
+            this.stats.mana += this.stats.manaReg;
         }
     }
 }

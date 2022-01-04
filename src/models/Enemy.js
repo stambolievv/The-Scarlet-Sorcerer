@@ -7,8 +7,10 @@ class Enemy {
         this.vel = { x: 0, y: 0 };
         this.dim = { w: this.prop.frameWidth * 0.7, h: this.prop.frameHeight * 0.7 };
         this.gravity = { x: 0, y: 0.1 };
-        this.orientation = Math.random() < 0.45 ? 'Left' : 'Right';
-        this.type = this.constructor.name.toLocaleLowerCase();
+        this.animation = {
+            type: this.constructor.name.toLocaleLowerCase(),
+            orientation: Math.random() < 0.45 ? 'Left' : 'Right'
+        };
         this.stats = {
             health: 1,
             speed: data.stats.speed,
@@ -16,9 +18,9 @@ class Enemy {
     }
 
     draw(ctx, elapsed) {
-        const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.type + this.orientation)].loc.length;
-        const frameX = this.prop.animations[(this.type + this.orientation)].loc[position].x;
-        const frameY = this.prop.animations[(this.type + this.orientation)].loc[position].y;
+        const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
+        const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
+        const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
 
         ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * 0.3, this.pos.y - this.dim.h * 0.3, this.prop.frameWidth, this.prop.frameHeight);
 
@@ -36,7 +38,7 @@ class Enemy {
 export class Bat extends Enemy {
     constructor(data, position) {
         super(data, position);
-        this.props = this.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
+        this.props = this.animation.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
         this.pos.x = this.props.spawn;
         this.pos.y *= (Math.random() * (0.7 - 0.1) + 0.1);
     }
@@ -57,17 +59,17 @@ export class Skeleton extends Enemy {
     update(side) {
         if (side.left || this.pos.x < this.player.pos.x) {
             this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
-            this.orientation = 'Right';
+            this.animation.orientation = 'Right';
         } else if (side.right || this.pos.x > this.player.pos.x) {
             this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
-            this.orientation = 'Left';
+            this.animation.orientation = 'Left';
         } else {
             // Fixing the bug when player is close to the border of the screen and enemy stop moving.
             if (this.vel.x >= 0.1) {
-                this.orientation = 'Right';
+                this.animation.orientation = 'Right';
                 this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
             } else {
-                this.orientation = 'Left';
+                this.animation.orientation = 'Left';
                 this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
             }
         }
@@ -85,7 +87,7 @@ export class Skeleton extends Enemy {
 export class Saw extends Enemy {
     constructor(data, position) {
         super(data, position);
-        this.props = this.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
+        this.props = this.animation.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
         this.pos.x = this.props.spawn;
         this.pos.y *= Math.random() * (0.7 - 0.1) + 0.1;
     }
