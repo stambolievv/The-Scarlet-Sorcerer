@@ -1,7 +1,6 @@
 import { audio } from '../properties.js';
 import createTimer from '../util/Timer.js';
 
-const fireRateTimer = new createTimer(true);
 const oxygenTimer = new createTimer(true);
 
 export default class Player {
@@ -34,12 +33,13 @@ export default class Player {
       maxBonusHealth: 5,
       mana: 100,
       maxMana: 100,
-      manaReg: 0.02,
+      manaReg: 0.04,
       oxygen: 300,
       maxOxygen: 300,
       jumpBoost: 15,
       movementSpeed: 4,
-      fireRate: 3
+      fireRate: 1.6,
+      fireRateReg: 0
     };
   }
 
@@ -141,14 +141,11 @@ export default class Player {
 
   handleStats() {
     // handle fireRate 
-    if (!this.state.canShoot) {
-      fireRateTimer.start();
-      if (fireRateTimer.output >= this.stats.fireRate) {
-        this.state.canShoot = true;
-        fireRateTimer.reset();
-      }
-    } else {
-      fireRateTimer.reset();
+    this.stats.fireRateReg += 0.01;
+    const timePassed = Number(this.stats.fireRateReg.toFixed(1));
+    if ((timePassed == this.stats.fireRate) && !this.state.canShoot) {
+      this.stats.fireRateReg = 0;
+      this.state.canShoot = true;
     }
 
     // handle oxygen
