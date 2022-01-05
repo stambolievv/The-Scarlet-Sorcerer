@@ -181,10 +181,6 @@ export default
         'src': 'static/audio/background.wav',
         'loop': true
       },
-      'danger': {
-        'src': 'static/audio/danger.wav',
-        'loop': true
-      },
       'collect': {
         'src': 'static/audio/collect.wav',
         'loop': false
