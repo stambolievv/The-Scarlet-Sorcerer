@@ -8,7 +8,7 @@ class GUI {
   }
   draw(ctx) {
     ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-    
+
     if (ctx.DEBUG) {
       ctx.beginPath();
       ctx.strokeStyle = 'blue';
@@ -34,7 +34,7 @@ class HealthBar extends GUI {
   }
 
   update() {
-    if (this.playerStats.health >= 0) {
+    if (this.playerStats.health >= 0 && this.playerStats.health <= this.playerStats.maxHealth) {
       this.dim.w = (this.playerStats.health / this.playerStats.maxHealth) * this.maxWidth;
     }
   }
@@ -47,7 +47,7 @@ class _BonusBar extends GUI {
   }
 
   update() {
-    if (this.playerStats.bonusHealth >= 0) {
+    if (this.playerStats.bonusHealth >= 0 && this.playerStats.bonusHealth <= this.playerStats.maxBonusHealth) {
       this.dim.w = (this.playerStats.bonusHealth / this.playerStats.maxBonusHealth) * this.maxWidth;
     }
   }
@@ -60,7 +60,7 @@ class ManaBar extends GUI {
   }
 
   update() {
-    if (this.playerStats.mana >= 0) {
+    if (this.playerStats.mana >= 0 && this.playerStats.mana <= this.playerStats.maxMana) {
       this.dim.w = (this.playerStats.mana / this.playerStats.maxMana) * this.maxWidth;
     }
   }
@@ -73,7 +73,7 @@ class OxygenBar extends GUI {
   }
 
   update() {
-    if (this.playerStats.oxygen >= 0) {
+    if (this.playerStats.oxygen >= 0 && this.playerStats.oxygen <= this.playerStats.maxOxygen) {
       this.dim.w = (this.playerStats.oxygen / this.playerStats.maxOxygen) * this.maxWidth;
     }
   }
