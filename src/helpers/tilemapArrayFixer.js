@@ -7,13 +7,13 @@ let result = '';
 
 data.forEach((id, index) => {
 
-    if (id == 0) { id = -1; }
+  if (id == 0) { id = -1; }
 
-    if (id != 0) { id -= 1; }
+  if (id != 0) { id -= 1; }
 
-    if (index % 27 == 0) { result += '\n'; }
+  if (index % 27 == 0) { result += '\n'; }
 
-    result += id + ', ';
+  result += id + ', ';
 });
 
 // The result is used in "asset-pack.js" as a tileset map.
