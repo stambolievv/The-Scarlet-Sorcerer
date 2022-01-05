@@ -7,7 +7,7 @@ import Projectiles from './entities/Projectile.js';
 import Perk from './entities/Perk.js';
 import * as GUI from './util/GUI.js';
 import FloatingMessage from './util/FloatingMessage.js';
-import { tick } from './util/fps.js';
+import tick from './util/fps.js';
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');

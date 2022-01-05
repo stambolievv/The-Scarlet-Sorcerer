@@ -10,14 +10,12 @@ export default class FloatingMessage {
   }
 
   draw(ctx) {
-    const lines = this.text.split('\n');
-
     ctx.globalAlpha = this.opacity;
+
     ctx.fillStyle = this.color;
     ctx.textAlign = 'center';
     ctx.font = this.size + 'px rubber';
-
-    lines.forEach((l, i) => ctx.fillText(l, this.pos.x, this.pos.y + (i * this.size)));
+    this.text.split('\n').forEach((t, i) => ctx.fillText(t, this.pos.x, this.pos.y + (i * this.size)));
 
     ctx.globalAlpha = 1;
   }

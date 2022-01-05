@@ -10,10 +10,8 @@ class GUI {
     ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
 
     if (ctx.DEBUG) {
-      ctx.beginPath();
       ctx.strokeStyle = 'blue';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-      ctx.closePath();
     }
   }
   update() { }

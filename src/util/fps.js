@@ -5,7 +5,7 @@ let timeMeasurements = [];
 let fps = 0;
 let ms = 0;
 
-export function tick(ctx, elapsed) {
+export default function tick(ctx, elapsed) {
   timeMeasurements.push(elapsed);
 
   const msPassed = timeMeasurements[timeMeasurements.length - 1] - timeMeasurements[0];
@@ -17,10 +17,15 @@ export function tick(ctx, elapsed) {
   }
 
   if (ctx.DEBUG) {
-    ctx.textAlign = 'right';
-    ctx.font = 'bold 24px Helvetica';
+    // global values
+    ctx.font = 'bold 22px Helvetica';
+    ctx.textAlign = 'left';
     ctx.fillStyle = 'lime';
-    ctx.fillText(fps + '  :FPS', ctx.canvas.width * 0.95, ctx.canvas.height * 0.17);
-    ctx.fillText(ms + '  :MS', ctx.canvas.width * 0.95, ctx.canvas.height * 0.2);
+    ctx.fillText(fps + ' :FPS', ctx.canvas.width * 0.85, ctx.canvas.height * 0.17);
+    ctx.fillText(ms + ' :MS', ctx.canvas.width * 0.85, ctx.canvas.height * 0.2);
+    ctx.fillStyle = 'yellow';
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 2;
+    ctx.textAlign = 'center';
   }
 };

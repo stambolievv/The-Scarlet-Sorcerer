@@ -53,11 +53,8 @@ export default class Player {
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.prop.frameWidth * 0.7, this.prop.frameHeight * 0.7);
 
     if (ctx.DEBUG) {
-      ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = 'white';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-      ctx.closePath();
     }
   }
 

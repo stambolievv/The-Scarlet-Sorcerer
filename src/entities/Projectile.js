@@ -20,11 +20,8 @@ export default class Projectiles {
     ctx.resetTransform();
 
     if (ctx.DEBUG) {
-      ctx.beginPath();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'black';
+      ctx.strokeStyle = 'red';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
-      ctx.closePath();
     }
   }
 
