@@ -143,7 +143,8 @@ export default class Player {
     // handle fireRate 
     this.stats.fireRateReg += 0.01;
     const timePassed = Number(this.stats.fireRateReg.toFixed(1));
-    if ((timePassed == this.stats.fireRate) && !this.state.canShoot) {
+    const fireRate = Number(this.stats.fireRate.toFixed(1));
+    if ((timePassed == fireRate) && !this.state.canShoot) {
       this.stats.fireRateReg = 0;
       this.state.canShoot = true;
     }
