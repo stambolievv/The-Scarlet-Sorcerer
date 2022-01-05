@@ -14,7 +14,8 @@
   user-select: none;
 }
 
-html {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -23,10 +24,7 @@ body {
   display: grid;
   justify-content: center;
   align-content: space-around;
-  min-height: 100%;
-  width: 100%;
   background-color: #333;
-  color: #fff;
   font-family: "rubber";
   overflow: hidden;
 }
