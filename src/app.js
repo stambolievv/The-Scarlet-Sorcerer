@@ -7,6 +7,7 @@ import Projectiles from './entities/Projectile.js';
 import Perk from './entities/Perk.js';
 import * as GUI from './util/GUI.js';
 import FloatingMessage from './util/FloatingMessage.js';
+import { tick } from './util/fps.js';
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');
@@ -15,7 +16,7 @@ const CANVAS_HEIGHT = canvas.height = 720;
 
 const ctx = canvas.getContext('2d', { alpha: false });
 ctx.imageSmoothingEnabled = false;
-ctx.DEBUG = false; // hitboxes and stuff
+ctx.DEBUG = false; // fps, hitboxes and stuff
 
 let lastTime = 0;
 let elapsed = 0;
@@ -27,10 +28,11 @@ function animate(timestamp) {
   lastTime = timestamp;
   elapsed += deltaTime;
 
+
   backgroundParallax(background);
   platformsAnimation();
-  playerAnimation();
   guiAnimation();
+  playerAnimation();
   enemiesAnimation();
   projectilesAnimation();
   perkAnimation();
@@ -38,6 +40,7 @@ function animate(timestamp) {
   textOnDisplay();
   soundVolume(audio, gameSettings.masterVolume);
 
+  tick(ctx, elapsed);
   requestAnimationFrame(animate);
 }
 //handle background
@@ -365,18 +368,18 @@ function collision(AA, BB) {
   ?---------------------------------------------+
   !                    ISSUE                    |
   !              Hours spent: >20               |
-  ? --------------------------------------------+
+  ?---------------------------------------------+
   !     Whenever player right border is         |
   !     close to one of the platform            |
   !     left border and they collide            |
   !     when jump on it, player is moved        |
   !     to the left, flush with the border.     |
   !     Turn on DEBUG for easier visualization. |
-  ? --------------------------------------------|
+  ?---------------------------------------------+
   !                   QUICK FIX:                |
   !          Math.ceil() on "crossWidth".       |
   !          If removed is getting worst.       |
-  ? --------------------------------------------+
+  ?---------------------------------------------+
   */
 
   /*
