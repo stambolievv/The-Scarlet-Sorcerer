@@ -6,26 +6,31 @@ class GUI {
     this.maxWidth = this.dim.w;
     this.playerStats = playerStats;
   }
-  draw() { }
+  draw(ctx) {
+    ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+    
+    if (ctx.DEBUG) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'blue';
+      ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
+      ctx.closePath();
+    }
+  }
   update() { }
 }
 
 class __HUD__ extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.hud, playerStats, position);
-  }
-
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.05, this.pos.y * 0.15, this.dim.w, this.dim.h);
+    this.pos.x *= 0.05;
+    this.pos.y *= 0.15;
   }
 }
 class HealthBar extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.healthBar, playerStats, position);
-  }
-
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.1, this.pos.y * 0.165, this.dim.w, this.dim.h * 0.9);
+    this.pos.x *= 0.1;
+    this.pos.y *= 0.164;
   }
 
   update() {
@@ -37,10 +42,8 @@ class HealthBar extends GUI {
 class _BonusBar extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.bonusBar, playerStats, position);
-  }
-
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.1, this.pos.y * 0.165, this.dim.w, this.dim.h * 0.86);
+    this.pos.x *= 0.1;
+    this.pos.y *= 0.164;
   }
 
   update() {
@@ -52,10 +55,8 @@ class _BonusBar extends GUI {
 class ManaBar extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.manaBar, playerStats, position);
-  }
-
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.101, this.pos.y * 0.199, this.dim.w, this.dim.h);
+    this.pos.x *= 0.101;
+    this.pos.y *= 0.197;
   }
 
   update() {
@@ -67,10 +68,8 @@ class ManaBar extends GUI {
 class OxygenBar extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.oxygenBar, playerStats, position);
-  }
-
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.1, this.pos.y * 0.214, this.dim.w, this.dim.h);
+    this.pos.x *= 0.1;
+    this.pos.y *= 0.214;
   }
 
   update() {
@@ -83,10 +82,13 @@ class OxygenBar extends GUI {
 class Stats extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.stats, playerStats, position);
+    this.pos.y *= 0.889;
+    this.pos.x *= 0.5;
+    this.pos.x -= this.dim.w * 0.5;
   }
 
   draw(ctx) {
-    ctx.drawImage(this.sprite, this.pos.x * 0.5 - this.dim.w * 0.5, this.pos.y * 0.889, this.dim.w, this.dim.h);
+    super.draw(ctx);
 
     ctx.textAlign = 'center';
     ctx.font = '14px rubber';
