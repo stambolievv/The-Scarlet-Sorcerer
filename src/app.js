@@ -15,7 +15,7 @@ const CANVAS_HEIGHT = canvas.height = 720;
 
 const ctx = canvas.getContext('2d', { alpha: false });
 ctx.imageSmoothingEnabled = false;
-ctx.DEBUG = false;
+ctx.DEBUG = false; // hitboxes and stuff
 
 let lastTime = 0;
 let elapsed = 0;
@@ -179,9 +179,9 @@ function enemiesCreate(...types) {
 }
 function enemiesAnimation() {
   //! refactoring later
-  // if (elapsed % 4 == 0) { enemiesCreate('saw'); }
-  // if (elapsed % 8 == 0) { enemiesCreate('bat'); }
-  // if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
+  if (elapsed % 4 == 0) { enemiesCreate('saw'); }
+  if (elapsed % 8 == 0) { enemiesCreate('bat'); }
+  if (elapsed % 10 == 0) { enemiesCreate('skeleton'); }
 
   enemies.forEach(e => {
     const sideCollision = e.animation.type == 'skeleton' ? collision([e], platforms) : undefined;
@@ -361,6 +361,24 @@ function overlap(AA, BB, callback) {
   });
 }
 function collision(AA, BB) {
+  /* 
+  ?---------------------------------------------+
+  !                    ISSUE                    |
+  !              Hours spent: >20               |
+  ? --------------------------------------------+
+  !     Whenever player right border is         |
+  !     close to one of the platform            |
+  !     left border and they collide            |
+  !     when jump on it, player is moved        |
+  !     to the left, flush with the border.     |
+  !     Turn on DEBUG for easier visualization. |
+  ? --------------------------------------------|
+  !                   QUICK FIX:                |
+  !          Math.ceil() on "crossWidth".       |
+  !          If removed is getting worst.       |
+  ? --------------------------------------------+
+  */
+
   /*
   Collision detection with different side of objects.
   The "a" from "AA" array stop because "b" from "BB" array is immovable.
@@ -368,26 +386,26 @@ function collision(AA, BB) {
   const side = { top: false, bottom: false, left: false, right: false, type: undefined };
   AA.forEach(a => {
     BB.forEach(b => {
-      // Get the distance for the two objects
-      const dx = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
-      const dy = (a.pos.y + (a.dim.h / 2)) - (b.pos.y + (b.dim.h / 2));
+      // Get the center distance for the two objects
+      const diffX = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
+      const diffY = (a.pos.y + (a.dim.h / 2)) - (b.pos.y + (b.dim.h / 2));
 
       // Add the half widths and half heights of the objects.
       const widthHalf = (a.dim.w / 2) + (b.dim.w / 2);
       const heightHalf = (a.dim.h / 2) + (b.dim.h / 2);
 
       // If the "x" and "y" vector are less than the half width or half height, they we must be inside the object, causing a collision.
-      if (Math.abs(dx) < widthHalf && Math.abs(dy) < heightHalf) {
+      if (Math.abs(diffX) < widthHalf && Math.abs(diffY) < heightHalf) {
 
         // Figures out on which side we are colliding (top, bottom, left, or right).
-        const crossWidth = Math.ceil(widthHalf - Math.abs(dx)); //! ---------- 
-        const crossHeight = heightHalf - Math.abs(dy);
+        const crossWidth = Math.ceil(widthHalf - Math.abs(diffX));
+        const crossHeight = heightHalf - Math.abs(diffY);
 
         // Pass the value of the tile to check if its painful or not.
         side.type = b.tileValue;
 
         if (crossWidth > crossHeight) {
-          if (dy > 0) {
+          if (diffY > 0) {
             side.top = true;
             a.pos.y += crossHeight;
           } else {
@@ -396,7 +414,7 @@ function collision(AA, BB) {
           }
         }
         if (crossWidth < crossHeight) {
-          if (dx > 0) {
+          if (diffX > 0) {
             side.left = true;
             a.pos.x += crossWidth;
           } else {
@@ -404,7 +422,6 @@ function collision(AA, BB) {
             a.pos.x -= crossWidth;
           }
         }
-        // console.log(Math.abs(dx), side.right);
       }
     });
   });
