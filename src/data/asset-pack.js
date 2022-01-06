@@ -30,6 +30,11 @@ export default
         'src': 'static/assets/gui/stats.png',
         'width': 320,
         'height': 64,
+      },
+      'menu': {
+        'src': 'static/assets/gui/menu_icon.png',
+        'width': 32,
+        'height': 32,
       }
     },
     'background': {
