@@ -1,5 +1,5 @@
 import { gameSettings, gui, background, images, audio, spritesheets } from './properties.js';
-import { platforms, players, interfaces, projectiles, perks, keysPressed, enemies, enemyStats, textMessages } from './constants.js';
+import { platforms, players, interfaces, projectiles, perks, enemies, enemyStats, textMessages } from './constants.js';
 import Platform from './entities/Platform.js';
 import Player from './entities/Player.js';
 import { Bat, Skeleton, Saw } from './entities/Enemy.js';
@@ -28,7 +28,6 @@ function animate(timestamp) {
   lastTime = timestamp;
   elapsed += deltaTime;
 
-
   backgroundParallax(background);
   platformsAnimation();
   guiAnimation();
@@ -39,8 +38,8 @@ function animate(timestamp) {
   messagesAnimation();
   textOnDisplay();
   soundVolume(audio, gameSettings.masterVolume);
-
   tick(ctx, elapsed);
+
   requestAnimationFrame(animate);
 }
 //handle background
@@ -100,7 +99,7 @@ function playerAnimation() {
 
   players.forEach(p => {
     p.draw(ctx, elapsed);
-    p.update(keysPressed, sideWorld, sideCollision);
+    p.update(gameSettings.keyboard, sideWorld, sideCollision);
     p.handleStats(elapsed);
     if (p.state.outOfOxygen) {
       messageCreate('Out of oxygen. You are taking damage', 90, 32, 'red');
@@ -129,29 +128,6 @@ function guiAnimation() {
     i.draw(ctx);
     i.update();
   });
-}
-function keyPress(e) {
-  if (e.type == 'keydown') {
-    // on keydown event
-    keysPressed.add(e.code);
-  } else {
-    // on keyup event
-    keysPressed.delete(e.code);
-  }
-}
-function onClick(e) {
-  if (players[0].stats.mana >= 20) {
-    if (players[0].state.canShoot) {
-      players[0].state.canShoot = false;
-      players[0].stats.fireRateReg = 0;
-      players[0].stats.mana -= 20;
-      players[0].animation.state = 'attack';
-
-      projectilesCreate(e.offsetX, e.offsetY);
-    }
-  } else {
-    messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
-  }
 }
 
 // handle enemies
@@ -230,6 +206,20 @@ function projectilesAnimation() {
   });
 
   removeWorldOutBounds(projectiles);
+}
+function projectileFire(e) {
+  if (gameSettings.mouse.pressed && players[0].stats.mana >= 20) {
+    if (players[0].state.canShoot) {
+      players[0].state.canShoot = false;
+      players[0].stats.fireRateReg = 0;
+      players[0].stats.mana -= 20;
+      players[0].animation.state = 'attack';
+
+      projectilesCreate(e.offsetX, e.offsetY);
+    }
+  } else {
+    messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
+  }
 }
 
 //handle perks
@@ -335,7 +325,6 @@ function textOnDisplay() {
   ctx.fillStyle = 'white';
   ctx.fillText('Timer: ' + gameSettings.timer.output, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.05);
   ctx.fillText('Score: ' + gameSettings.scorePoints, CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.09);
-  // gameSettings.menu = ctx.fillText('Settings', CANVAS_WIDTH * 0.9, CANVAS_HEIGHT * 0.05);
 }
 
 //handle sounds
@@ -490,8 +479,27 @@ function random(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+ 
+//?    /////////////////////////
+//?   //// EVENT LISTENERS ////
+//?  /////////////////////////
 
-window.addEventListener('keydown', keyPress);
-window.addEventListener('keyup', keyPress);
-window.addEventListener('click', onClick);
+window.addEventListener('keydown', (e) => {
+  gameSettings.keyboard.add(e.code);
+});
+window.addEventListener('keyup', (e) => {
+  gameSettings.keyboard.delete(e.code);
+});
+canvas.addEventListener('mousemove', (e) => {
+  gameSettings.mouse.x = e.offsetX || e.layerX;
+  gameSettings.mouse.y = e.offsetY || e.layerY;
+});
+canvas.addEventListener('mousedown', (e) => {
+  gameSettings.mouse.pressed = true;
+  projectileFire(e);
+});
+canvas.addEventListener('mouseup', (e) => {
+  gameSettings.mouse.pressed = false;
+  console.log(gameSettings);
+});
 window.addEventListener('load', animate(0));
