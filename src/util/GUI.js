@@ -1,4 +1,8 @@
-import { gameSettings } from '../properties.js';
+import { GAME, ASSETS } from '../properties.js';
+import { interfaces, players } from '../constants.js';
+import { relativePosition } from '../mechanics.js';
+
+
 
 class GUI {
   constructor(sprite, playerStats, position) {
@@ -8,6 +12,7 @@ class GUI {
     this.maxWidth = this.dim.w;
     this.playerStats = playerStats;
     this.state = 'default';
+    this.isClicked = false;
   }
   draw(ctx) {
     ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
@@ -18,17 +23,25 @@ class GUI {
     }
   }
   update() {
-    if (gameSettings.mouse.x >= this.pos.x && gameSettings.mouse.x <= this.pos.x + this.dim.w &&
-      gameSettings.mouse.y >= this.pos.y && gameSettings.mouse.y <= this.pos.y + this.dim.h) {
-      if (gameSettings.mouse.pressed) { return this.state = 'active'; }
-      return this.state = 'hover';
+    if (GAME.MOUSE.x >= this.pos.x && GAME.MOUSE.x <= this.pos.x + this.dim.w &&
+      GAME.MOUSE.y >= this.pos.y && GAME.MOUSE.y <= this.pos.y + this.dim.h) {
+
+      this.state = 'hover';
+
+      if (GAME.MOUSE.pressed) {
+        this.state = 'active';
+        if (!this.isClicked) { this.isClicked = true; }
+      } else {
+        this.isClicked = false;
+      }
+
     } else {
-      return this.state = 'default';
+      this.state = 'default';
     }
   }
 }
 
-class __HUD__ extends GUI {
+class HUD extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.hud, playerStats, position);
     this.pos.x *= 0.05;
@@ -49,7 +62,7 @@ class HealthBar extends GUI {
     }
   }
 }
-class _BonusBar extends GUI {
+class BonusBar extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.bonusBar, playerStats, position);
     this.pos.x *= 0.1;
@@ -88,14 +101,13 @@ class OxygenBar extends GUI {
     }
   }
 }
-
 class Stats extends GUI {
   constructor(sprite, playerStats, position) {
     super(sprite.stats, playerStats, position);
     this.pos.y *= 0.889;
     this.pos.x *= 0.5;
     this.pos.x -= this.dim.w * 0.5;
-    this._hoverText = [];
+    this._infoText = [];
     this._textPos = [
       { x: 0.26, y: 1.03 },
       { x: 0.26, y: 1.09 },
@@ -112,10 +124,15 @@ class Stats extends GUI {
   draw(ctx) {
     super.draw(ctx);
 
+    ctx.textAlign = 'right';
+    ctx.font = '18px rubber';
+    this._infoText.forEach((t, i) => {
+      ctx.fillText(t, this.pos.x * this._textPos[i].x, this.pos.y * this._textPos[i].y);
+    });
+
     ctx.textAlign = 'center';
     ctx.font = '14px rubber';
     ctx.fillStyle = 'white';
-
     ctx.fillText(this.playerStats.level, ctx.canvas.width * 0.413, ctx.canvas.height * 0.921);
     ctx.fillText(this.playerStats.health, ctx.canvas.width * 0.461, ctx.canvas.height * 0.921);
     ctx.fillText(Math.floor(this.playerStats.mana) / 10, ctx.canvas.width * 0.511, ctx.canvas.height * 0.921);
@@ -126,18 +143,12 @@ class Stats extends GUI {
     ctx.fillText(this.playerStats.bonusHealth, ctx.canvas.width * 0.461, ctx.canvas.height * 0.965);
     ctx.fillText(Math.floor(this.playerStats.oxygen / 10), ctx.canvas.width * 0.511, ctx.canvas.height * 0.965);
     ctx.fillText(this.playerStats.movementSpeed.toFixed(1), ctx.canvas.width * 0.561, ctx.canvas.height * 0.965);
-
-    this._hoverText.forEach((t, i) => {
-      ctx.textAlign = 'right';
-      ctx.font = '18px rubber';
-      ctx.fillText(t, this.pos.x * this._textPos[i].x, this.pos.y * this._textPos[i].y);
-    });
   }
 
   update() {
     super.update();
-    if (this.state == 'hover' || this.state == 'active') {
-      this._hoverText = [
+    if (GAME.statsInfo) {
+      this._infoText = [
         `Level: ${this.playerStats.level}`,
         `Perks: ${this.playerStats.perks}`,
         `Health: ${this.playerStats.health}`,
@@ -149,24 +160,16 @@ class Stats extends GUI {
         `Fire Rate: ${this.playerStats.fireRate.toFixed(1)}`,
       ];
     } else {
-      this._hoverText = [];
+      this._infoText = [];
     }
   }
 }
 
-
-class Menu extends GUI {
+class Icon extends GUI {
   constructor(sprite, playerStats, position) {
-    super(sprite.menu, playerStats, position);
-    this.pos.x *= 0.95;
-    this.pos.y *= 0.02;
-    this.dim.w *= 1.3;
-    this.dim.h *= 1.3;
-    this.isClicked = false;
-    this.shadow = {
-      color: 'gray',
-      blur: 10
-    };
+    super(sprite, playerStats, position);
+    this.text = '';
+    this.shadow = { color: 'gray', blur: 10 };
   }
 
   draw(ctx) {
@@ -175,6 +178,10 @@ class Menu extends GUI {
     super.draw(ctx);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
+
+    if (this.state == 'hover' || this.state == 'active') {
+      ctx.fillText(this.text, this.pos.x + this.dim.w * 0.5, this.pos.y - 10);
+    }
   }
 
   update() {
@@ -186,16 +193,172 @@ class Menu extends GUI {
       this.shadow.color = 'gray';
       this.shadow.blur = 10;
     }
-    if (this.state == 'active') { gameSettings.state = 'pause'; }
+  }
+}
+class Menu extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.menu, playerStats, position);
+    this.pos.x *= 0.94;
+    this.pos.y *= 0.02;
+  }
+  update() {
+    super.update();
+    if (this.isClicked) { return GAME.paused = true; }
+  }
+}
+class MenuBg extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.bg, playerStats, position);
+    this.pos.x *= 0.5;
+    this.pos.x -= this.dim.w * 0.5;
+    this.pos.y *= 0.5;
+    this.pos.y -= this.dim.h * 0.5;
+  };
+
+  draw(ctx) {
+    super.draw(ctx);
+    ctx.font = 'bold 48px rubber';
+    ctx.fillText('Paused', this.pos.x * 1.53, this.pos.y * 1.26);
+  }
+
+  update() { }
+}
+class Back extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.back, playerStats, position);
+    this.pos.x *= 0.376;
+    this.pos.y *= 0.434;
+    this.text = 'Go Back';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { return GAME.paused = false; }
+  }
+}
+class Restart extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.restart, playerStats, position);
+    this.pos.x *= 0.476;
+    this.pos.y *= 0.434;
+    this.text = 'Restart';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { return GAME.paused = false; }
+  }
+}
+class Resume extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.resume, playerStats, position);
+    this.pos.x *= 0.576;
+    this.pos.y *= 0.434;
+    this.text = 'Resume';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { return GAME.paused = false; }
+  }
+}
+class Power extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.power, playerStats, position);
+    this.pos.x *= 0.377;
+    this.pos.y *= 0.567;
+    this.text = 'Cheat Mode';
+    this.playerStats = playerStats;
+    this.oldStats = playerStats;
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) {
+      GAME.cheatMode = this.isClicked;
+    }
+
+    if (GAME.cheatMode) {
+      this.playerStats.level = 999;
+      this.playerStats.perks = 999;
+      this.playerStats.health = 999;
+      this.playerStats.maxHealth = 999;
+      this.playerStats.bonusHealth = 999;
+      this.playerStats.maxBonusHealth = 999;
+      this.playerStats.mana = 999;
+      this.playerStats.maxMana = 999;
+      this.playerStats.manaReg = 3;
+      this.playerStats.oxygen = 9999;
+      this.playerStats.maxOxygen = 9999;
+      this.playerStats.jumpBoost = 20;
+      this.playerStats.movementSpeed = 150;
+      this.playerStats.fireRate = 0;
+    } else {
+      this.playerStats = this.oldStats;
+    }
+  }
+}
+class Info extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.info, playerStats, position);
+    this.pos.x *= 0.476;
+    this.pos.y *= 0.567;
+    this.text = 'Stats Info';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) {
+      GAME.statsInfo = this.isClicked;
+    } else {
+      GAME.statsInfo = this.isClicked;
+    }
+  }
+}
+class Fps extends Icon {
+  constructor(sprite, playerStats, position) {
+    super(sprite.fps, playerStats, position);
+    this.pos.x *= 0.576;
+    this.pos.y *= 0.567;
+    this.text = 'Show FPS';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { return GAME.showFps = !GAME.showFps; }
   }
 }
 
-export {
-  __HUD__,
-  _BonusBar,
-  HealthBar,
+const elements = [
+  // MenuBg,
+  // Restart,
+  // Resume,
+  // Back,
+  // Power,
+  // Info,
+  // Fps,
+  // Menu,
+  Stats,
   ManaBar,
   OxygenBar,
-  Stats,
-  Menu,
+  HealthBar,
+  BonusBar,
+  HUD,
+];
+
+(function create() {
+  elements.forEach(i => {
+    interfaces.push(new i(ASSETS.gui, players[0].stats, relativePosition(1, 1)));
+  });
+})();
+
+function guiAnimation(ctx) {
+  interfaces.forEach(i => {
+    i.draw(ctx);
+    i.update();
+  });
+}
+
+export {
+  guiAnimation
 };

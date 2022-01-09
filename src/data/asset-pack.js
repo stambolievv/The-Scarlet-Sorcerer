@@ -31,10 +31,45 @@ export default
         'width': 320,
         'height': 64,
       },
+      'bg': {
+        'src': 'static/assets/gui/menu_bg.png',
+        'width': 448,
+        'height': 288,
+      },
       'menu': {
         'src': 'static/assets/gui/menu_icon.png',
-        'width': 32,
-        'height': 32,
+        'width': 64,
+        'height': 64,
+      },
+      'back': {
+        'src': 'static/assets/gui/back_icon.png',
+        'width': 64,
+        'height': 64,
+      },
+      'restart': {
+        'src': 'static/assets/gui/restart_icon.png',
+        'width': 64,
+        'height': 64,
+      },
+      'resume': {
+        'src': 'static/assets/gui/resume_icon.png',
+        'width': 64,
+        'height': 64,
+      },
+      'power': {
+        'src': 'static/assets/gui/power_icon.png',
+        'width': 64,
+        'height': 64,
+      },
+      'info': {
+        'src': 'static/assets/gui/info_icon.png',
+        'width': 64,
+        'height': 64,
+      },
+      'fps': {
+        'src': 'static/assets/gui/fps_icon.png',
+        'width': 64,
+        'height': 64,
       }
     },
     'background': {
@@ -154,7 +189,7 @@ export default
         'src': 'static/assets/bat.png',
         'frameWidth': 64,
         'frameHeight': 64,
-        'pointsForDeath': 5,
+        'pointsForDeath': 10,
         'animations': {
           'batLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 64, 'y': 0 }, { 'x': 128, 'y': 0 }] },
           'batRight': { 'loc': [{ 'x': 0, 'y': 64 }, { 'x': 64, 'y': 64 }, { 'x': 128, 'y': 64 }] },
@@ -164,7 +199,7 @@ export default
         'src': 'static/assets/skeleton.png',
         'frameWidth': 32,
         'frameHeight': 32,
-        'pointsForDeath': 10,
+        'pointsForDeath': 20,
         'animations': {
           'skeletonLeft': { 'loc': [{ 'x': 0, 'y': 0 }, { 'x': 32, 'y': 0 }, { 'x': 64, 'y': 0 }] },
           'skeletonRight': { 'loc': [{ 'x': 0, 'y': 32 }, { 'x': 32, 'y': 32 }, { 'x': 64, 'y': 32 }] },
