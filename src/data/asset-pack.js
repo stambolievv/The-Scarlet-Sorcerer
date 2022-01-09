@@ -2,97 +2,97 @@ export default
   {
     'gui': {
       'hud': {
-        'src': 'static/assets/gui/hud_bg.png',
+        'src': 'assets/images/gui/hud_bg.png',
         'width': 273,
         'height': 74,
       },
       'healthBar': {
-        'src': 'static/assets/gui/hp_bar.png',
+        'src': 'assets/images/gui/hp_bar.png',
         'width': 185,
         'height': 24,
       },
       'bonusBar': {
-        'src': 'static/assets/gui/bonus_hp_bar.png',
+        'src': 'assets/images/gui/bonus_hp_bar.png',
         'width': 185,
         'height': 24,
       },
       'manaBar': {
-        'src': 'static/assets/gui/mana_bar.png',
+        'src': 'assets/images/gui/mana_bar.png',
         'width': 205,
         'height': 12,
       },
       'oxygenBar': {
-        'src': 'static/assets/gui/oxygen_bar.png',
+        'src': 'assets/images/gui/oxygen_bar.png',
         'width': 180,
         'height': 11,
       },
       'stats': {
-        'src': 'static/assets/gui/stats.png',
+        'src': 'assets/images/gui/stats.png',
         'width': 320,
         'height': 64,
       },
       'bg': {
-        'src': 'static/assets/gui/menu_bg.png',
+        'src': 'assets/images/gui/menu_bg.png',
         'width': 448,
         'height': 288,
       },
       'menu': {
-        'src': 'static/assets/gui/menu_icon.png',
+        'src': 'assets/images/gui/menu_icon.png',
         'width': 64,
         'height': 64,
       },
       'back': {
-        'src': 'static/assets/gui/back_icon.png',
+        'src': 'assets/images/gui/back_icon.png',
         'width': 64,
         'height': 64,
       },
       'restart': {
-        'src': 'static/assets/gui/restart_icon.png',
+        'src': 'assets/images/gui/restart_icon.png',
         'width': 64,
         'height': 64,
       },
       'resume': {
-        'src': 'static/assets/gui/resume_icon.png',
+        'src': 'assets/images/gui/resume_icon.png',
         'width': 64,
         'height': 64,
       },
       'power': {
-        'src': 'static/assets/gui/power_icon.png',
+        'src': 'assets/images/gui/power_icon.png',
         'width': 64,
         'height': 64,
       },
       'info': {
-        'src': 'static/assets/gui/info_icon.png',
+        'src': 'assets/images/gui/info_icon.png',
         'width': 64,
         'height': 64,
       },
       'fps': {
-        'src': 'static/assets/gui/fps_icon.png',
+        'src': 'assets/images/gui/fps_icon.png',
         'width': 64,
         'height': 64,
       }
     },
     'background': {
       'layer1': {
-        'src': 'static/assets/layers/1.png',
+        'src': 'assets/images/layers/1.png',
         'width': 1296,
         'height': 720,
         'moving': false
       },
       'layer2': {
-        'src': 'static/assets/layers/2.png',
+        'src': 'assets/images/layers/2.png',
         'width': 1296,
         'height': 720,
         'moving': false
       },
       'layer3': {
-        'src': 'static/assets/layers/3.png',
+        'src': 'assets/images/layers/3.png',
         'width': 1296,
         'height': 720,
         'moving': false
       },
       'layer4': {
-        'src': 'static/assets/layers/4.png',
+        'src': 'assets/images/layers/4.png',
         'width': 1920,
         'height': 720,
         'moving': true
@@ -101,7 +101,7 @@ export default
     'spritesheets': {
       // map
       'tileset': {
-        'src': 'static/assets/tileset.png',
+        'src': 'assets/images/tileset.png',
         'frameWidth': 48,
         'frameHeight': 48,
         'columns': 18,
@@ -127,7 +127,7 @@ export default
       },
       // player
       'player': {
-        'src': 'static/assets/wizard.png',
+        'src': 'assets/images/wizard.png',
         'frameWidth': 166,
         'frameHeight': 136,
         'animations': {
@@ -150,7 +150,7 @@ export default
         }
       },
       'projectile': {
-        'src': 'static/assets/fireball.png',
+        'src': 'assets/images/fireball.png',
         'frameWidth': 17,
         'frameHeight': 34,
         'animations': {
@@ -158,7 +158,7 @@ export default
         }
       },
       'perk': {
-        'src': 'static/assets/perk.png',
+        'src': 'assets/images/perk.png',
         'frameWidth': 24,
         'frameHeight': 24,
         'position': [
@@ -186,7 +186,7 @@ export default
       },
       // enemies
       'bat': {
-        'src': 'static/assets/bat.png',
+        'src': 'assets/images/bat.png',
         'frameWidth': 64,
         'frameHeight': 64,
         'pointsForDeath': 10,
@@ -196,7 +196,7 @@ export default
         }
       },
       'skeleton': {
-        'src': 'static/assets/skeleton.png',
+        'src': 'assets/images/skeleton.png',
         'frameWidth': 32,
         'frameHeight': 32,
         'pointsForDeath': 20,
@@ -206,7 +206,7 @@ export default
         }
       },
       'saw': {
-        'src': 'static/assets/saw.png',
+        'src': 'assets/images/saw.png',
         'frameWidth': 50,
         'frameHeight': 50,
         'pointsForDeath': 0,
@@ -218,21 +218,21 @@ export default
     },
     'audio': {
       'background': {
-        'src': 'static/audio/background.wav',
+        'src': 'assets/audio/background.wav',
         'loop': true
       },
       'collect': {
-        'src': 'static/audio/collect.wav',
+        'src': 'assets/audio/collect.wav',
         'loop': false
 
       },
       'footsteps': {
-        'src': 'static/audio/footsteps.wav',
+        'src': 'assets/audio/footsteps.wav',
         'loop': false
 
       },
       'enemyKill': {
-        'src': 'static/audio/enemyKill.wav',
+        'src': 'assets/audio/enemyKill.wav',
         'loop': false
       },
     }

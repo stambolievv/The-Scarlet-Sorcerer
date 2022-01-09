@@ -9,7 +9,7 @@ class Perk {
     this.sprite = data.sprite;
     this.pos = { x: position.x, y: position.y };
     this.dim = { w: 24, h: 24 };
-    this.type = this.prop.variety[random(0, this.prop.variety.length)];
+    this.type = this.prop.variety[random(0, this.prop.variety.length - 1)];
     this.theta = 0;
   }
 
