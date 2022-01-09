@@ -1,4 +1,4 @@
-import { GAME, ASSETS } from './properties.js';
+import { GAME, ASSETS } from '../src/properties.js';
 import { players } from './constants.js';
 import { platformsAnimation } from './entities/platform.js';
 import { playerAnimation } from './entities/player.js';
