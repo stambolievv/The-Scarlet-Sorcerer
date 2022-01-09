@@ -49,6 +49,7 @@ function floatingMessages(ctx) {
   //text on display
   GAME.TIMER.start();
   ctx.font = '24px rubber';
+  ctx.fillStyle = 'white';
   ctx.fillText('Timer: ' + GAME.TIMER.output, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.05);
   ctx.fillText('Score: ' + GAME.SCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.09);
 }
