@@ -1,5 +1,5 @@
-import { GAME, ASSETS } from './properties.js';
-import { players } from './constants.js';
+import { GAME, ASSETS } from '/src/properties.js';
+import { players } from '../src/constants.js';
 import { platformsAnimation } from './entities/platform.js';
 import { playerAnimation } from './entities/player.js';
 import { enemiesAnimation } from './entities/enemy.js';
