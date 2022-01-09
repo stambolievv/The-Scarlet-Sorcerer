@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param {Object} source 
+ * @returns {Object} 
+ */
 export default function loadFiles(source) {
   const media = { gui: {}, background: {}, images: {}, audio: {} };
 

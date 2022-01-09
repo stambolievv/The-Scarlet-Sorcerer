@@ -1,9 +1,12 @@
-import { audio } from '../properties.js';
+import { GAME, ASSETS, DATA } from '../properties.js';
+import { players, enemies, platforms } from '../constants.js';
+import { overlap, collision, collideWorldBounds, relativePosition } from '../mechanics.js';
+import { messageCreate } from '../util/floatingMessage.js';
 import createTimer from '../util/Timer.js';
 
 const oxygenTimer = new createTimer(true);
 
-export default class Player {
+class Player {
   constructor(data, position) {
     this.prop = data.prop;
     this.sprite = data.sprite;
@@ -80,7 +83,7 @@ export default class Player {
         if (!side.left && this.vel.x > -this.stats.movementSpeed) {
           this.vel.x--;
         }
-        if (side.bottom) { audio.footsteps.play(); }
+        if (side.bottom) { ASSETS.audio.footsteps.play(); }
         this.animation.orientation = 'Left';
         this.animation.state = 'run';
       },
@@ -94,7 +97,7 @@ export default class Player {
         if (!side.right && this.vel.x < this.stats.movementSpeed) {
           this.vel.x++;
         }
-        if (side.bottom) { audio.footsteps.play(); }
+        if (side.bottom) { ASSETS.audio.footsteps.play(); }
         this.animation.orientation = 'Right';
         this.animation.state = 'run';
       },
@@ -176,3 +179,42 @@ export default class Player {
     }
   }
 }
+
+(function create() {
+  const playerData = {
+    prop: DATA.player,
+    sprite: ASSETS.images.player,
+    painfulFrame: DATA.tileset.painfulFrame
+  };
+
+  players.push(new Player(playerData, relativePosition(0.1, 0.65)));
+})();
+
+function playerAnimation(ctx, elapsed) {
+  const sideWorld = collideWorldBounds(players);
+  const sideCollision = collision(players, platforms);
+
+  players.forEach(p => {
+    p.draw(ctx, elapsed);
+    p.update(GAME.KEYBOARD, sideWorld, sideCollision);
+    p.handleStats(elapsed);
+    if (p.state.outOfOxygen) {
+      messageCreate('Out of oxygen. You are taking damage', 90, 32, 'red');
+    }
+  });
+
+  overlap(players, enemies, (player, enemy) => {
+    enemies.splice(enemies.indexOf(enemy), 1);
+    ASSETS.audio.enemyKill.play();
+
+    if (player.stats.bonusHealth > 0) {
+      player.stats.bonusHealth -= 1;
+    } else {
+      player.stats.health -= 1;
+    }
+  });
+}
+
+export {
+  playerAnimation
+};

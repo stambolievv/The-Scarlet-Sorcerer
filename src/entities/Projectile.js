@@ -1,4 +1,9 @@
-export default class Projectiles {
+import { GAME, ASSETS, DATA } from '../properties.js';
+import { projectiles, players } from '../constants.js';
+import { removeWorldOutBounds } from '../mechanics.js';
+import { messageCreate } from '../util/floatingMessage.js';
+
+class Projectiles {
   constructor(data) {
     this.prop = data.prop;
     this.sprite = data.sprite;
@@ -30,3 +35,42 @@ export default class Projectiles {
     this.pos.y -= this.vel.y * Math.sin(this.angle);
   }
 }
+
+function create(mouseX, mouseY) {
+  const projectileData = {
+    prop: DATA.projectile,
+    sprite: ASSETS.images.projectile,
+    player: players[0],
+    angle: Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX)
+  };
+  projectiles.push(new Projectiles(projectileData));
+};
+
+function projectileFire(e) {
+  if (GAME.MOUSE.pressed && players[0].stats.mana >= 20) {
+    if (players[0].state.canShoot) {
+      players[0].state.canShoot = false;
+      players[0].stats.fireRateReg = 0;
+      players[0].stats.mana -= 20;
+      players[0].animation.state = 'attack';
+
+      create(e.offsetX, e.offsetY);
+    }
+  } else {
+    messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
+  }
+}
+
+function projectilesAnimation(ctx, elapsed) {
+  projectiles.forEach(p => {
+    p.draw(ctx, elapsed);
+    p.update();
+  });
+
+  removeWorldOutBounds(projectiles);
+}
+
+export {
+  projectileFire,
+  projectilesAnimation
+};

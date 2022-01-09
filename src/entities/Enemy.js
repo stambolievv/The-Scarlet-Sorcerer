@@ -1,3 +1,9 @@
+import { GAME, ASSETS, DATA } from '../properties.js';
+import { enemies, enemyStats, players, platforms, projectiles } from '../constants.js';
+import { overlap, collision, removeWorldOutBounds, relativePosition, random } from '../mechanics.js';
+import { spawnPerk } from './perk.js';
+import { messageCreate } from '../util/floatingMessage.js';
+
 class Enemy {
   constructor(data, position) {
     this.prop = data.prop;
@@ -31,26 +37,24 @@ class Enemy {
   }
 }
 
-
-export class Bat extends Enemy {
+class Bat extends Enemy {
   constructor(data, position) {
     super(data, position);
     this.props = this.animation.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
     this.pos.x = this.props.spawn;
-    this.pos.y *= (Math.random() * (0.7 - 0.1) + 0.1);
+    this.pos.y *= random(1, 7) / 10;
   }
 
   update() {
     this.pos.x += this.props.movement * (Math.random() * this.stats.speed);
-    this.pos.y += Math.sin(Math.random() * 4 - 5);
+    this.pos.y += Math.sin(random(1, 6));
   }
 }
-
-export class Skeleton extends Enemy {
+class Skeleton extends Enemy {
   constructor(data, position) {
     super(data, position);
-    this.pos.x *= Math.random() * (0.9 - 0.1) + 0.1;
-    this.pos.y *= Math.random() * (0.3 - 0.15) + 0.15;
+    this.pos.x *= random(9, 1) / 10;
+    this.pos.y *= random(2, 3) / 10;
   }
 
   update(side) {
@@ -82,13 +86,12 @@ export class Skeleton extends Enemy {
     if (side.bottom) { this.vel.y = 0; }
   }
 }
-
-export class Saw extends Enemy {
+class Saw extends Enemy {
   constructor(data, position) {
     super(data, position);
     this.props = this.animation.orientation == 'Left' ? { spawn: this.pos.x, movement: -1 } : { spawn: -this.dim.w, movement: 1 };
     this.pos.x = this.props.spawn;
-    this.pos.y *= Math.random() * (0.7 - 0.1) + 0.1;
+    this.pos.y *= random(1, 7) / 10;
   }
 
   update() {
@@ -97,3 +100,88 @@ export class Saw extends Enemy {
     this.pos.y += this.vel.y;
   }
 }
+
+function create(...types) {
+  const spawnPoint = relativePosition(1, 1);
+
+  for (const type of types) {
+    const enemyData = {
+      prop: DATA[type],
+      sprite: ASSETS.images[type],
+      player: players[0],
+      stats: enemyStats
+    };
+
+    if (type == 'bat') {
+      enemies.push(new Bat(enemyData, spawnPoint));
+      continue;
+    }
+    if (type == 'skeleton') {
+      enemies.push(new Skeleton(enemyData, spawnPoint));
+      continue;
+    }
+    if (type == 'saw') {
+      enemies.push(new Saw(enemyData, spawnPoint));
+      continue;
+    }
+  }
+}
+function enemiesAnimation(ctx, elapsed) {
+  //! refactoring later
+
+  // if (elapsed % 4 == 0) { create('saw'); }
+  // if (elapsed % 8 == 0) { create('bat'); }
+  // if (elapsed % 10 == 0) { create('skeleton'); }
+
+  enemies.forEach(e => {
+    const sideCollision = e.animation.type == 'skeleton' ? collision([e], platforms) : undefined;
+    e.draw(ctx, elapsed);
+    e.update(sideCollision);
+  });
+
+  overlap(enemies, projectiles, (enemy, projectile) => {
+    if (enemy.animation.type == 'saw') { return; }
+
+    projectiles.splice(projectiles.indexOf(projectile), 1);
+
+    enemy.stats.health -= 1;
+
+    if (enemy.stats.health == 0) {
+      GAME.SCORE += enemy.prop.pointsForDeath;
+      enemies.splice(enemies.indexOf(enemy), 1);
+    }
+
+    ASSETS.audio.enemyKill.play();
+
+    handleScore();
+  });
+
+  removeWorldOutBounds(enemies);
+}
+
+
+function handleScore() {
+  if (GAME.SCORE % 20 == 0 && GAME.SCORE % 100 != 0) {
+    enemyStats.speed += 0.2;
+    messageCreate('Enemy speed increase', 50);
+  }
+
+  if (GAME.SCORE % 10 == 0 && GAME.SCORE % 100 != 0) {
+    players[0].stats.level += 1;
+    spawnPerk();
+    messageCreate('New Perk spawned for 15 sec', 70, 22);
+  }
+
+  if (GAME.SCORE == 100 || GAME.SCORE == 200) {
+    messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
+  }
+
+  if (GAME.SCORE == 300) {
+    messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
+  }
+}
+
+
+export {
+  enemiesAnimation
+};

@@ -1,4 +1,8 @@
-export default class FloatingMessage {
+import { GAME } from '../properties.js';
+import { textMessages } from '../constants.js';
+import { relativePosition } from '../mechanics.js';
+
+class FloatingMessage {
   constructor(text, position, fixed, size, color) {
     this.text = text;
     this.pos = { x: position.x, y: position.y };
@@ -26,3 +30,24 @@ export default class FloatingMessage {
     if (this.opacity > 0.01) { this.opacity -= 0.005; }
   }
 }
+
+function messageCreate(text, priority = 0, size = 18, color = 'white', position = { x: 0.5, y: 0.3 }, fixed = true) {
+  const spawnPoint = relativePosition(position.x, position.y);
+  textMessages.unshift({ priority, text: new FloatingMessage(text, spawnPoint, fixed, size, color) });
+}
+
+function floatingMessages(ctx) {
+  textMessages
+    .sort((a, b) => b.priority - a.priority)
+    .forEach(({ text }, i) => {
+      if (text.fixed) { text.pos.y = GAME.HEIGHT * 0.3 - i * 30; }
+      text.draw(ctx);
+      text.update();
+      if (text.lifeSpan > 200) { textMessages.splice(i, 1); }
+    });
+}
+
+export {
+  messageCreate,
+  floatingMessages,
+};
