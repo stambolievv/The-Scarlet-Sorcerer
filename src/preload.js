@@ -1,5 +1,4 @@
 /**
- * 
  * @param {Object} source 
  * @returns {Object} 
  */

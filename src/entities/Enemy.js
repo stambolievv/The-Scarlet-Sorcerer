@@ -128,10 +128,9 @@ function create(...types) {
 }
 function enemiesAnimation(ctx, elapsed) {
   //! refactoring later
-
-  // if (elapsed % 4 == 0) { create('saw'); }
-  // if (elapsed % 8 == 0) { create('bat'); }
-  // if (elapsed % 10 == 0) { create('skeleton'); }
+  if (elapsed % 4 == 0) { create('saw'); }
+  if (elapsed % 8 == 0) { create('bat'); }
+  if (elapsed % 10 == 0) { create('skeleton'); }
 
   enemies.forEach(e => {
     const sideCollision = e.animation.type == 'skeleton' ? collision([e], platforms) : undefined;

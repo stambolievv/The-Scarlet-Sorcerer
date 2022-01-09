@@ -8,7 +8,22 @@ const spriteAnimation = [];
 // Manually add each animation name and frames length.
 // The name should be something conventional.
 const animationState = [
-  { name: 'blade', frames: 3 },
+  { name: 'ultimateLeft', frames: 8 },
+  { name: 'ultimateRight', frames: 8 },
+  { name: 'attackLeft', frames: 8 },
+  { name: 'attackRight', frames: 8 },
+  { name: 'deathLeft', frames: 7 },
+  { name: 'deathRight', frames: 7 },
+  { name: 'fallLeft', frames: 2 },
+  { name: 'fallRight', frames: 2 },
+  { name: 'hitLeft', frames: 4 },
+  { name: 'hitRight', frames: 4 },
+  { name: 'idleLeft', frames: 6 },
+  { name: 'idleRight', frames: 6 },
+  { name: 'jumpLeft', frames: 2 },
+  { name: 'jumpRight', frames: 2 },
+  { name: 'runLeft', frames: 8 },
+  { name: 'runRight', frames: 8 }
 ];
 
 // For each object in "animationState" array

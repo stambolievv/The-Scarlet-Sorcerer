@@ -35,7 +35,6 @@ function animate(timestamp) {
   projectilesAnimation(ctx, elapsed);
   perkAnimation(ctx, elapsed);
   floatingMessages(ctx);
-  textOnDisplay();
   guiAnimation(ctx);
   soundVolume(ASSETS.audio, GAME.VOLUME);
   tick(ctx, elapsed);
@@ -48,15 +47,6 @@ function backgroundParallax(background) {
     const posX = layer.moving ? (Math.round(players[0].pos.x * -0.1)) : 0;
     ctx.drawImage(layer, posX, 0, layer.width, layer.height);
   });
-}
-
-function textOnDisplay() {
-  GAME.TIMER.start();
-  ctx.font = '24px rubber';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'white';
-  ctx.fillText('Timer: ' + GAME.TIMER.output, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.05);
-  ctx.fillText('Score: ' + GAME.SCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.09);
 }
 
 function soundVolume(sounds, masterVolume) {
