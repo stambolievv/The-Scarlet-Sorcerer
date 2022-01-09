@@ -1,13 +1,13 @@
-import { GAME, ASSETS } from '../src/properties.js';
-import { players } from '../src/constants.js';
-import { platformsAnimation } from '../src/entities/platform.js';
-import { playerAnimation } from '../src/entities/player.js';
-import { enemiesAnimation } from '../src/entities/enemy.js';
-import { projectileFire, projectilesAnimation } from '../src/entities/projectile.js';
-import { perkAnimation } from '../src/entities/perk.js';
-import { guiAnimation } from '../src/util/GUI.js';
-import { floatingMessages } from '../src/util/floatingMessage.js';
-import tick from '../src/util/fps.js';
+import { GAME, ASSETS } from './properties.js';
+import { players } from './constants.js';
+import { platformsAnimation } from './entities/platform.js';
+import { playerAnimation } from './entities/player.js';
+import { enemiesAnimation } from './entities/enemy.js';
+import { projectileFire, projectilesAnimation } from './entities/projectile.js';
+import { perkAnimation } from './entities/perk.js';
+import { guiAnimation } from './util/GUI.js';
+import { floatingMessages } from './util/floatingMessage.js';
+import tick from './util/fps.js';
 
 /** @type {HTMLCanvasElement} */
 const canvas = document.getElementById('game');
