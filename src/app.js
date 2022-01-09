@@ -1,8 +1,8 @@
 import { GAME, ASSETS } from '../src/properties.js';
 import { players } from './constants.js';
-import { platformsAnimation } from './entities/platform.js';
-import { playerAnimation } from './entities/player.js';
-import { enemiesAnimation } from './entities/enemy.js';
+import { platformsAnimation } from '../src/entities/platform.js';
+import { playerAnimation } from '../src/entities/player.js';
+import { enemiesAnimation } from '../src/entities/enemy.js';
 import { projectileFire, projectilesAnimation } from './entities/projectile.js';
 import { perkAnimation } from './entities/perk.js';
 import { guiAnimation } from './util/GUI.js';
