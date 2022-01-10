@@ -11,13 +11,14 @@ class Player {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.painfulFrame = data.painfulFrame;
+    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.vel = { x: 0, y: 0 };
     this.dim = { w: 30, h: 50 };
     this.gravity = { x: 0, y: 0.5 };
     this.friction = { x: 0.9, y: 0.99 };
     this.animation = {
-      state: 'idle',
+      type: 'idle',
       orientation: 'Right'
     };
     this.state = {
@@ -30,8 +31,8 @@ class Player {
     this.stats = {
       level: 1,
       perks: 0,
-      health: 3,
-      maxHealth: 3,
+      health: 5,
+      maxHealth: 5,
       bonusHealth: 2,
       maxBonusHealth: 5,
       mana: 100,
@@ -46,13 +47,15 @@ class Player {
     };
   }
 
-  draw(ctx, elapsed) {
+  draw(ctx, deltaTime) {
+    this.elapsed += deltaTime * 0.01;
+
+
+    const position = Math.floor(this.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
+    const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
+    const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
+
     const offset = this.animation.orientation == 'Right' ? 1 : 2;
-
-    const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.animation.state + this.animation.orientation)].loc.length;
-    const frameX = this.prop.animations[(this.animation.state + this.animation.orientation)].loc[position].x;
-    const frameY = this.prop.animations[(this.animation.state + this.animation.orientation)].loc[position].y;
-
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.prop.frameWidth * 0.7, this.prop.frameHeight * 0.7);
 
     if (ctx.DEBUG) {
@@ -69,53 +72,8 @@ class Player {
       right: sideWorld.right || sideCollision.right,
       type: sideCollision.type
     };
-    const keys = [...keysPressed];
-    const controller = {
-      KeyW: () => {
-        if (!this.state.jumping && this.state.grounded) {
-          this.state.jumping = true;
-          this.state.grounded = false;
-          this.vel.y -= this.stats.jumpBoost;
-        }
-        this.animation.state = this.state.grounded ? 'idle' : 'jump';
-      },
-      KeyA: () => {
-        if (!side.left && this.vel.x > -this.stats.movementSpeed) {
-          this.vel.x--;
-        }
-        if (side.bottom) { ASSETS.audio.footsteps.play(); }
-        this.animation.orientation = 'Left';
-        this.animation.state = 'run';
-      },
-      KeyS: () => {
-        if (!side.bottom && this.vel.y < this.stats.jumpBoost) {
-          this.vel.y++;
-        }
-        this.animation.state = this.state.grounded ? 'idle' : 'fall';
-      },
-      KeyD: () => {
-        if (!side.right && this.vel.x < this.stats.movementSpeed) {
-          this.vel.x++;
-        }
-        if (side.bottom) { ASSETS.audio.footsteps.play(); }
-        this.animation.orientation = 'Right';
-        this.animation.state = 'run';
-      },
-      Space: () => { controller.KeyW(); },
-      ArrowUp: () => { controller.KeyW(); },
-      ArrowDown: () => { controller.KeyS(); },
-      ArrowLeft: () => { controller.KeyA(); },
-      ArrowRight: () => { controller.KeyD(); },
-    };
-    if (keys.length > 0) {
-      try {
-        keys.forEach(key => { controller[key](); });
-      } catch (err) {
-        // console.error('Not a functional key is pressed!');
-      }
-    } else {
-      this.animation.state = 'idle';
-    }
+
+    this.controller(keysPressed, side);
 
     this.state.grounded = false;
     if (side.bottom && !(side.left || side.right)) {
@@ -126,7 +84,7 @@ class Player {
     if (side.top) { this.vel.y *= -0.1; }
 
     if (this.painfulFrame.includes(side.type) && side.bottom) { this.state.onIsland = true; } else { this.state.onIsland = false; }
-    if (!(side.left || side.top || side.right || side.bottom || this.state.jumping)) { this.animation.state = 'fall'; }
+    if (!(side.left || side.top || side.right || side.bottom || this.state.jumping)) { this.animation.type = 'fall'; }
 
     this.vel.x += this.gravity.x;
     this.vel.y += this.gravity.y;
@@ -139,24 +97,69 @@ class Player {
     if (this.state.grounded) { this.vel.y = 0; }
   }
 
-  handleStats() {
+  controller(keysPressed, side) {
+    const controls = {
+      KeyW: () => {
+        if (!this.state.jumping && this.state.grounded) {
+          this.state.jumping = true;
+          this.state.grounded = false;
+          this.vel.y -= this.stats.jumpBoost;
+        }
+        this.animation.type = this.state.grounded ? 'idle' : 'jump';
+      },
+      KeyA: () => {
+        if (!side.left && this.vel.x > -this.stats.movementSpeed) { this.vel.x--; }
+        if (side.bottom) { ASSETS.audio.footsteps.play(); }
+        this.animation.orientation = 'Left';
+        this.animation.type = 'run';
+      },
+      KeyS: () => {
+        if (!side.bottom && this.vel.y < this.stats.jumpBoost) { this.vel.y++; }
+        this.animation.type = this.state.grounded ? 'idle' : 'fall';
+      },
+      KeyD: () => {
+        if (!side.right && this.vel.x < this.stats.movementSpeed) { this.vel.x++; }
+        if (side.bottom) { ASSETS.audio.footsteps.play(); }
+        this.animation.orientation = 'Right';
+        this.animation.type = 'run';
+      },
+      Space: () => { controls.KeyW(); },
+      ArrowUp: () => { controls.KeyW(); },
+      ArrowDown: () => { controls.KeyS(); },
+      ArrowLeft: () => { controls.KeyA(); },
+      ArrowRight: () => { controls.KeyD(); },
+    };
+
+    const keys = [...keysPressed];
+    if (keys.length > 0) {
+      try {
+        keys.forEach(key => { controls[key](); });
+      } catch (err) {
+        // console.error('Not a functional key is pressed!');
+      }
+    } else {
+      this.animation.type = 'idle';
+    }
+  }
+
+  handleStats(deltaTime) {
+    deltaTime = Number((deltaTime * 0.01).toFixed(3));
+
     // handle fireRate 
-    this.stats.fireRateReg += 0.01;
-    const timePassed = Number(this.stats.fireRateReg.toFixed(1));
-    const fireRate = Number(this.stats.fireRate.toFixed(1));
-    if ((timePassed >= fireRate) && !this.state.canShoot) {
+    this.stats.fireRateReg += deltaTime * 0.1;
+    if ((this.stats.fireRateReg >= this.stats.fireRate) && !this.state.canShoot) {
       this.stats.fireRateReg = 0;
       this.state.canShoot = true;
     }
 
     // handle oxygen
     if (this.stats.oxygen < 300 && !this.state.onIsland) {
-      this.stats.oxygen += 0.5;
       this.state.outOfOxygen = false;
+      this.stats.oxygen += deltaTime * 5;
     } else if (this.stats.oxygen > 0 && this.state.onIsland) {
-      this.stats.oxygen -= 0.5;
       this.state.outOfOxygen = false;
-    } else if (this.stats.oxygen == 0 && this.state.onIsland) {
+      this.stats.oxygen -= deltaTime * 5;
+    } else if (this.stats.oxygen <= 0 && this.state.onIsland) {
       oxygenTimer.start();
       this.state.outOfOxygen = false;
       if (oxygenTimer.output > 3) {
@@ -181,23 +184,23 @@ class Player {
 }
 
 (function create() {
-  const playerData = {
+  const data = {
     prop: DATA.player,
     sprite: ASSETS.images.player,
     painfulFrame: DATA.tileset.painfulFrame
   };
 
-  players.push(new Player(playerData, relativePosition(0.1, 0.65)));
+  players.push(new Player(data, relativePosition(0.1, 0.65)));
 })();
 
-function playerAnimation(ctx, elapsed) {
+function playerAnimation(ctx, deltaTime) {
   const sideWorld = collideWorldBounds(players);
   const sideCollision = collision(players, platforms);
 
   players.forEach(p => {
-    p.draw(ctx, elapsed);
+    p.draw(ctx, deltaTime);
     p.update(GAME.KEYBOARD, sideWorld, sideCollision);
-    p.handleStats(elapsed);
+    p.handleStats(deltaTime);
     if (p.state.outOfOxygen) {
       messageCreate('Out of oxygen. You are taking damage', 90, 32, 'red');
     }

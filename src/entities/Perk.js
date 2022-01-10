@@ -7,14 +7,17 @@ class Perk {
   constructor(data, position) {
     this.prop = data.prop;
     this.sprite = data.sprite;
+    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.dim = { w: 24, h: 24 };
     this.type = this.prop.variety[random(0, this.prop.variety.length - 1)];
     this.theta = 0;
   }
 
-  draw(ctx, elapsed) {
-    const position = Math.floor(elapsed * 0.01) % this.prop.animations[this.type.name].loc.length;
+  draw(ctx, deltaTime) {
+    this.elapsed += deltaTime * 0.005;
+
+    const position = Math.floor(this.elapsed) % this.prop.animations[this.type.name].loc.length;
     const frameX = this.prop.animations[this.type.name].loc[position].x;
     const frameY = this.prop.animations[this.type.name].loc[position].y;
 
@@ -34,20 +37,20 @@ class Perk {
 }
 
 function spawnPerk() {
-  const perksData = {
+  const data = {
     prop: DATA.perk,
     sprite: ASSETS.images.perk
   };
 
   const rng = random(0, 5);
-  const spawnPoint = relativePosition(perksData.prop.position[rng].x, perksData.prop.position[rng].y);
+  const spawnPoint = relativePosition(data.prop.position[rng].x, data.prop.position[rng].y);
 
-  perks.push(new Perk(perksData, spawnPoint));
+  perks.push(new Perk(data, spawnPoint));
 }
 
-function perkAnimation(ctx, elapsed) {
+function perkAnimation(ctx, deltaTime) {
   perks.forEach((p, i) => {
-    p.draw(ctx, elapsed);
+    p.draw(ctx, deltaTime);
     p.update();
     if (p.theta > 50) { perks.splice(i, 1); }
   });

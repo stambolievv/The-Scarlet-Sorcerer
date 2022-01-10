@@ -4,7 +4,7 @@ import { platformsAnimation } from './entities/platform.js';
 import { playerAnimation } from './entities/player.js';
 import { enemiesAnimation } from './entities/enemy.js';
 import { projectileFire, projectilesAnimation } from './entities/projectile.js';
-import { perkAnimation } from './entities/perk.js';
+import { perkAnimation, spawnPerk } from './entities/perk.js';
 import { guiAnimation } from './util/GUI.js';
 import { floatingMessages } from './util/floatingMessage.js';
 import tick from './util/fps.js';
@@ -19,29 +19,28 @@ ctx.imageSmoothingEnabled = false;
 ctx.DEBUG = false; // fps, hitboxes and stuff
 
 let lastTime = 0;
-let elapsed = 0;
 
 ASSETS.audio.background.play();
 
 function animate(timestamp) {
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
-  elapsed += deltaTime;
 
   backgroundParallax(ASSETS.background);
   platformsAnimation(ctx);
-  playerAnimation(ctx, elapsed);
-  enemiesAnimation(ctx, elapsed);
-  projectilesAnimation(ctx, elapsed);
-  perkAnimation(ctx, elapsed);
-  floatingMessages(ctx);
   guiAnimation(ctx);
+  playerAnimation(ctx, deltaTime);
+  perkAnimation(ctx, deltaTime);
+  projectilesAnimation(ctx, deltaTime);
+  enemiesAnimation(ctx, deltaTime);
+  floatingMessages(ctx);
+
   soundVolume(ASSETS.audio, GAME.VOLUME);
-  tick(ctx, elapsed);
+  tick(ctx, deltaTime);
 
   requestAnimationFrame(animate);
 }
-
+window.spawnPerk = spawnPerk;
 function backgroundParallax(background) {
   Object.values(background).forEach(layer => {
     const posX = layer.moving ? (Math.round(players[0].pos.x * -0.1)) : 0;

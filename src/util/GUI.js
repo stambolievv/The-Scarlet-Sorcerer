@@ -141,7 +141,7 @@ class Stats extends GUI {
 
     ctx.fillText(this.playerStats.perks, ctx.canvas.width * 0.413, ctx.canvas.height * 0.965);
     ctx.fillText(this.playerStats.bonusHealth, ctx.canvas.width * 0.461, ctx.canvas.height * 0.965);
-    ctx.fillText(Math.floor(this.playerStats.oxygen / 10), ctx.canvas.width * 0.511, ctx.canvas.height * 0.965);
+    ctx.fillText(Math.rounddwa(this.playerStats.oxygen / 10), ctx.canvas.width * 0.511, ctx.canvas.height * 0.965);
     ctx.fillText(this.playerStats.movementSpeed.toFixed(1), ctx.canvas.width * 0.561, ctx.canvas.height * 0.965);
   }
 
@@ -274,9 +274,7 @@ class Power extends Icon {
 
   update() {
     super.update();
-    if (this.isClicked) {
-      GAME.cheatMode = this.isClicked;
-    }
+    if (this.isClicked) { GAME.cheatMode = !GAME.cheatMode; }
 
     if (GAME.cheatMode) {
       this.playerStats.level = 999;
@@ -308,11 +306,7 @@ class Info extends Icon {
 
   update() {
     super.update();
-    if (this.isClicked) {
-      GAME.statsInfo = this.isClicked;
-    } else {
-      GAME.statsInfo = this.isClicked;
-    }
+    if (this.isClicked) { GAME.statsInfo = !GAME.statsInfo; }
   }
 }
 class Fps extends Icon {

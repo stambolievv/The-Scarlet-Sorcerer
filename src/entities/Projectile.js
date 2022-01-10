@@ -8,14 +8,17 @@ class Projectiles {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.player = data.player;
+    this.elapsed = 0;
     this.pos = { x: this.player.pos.x + this.player.dim.w / 4, y: this.player.pos.y - this.player.dim.h / 4 };
     this.vel = { x: 3, y: 3 };
     this.dim = { w: this.prop.frameWidth, h: this.prop.frameHeight / 2 };
     this.angle = data.angle;
   }
 
-  draw(ctx, elapsed) {
-    const position = Math.floor(elapsed * 0.01) % this.prop.animations['projectile'].loc.length;
+  draw(ctx, deltaTime) {
+    this.elapsed += deltaTime * 0.01;
+
+    const position = Math.floor(this.elapsed) % this.prop.animations['projectile'].loc.length;
     const frameX = this.prop.animations['projectile'].loc[position].x;
     const frameY = this.prop.animations['projectile'].loc[position].y;
 
@@ -37,13 +40,13 @@ class Projectiles {
 }
 
 function create(mouseX, mouseY) {
-  const projectileData = {
+  const data = {
     prop: DATA.projectile,
     sprite: ASSETS.images.projectile,
     player: players[0],
     angle: Math.atan2(players[0].pos.y - mouseY, players[0].pos.x - mouseX)
   };
-  projectiles.push(new Projectiles(projectileData));
+  projectiles.push(new Projectiles(data));
 };
 
 function projectileFire(e) {
@@ -61,9 +64,9 @@ function projectileFire(e) {
   }
 }
 
-function projectilesAnimation(ctx, elapsed) {
+function projectilesAnimation(ctx, deltaTime) {
   projectiles.forEach(p => {
-    p.draw(ctx, elapsed);
+    p.draw(ctx, deltaTime);
     p.update();
   });
 
