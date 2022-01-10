@@ -9,6 +9,7 @@ class Enemy {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.player = data.player;
+    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.vel = { x: 0, y: 0 };
     this.dim = { w: this.prop.frameWidth * 0.7, h: this.prop.frameHeight * 0.7 };
@@ -22,9 +23,13 @@ class Enemy {
       speed: data.stats.speed,
     };
   }
+  
+  static spawnInterval = 0;
 
-  draw(ctx, elapsed) {
-    const position = Math.floor(elapsed * 0.01) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
+  draw(ctx, deltaTime) {
+    this.elapsed += deltaTime * 0.01;
+
+    const position = Math.floor(this.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
     const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
     const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
 
@@ -101,40 +106,32 @@ class Saw extends Enemy {
   }
 }
 
-function create(...types) {
+function create(enemyInstance) {
   const spawnPoint = relativePosition(1, 1);
+  const type = enemyInstance.name.toLocaleLowerCase();
+  const data = {
+    prop: DATA[type],
+    sprite: ASSETS.images[type],
+    player: players[0],
+    stats: enemyStats
+  };
 
-  for (const type of types) {
-    const enemyData = {
-      prop: DATA[type],
-      sprite: ASSETS.images[type],
-      player: players[0],
-      stats: enemyStats
-    };
-
-    if (type == 'bat') {
-      enemies.push(new Bat(enemyData, spawnPoint));
-      continue;
-    }
-    if (type == 'skeleton') {
-      enemies.push(new Skeleton(enemyData, spawnPoint));
-      continue;
-    }
-    if (type == 'saw') {
-      enemies.push(new Saw(enemyData, spawnPoint));
-      continue;
-    }
-  }
+  enemies.push(new enemyInstance(data, spawnPoint));
+  enemies.sort((a, b) => a.pos.y - b.pos.y);
 }
-function enemiesAnimation(ctx, elapsed) {
+
+function enemiesAnimation(ctx, deltaTime) {
   //! refactoring later
-  if (elapsed % 4 == 0) { create('saw'); }
-  if (elapsed % 8 == 0) { create('bat'); }
-  if (elapsed % 10 == 0) { create('skeleton'); }
+  Saw.spawnInterval += deltaTime;
+  if (Saw.spawnInterval >= random(10, 15) * 1000) { Saw.spawnInterval = 0; create(Saw); }
+  Bat.spawnInterval += deltaTime;
+  if (Bat.spawnInterval >= random(5, 10) * 1000) { Bat.spawnInterval = 0; create(Bat); }
+  Skeleton.spawnInterval += deltaTime;
+  if (Skeleton.spawnInterval >= random(10, 20) * 1000) { Skeleton.spawnInterval = 0; create(Skeleton); }
 
   enemies.forEach(e => {
     const sideCollision = e.animation.type == 'skeleton' ? collision([e], platforms) : undefined;
-    e.draw(ctx, elapsed);
+    e.draw(ctx, deltaTime);
     e.update(sideCollision);
   });
 
