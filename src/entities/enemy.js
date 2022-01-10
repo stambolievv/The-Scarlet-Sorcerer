@@ -60,7 +60,7 @@ class Skeleton extends Enemy {
     super(data, position);
     this.pos.x *= random(9, 1) / 10;
     this.pos.y *= random(2, 3) / 10;
-    this.stats.speed *= random(2, 3) * 0.5;
+    this.stats.speed += random(0, 8) * 10 / 100;
   }
 
   update(side) {
@@ -85,7 +85,7 @@ class Skeleton extends Enemy {
 
     this.vel.x += this.gravity.x;
     this.vel.y += this.gravity.y;
-    this.pos.x += this.vel.x
+    this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
     if (side.left) { this.vel.x += 2.5; }
     if (side.right) { this.vel.x -= 2.5; }
