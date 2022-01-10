@@ -23,7 +23,7 @@ class Enemy {
       speed: data.stats.speed,
     };
   }
-  
+
   static spawnInterval = 0;
 
   draw(ctx, deltaTime) {
@@ -52,7 +52,7 @@ class Bat extends Enemy {
 
   update() {
     this.pos.x += this.props.movement * (Math.random() * this.stats.speed);
-    this.pos.y += Math.sin(random(1, 6));
+    this.pos.y += Math.sin(random(0, Math.PI * 2)) * 2;
   }
 }
 class Skeleton extends Enemy {
@@ -60,6 +60,7 @@ class Skeleton extends Enemy {
     super(data, position);
     this.pos.x *= random(9, 1) / 10;
     this.pos.y *= random(2, 3) / 10;
+    this.stats.speed *= random(2, 3) * 0.5;
   }
 
   update(side) {
@@ -84,7 +85,7 @@ class Skeleton extends Enemy {
 
     this.vel.x += this.gravity.x;
     this.vel.y += this.gravity.y;
-    this.pos.x += this.vel.x;
+    this.pos.x += this.vel.x
     this.pos.y += this.vel.y;
     if (side.left) { this.vel.x += 2.5; }
     if (side.right) { this.vel.x -= 2.5; }
