@@ -31,45 +31,30 @@ export default
         'width': 320,
         'height': 64,
       },
-      'bg': {
-        'src': 'assets/images/gui/menu_bg.png',
-        'width': 448,
-        'height': 288,
-      },
-      'menu': {
-        'src': 'assets/images/gui/menu_icon.png',
-        'width': 64,
-        'height': 64,
-      },
-      'back': {
-        'src': 'assets/images/gui/back_icon.png',
-        'width': 64,
-        'height': 64,
-      },
       'restart': {
         'src': 'assets/images/gui/restart_icon.png',
-        'width': 64,
-        'height': 64,
+        'width': 128,
+        'height': 128,
       },
-      'resume': {
-        'src': 'assets/images/gui/resume_icon.png',
-        'width': 64,
-        'height': 64,
-      },
-      'power': {
-        'src': 'assets/images/gui/power_icon.png',
-        'width': 64,
-        'height': 64,
-      },
-      'info': {
-        'src': 'assets/images/gui/info_icon.png',
-        'width': 64,
-        'height': 64,
+      'debug': {
+        'src': 'assets/images/gui/debug_icon.png',
+        'width': 32,
+        'height': 32,
       },
       'fps': {
         'src': 'assets/images/gui/fps_icon.png',
-        'width': 64,
-        'height': 64,
+        'width': 32,
+        'height': 32,
+      },
+      'info': {
+        'src': 'assets/images/gui/info_icon.png',
+        'width': 32,
+        'height': 32,
+      },
+      'power': {
+        'src': 'assets/images/gui/power_icon.png',
+        'width': 32,
+        'height': 32,
       }
     },
     'background': {
@@ -221,15 +206,25 @@ export default
         'src': 'assets/audio/background.wav',
         'loop': true
       },
+      'gameover': {
+        'src': 'assets/audio/gameover.wav',
+        'loop': false
+      },
       'collect': {
         'src': 'assets/audio/collect.wav',
         'loop': false
-
+      },
+      'oxygen': {
+        'src': 'assets/audio/oxygen.wav',
+        'loop': false
+      },
+      'projectile': {
+        'src': 'assets/audio/projectile.wav',
+        'loop': false
       },
       'footsteps': {
         'src': 'assets/audio/footsteps.wav',
         'loop': false
-
       },
       'enemyKill': {
         'src': 'assets/audio/enemyKill.wav',
