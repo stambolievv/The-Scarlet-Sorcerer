@@ -16,9 +16,9 @@ class FloatingMessage {
   draw(ctx) {
     ctx.globalAlpha = this.opacity;
 
+    ctx.font = this.size + 'px rubber';
     ctx.fillStyle = this.color;
     ctx.textAlign = 'center';
-    ctx.font = this.size + 'px rubber';
     this.text.split('\n').forEach((t, i) => ctx.fillText(t, this.pos.x, this.pos.y + (i * this.size)));
 
     ctx.globalAlpha = 1;

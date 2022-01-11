@@ -13,10 +13,11 @@ class Platform {
   draw(ctx) {
     ctx.drawImage(this.sprite, this.src.x, this.src.y, this.dim.w, this.dim.h, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
+      ctx.font = '22px rubber';
       ctx.fillStyle = 'yellow';
-      ctx.strokeStyle = 'black';
       ctx.fillText(this.tileValue, this.pos.x + this.dim.w / 2, this.pos.y + this.dim.h / 2);
+      ctx.strokeStyle = 'black';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }

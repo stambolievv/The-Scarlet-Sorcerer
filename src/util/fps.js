@@ -20,12 +20,10 @@ export default function tick(ctx, deltaTime) {
     timeMeasurements = [];
   }
 
-  if (ctx.DEBUG || GAME.showFps) {
-  // global values
-  ctx.font = 'bold 22px rubber';
-  ctx.fillStyle = 'CornflowerBlue';
-  ctx.fillText('FPS: ' + fps, ctx.canvas.width * 0.9, ctx.canvas.height * 0.17);
-  ctx.fillText(' MS: ' + ms, ctx.canvas.width * 0.9, ctx.canvas.height * 0.2);
-  ctx.lineWidth = 2;
+  if (GAME.showFps) {
+    ctx.font = '24px rubber';
+    ctx.fillStyle = 'CornflowerBlue';
+    ctx.fillText('FPS: ' + fps, ctx.canvas.width * 0.9, ctx.canvas.height * 0.17);
+    ctx.fillText(' MS: ' + ms, ctx.canvas.width * 0.9, ctx.canvas.height * 0.2);
   }
 };

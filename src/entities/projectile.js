@@ -27,7 +27,7 @@ class Projectiles {
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, -this.dim.w / 2, -this.dim.h / 2, this.prop.frameWidth, this.prop.frameHeight);
     ctx.resetTransform();
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
       ctx.strokeStyle = 'red';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
@@ -58,6 +58,7 @@ function projectileFire(e) {
       players[0].animation.state = 'attack';
 
       create(e.offsetX, e.offsetY);
+      ASSETS.audio.projectile.play();
     }
   } else {
     messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');

@@ -23,7 +23,7 @@ class Perk {
 
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x, this.pos.y, this.prop.frameWidth, this.prop.frameHeight);
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
       ctx.strokeStyle = this.type.color;
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
