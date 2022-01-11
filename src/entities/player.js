@@ -38,7 +38,7 @@ class Player {
       oxygen: 300,
       maxOxygen: 300,
       oxygenReg: 0,
-      jumpBoost: 15,
+      jumpBoost: 15.4,
       movementSpeed: 4,
       fireRate: 1.6,
       fireRateReg: 0
