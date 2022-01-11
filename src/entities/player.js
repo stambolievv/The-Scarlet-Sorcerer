@@ -2,9 +2,6 @@ import { GAME, ASSETS, DATA } from '../properties.js';
 import { players, enemies, platforms } from '../constants.js';
 import { overlap, collision, collideWorldBounds, relativePosition } from '../mechanics.js';
 import { messageCreate } from '../util/floatingMessage.js';
-import createTimer from '../util/Timer.js';
-
-const oxygenTimer = new createTimer(true);
 
 class Player {
   constructor(data, position) {
@@ -33,13 +30,14 @@ class Player {
       perks: 0,
       health: 5,
       maxHealth: 5,
-      bonusHealth: 2,
+      bonusHealth: 3,
       maxBonusHealth: 5,
       mana: 100,
       maxMana: 100,
       manaReg: 0.04,
       oxygen: 300,
       maxOxygen: 300,
+      oxygenReg: 0,
       jumpBoost: 15,
       movementSpeed: 4,
       fireRate: 1.6,
@@ -50,7 +48,6 @@ class Player {
   draw(ctx, deltaTime) {
     this.elapsed += deltaTime * 0.01;
 
-
     const position = Math.floor(this.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
     const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
     const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
@@ -58,7 +55,7 @@ class Player {
     const offset = this.animation.orientation == 'Right' ? 1 : 2;
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * offset, this.pos.y - this.dim.h * 0.9, this.prop.frameWidth * 0.7, this.prop.frameHeight * 0.7);
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
       ctx.strokeStyle = 'white';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
@@ -143,37 +140,36 @@ class Player {
   }
 
   handleStats(deltaTime) {
-    deltaTime = Number((deltaTime * 0.01).toFixed(3));
-
     // handle fireRate 
-    this.stats.fireRateReg += deltaTime * 0.1;
+    this.stats.fireRateReg += deltaTime * 0.001;
     if ((this.stats.fireRateReg >= this.stats.fireRate) && !this.state.canShoot) {
-      this.stats.fireRateReg = 0;
       this.state.canShoot = true;
+      this.stats.fireRateReg = 0;
     }
 
     // handle oxygen
     if (this.stats.oxygen < 300 && !this.state.onIsland) {
       this.state.outOfOxygen = false;
-      this.stats.oxygen += deltaTime * 5;
+      this.stats.oxygen += deltaTime * 0.05;
     } else if (this.stats.oxygen > 0 && this.state.onIsland) {
       this.state.outOfOxygen = false;
-      this.stats.oxygen -= deltaTime * 5;
+      this.stats.oxygen -= deltaTime * 0.05;
     } else if (this.stats.oxygen <= 0 && this.state.onIsland) {
-      oxygenTimer.start();
+      this.stats.oxygenReg += deltaTime * 0.1;
       this.state.outOfOxygen = false;
-      if (oxygenTimer.output > 3) {
+      if (this.stats.oxygenReg > 300) {
         if (this.stats.bonusHealth > 0) {
           this.stats.bonusHealth -= 1;
         } else {
           this.stats.health -= 1;
         }
+        ASSETS.audio.oxygen.play();
+        this.stats.oxygenReg = 0;
         this.state.outOfOxygen = true;
-        oxygenTimer.reset();
       }
     } else {
+      this.stats.oxygenReg = 0;
       this.state.outOfOxygen = false;
-      oxygenTimer.reset();
     }
 
     // handle mana
@@ -216,6 +212,12 @@ function playerAnimation(ctx, deltaTime) {
       player.stats.health -= 1;
     }
   });
+
+  if (players[0].stats.health <= 0 && !GAME.immortal) {
+    GAME.GAMEOVER = true;
+    ASSETS.audio.background.pause();
+    ASSETS.audio.gameover.play();
+  }
 }
 
 export {
