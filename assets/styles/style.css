@@ -19,6 +19,7 @@ html,
 body {
   height: 100%;
   width: 100%;
+  font-family: "rubber";
 }
 
 body {
@@ -26,7 +27,6 @@ body {
   justify-content: center;
   align-content: space-around;
   background-color: #333;
-  font-family: "rubber";
 }
 
 #container {
