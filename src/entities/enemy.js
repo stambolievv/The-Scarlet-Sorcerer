@@ -144,6 +144,7 @@ function enemiesAnimation(ctx, deltaTime) {
 
     if (enemy.stats.health == 0) {
       GAME.SCORE += enemy.prop.pointsForDeath;
+      checkHighScore();
       enemies.splice(enemies.indexOf(enemy), 1);
     }
 
@@ -155,6 +156,12 @@ function enemiesAnimation(ctx, deltaTime) {
   removeWorldOutBounds(enemies);
 }
 
+function checkHighScore() {
+  if (GAME.SCORE > GAME.HIGHSCORE) {
+    localStorage.setItem('tss-highscore', GAME.SCORE);
+    GAME.HIGHSCORE = GAME.SCORE;
+  }
+}
 
 function handleScore() {
   if (GAME.SCORE % 20 == 0) {
