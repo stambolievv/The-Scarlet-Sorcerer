@@ -35,7 +35,7 @@ class Enemy {
 
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x - this.dim.w * 0.3, this.pos.y - this.dim.h * 0.3, this.prop.frameWidth, this.prop.frameHeight);
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
       ctx.strokeStyle = 'white';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
@@ -66,10 +66,10 @@ class Skeleton extends Enemy {
   update(side) {
     // Some space for enemy to walk.
     const sideMovement = 100;
-    if (side.left || this.pos.x < this.player.pos.x - sideMovement) {
+    if (side.left || this.pos.x <= this.player.pos.x - sideMovement) {
       this.vel.x = this.vel.x > this.stats.speed ? this.stats.speed : this.vel.x += 0.1;
       this.animation.orientation = 'Right';
-    } else if (side.right || this.pos.x > this.player.pos.x + sideMovement) {
+    } else if (side.right || this.pos.x >= this.player.pos.x + sideMovement) {
       this.vel.x = this.vel.x < -this.stats.speed ? -this.stats.speed : this.vel.x -= 0.1;
       this.animation.orientation = 'Left';
     } else {
@@ -122,7 +122,6 @@ function create(enemyInstance) {
 }
 
 function enemiesAnimation(ctx, deltaTime) {
-  //! refactoring later
   Saw.spawnInterval += deltaTime;
   if (Saw.spawnInterval >= random(10, 15) * 1000) { Saw.spawnInterval = 0; create(Saw); }
   Bat.spawnInterval += deltaTime;
@@ -158,24 +157,24 @@ function enemiesAnimation(ctx, deltaTime) {
 
 
 function handleScore() {
-  if (GAME.SCORE % 20 == 0 && GAME.SCORE % 100 != 0) {
+  if (GAME.SCORE % 20 == 0) {
     enemyStats.speed += 0.2;
     messageCreate('Enemy speed increase', 50);
   }
 
-  if (GAME.SCORE % 10 == 0 && GAME.SCORE % 100 != 0) {
+  if (GAME.SCORE % 10 == 0) {
     players[0].stats.level += 1;
     spawnPerk();
     messageCreate('New Perk spawned for 15 sec', 70, 22);
   }
+  // Coming soon
+  // if (GAME.SCORE == 100 || GAME.SCORE == 200) {
+  //   messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
+  // }
 
-  if (GAME.SCORE == 100 || GAME.SCORE == 200) {
-    messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
-  }
-
-  if (GAME.SCORE == 300) {
-    messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
-  }
+  // if (GAME.SCORE == 300) {
+  //   messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
+  // }
 }
 
 
