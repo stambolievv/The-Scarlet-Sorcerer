@@ -2,56 +2,35 @@ import { GAME, ASSETS } from '../properties.js';
 import { interfaces, players } from '../constants.js';
 import { relativePosition } from '../mechanics.js';
 
-
-
 class GUI {
-  constructor(sprite, playerStats, position) {
+  constructor(sprite, player, position) {
     this.sprite = sprite;
     this.pos = { x: position.x, y: position.y };
     this.dim = { w: this.sprite.width, h: this.sprite.height };
     this.maxWidth = this.dim.w;
-    this.playerStats = playerStats;
-    this.state = 'default';
-    this.isClicked = false;
+    this.playerStats = player.stats;
   }
   draw(ctx) {
     ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
 
-    if (ctx.DEBUG) {
+    if (GAME.DEBUG) {
       ctx.strokeStyle = 'blue';
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }
-  update() {
-    if (GAME.MOUSE.x >= this.pos.x && GAME.MOUSE.x <= this.pos.x + this.dim.w &&
-      GAME.MOUSE.y >= this.pos.y && GAME.MOUSE.y <= this.pos.y + this.dim.h) {
-
-      this.state = 'hover';
-
-      if (GAME.MOUSE.pressed) {
-        this.state = 'active';
-        if (!this.isClicked) { this.isClicked = true; }
-      } else {
-        this.isClicked = false;
-      }
-
-    } else {
-      this.state = 'default';
-    }
-  }
+  update() { }
 }
 
 class HUD extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.hud, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.hud, player, position);
     this.pos.x *= 0.05;
     this.pos.y *= 0.15;
   }
-  update() { }
 }
 class HealthBar extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.healthBar, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.healthBar, player, position);
     this.pos.x *= 0.1;
     this.pos.y *= 0.164;
   }
@@ -63,8 +42,8 @@ class HealthBar extends GUI {
   }
 }
 class BonusBar extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.bonusBar, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.bonusBar, player, position);
     this.pos.x *= 0.1;
     this.pos.y *= 0.164;
   }
@@ -76,8 +55,8 @@ class BonusBar extends GUI {
   }
 }
 class ManaBar extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.manaBar, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.manaBar, player, position);
     this.pos.x *= 0.101;
     this.pos.y *= 0.197;
   }
@@ -89,8 +68,8 @@ class ManaBar extends GUI {
   }
 }
 class OxygenBar extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.oxygenBar, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.oxygenBar, player, position);
     this.pos.x *= 0.1;
     this.pos.y *= 0.214;
   }
@@ -102,8 +81,8 @@ class OxygenBar extends GUI {
   }
 }
 class Stats extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite.stats, playerStats, position);
+  constructor(sprite, player, position) {
+    super(sprite.stats, player, position);
     this.pos.y *= 0.889;
     this.pos.x *= 0.5;
     this.pos.x -= this.dim.w * 0.5;
@@ -126,6 +105,7 @@ class Stats extends GUI {
 
     ctx.textAlign = 'right';
     ctx.font = '18px rubber';
+    ctx.fillStyle = 'white';
     this._infoText.forEach((t, i) => {
       ctx.fillText(t, this.pos.x * this._textPos[i].x, this.pos.y * this._textPos[i].y);
     });
@@ -147,14 +127,14 @@ class Stats extends GUI {
 
   update() {
     super.update();
-    if (GAME.statsInfo) {
+    if (GAME.showStats) {
       this._infoText = [
         `Level: ${this.playerStats.level}`,
         `Perks: ${this.playerStats.perks}`,
         `Health: ${this.playerStats.health}`,
         `Bonus Health: ${this.playerStats.bonusHealth}`,
         `Mana: ${Math.floor(this.playerStats.mana) / 10}`,
-        `Oxygen: ${Math.floor(this.playerStats.oxygen / 10)}`,
+        `Oxygen: ${Math.round(this.playerStats.oxygen / 10)}`,
         `Jump Boost: ${this.playerStats.jumpBoost.toFixed(1)}`,
         `Movement Speed: ${this.playerStats.movementSpeed.toFixed(1)}`,
         `Fire Rate: ${this.playerStats.fireRate.toFixed(1)}`,
@@ -166,10 +146,13 @@ class Stats extends GUI {
 }
 
 class Icon extends GUI {
-  constructor(sprite, playerStats, position) {
-    super(sprite, playerStats, position);
-    this.text = '';
+  constructor(sprite, player, position) {
+    super(sprite, player, position);
+    this.state = 'default';
+    this.isClicked = false;
+    this.hover = { text: '', size: 14 };
     this.shadow = { color: 'gray', blur: 10 };
+    this.active = false;
   }
 
   draw(ctx) {
@@ -180,177 +163,154 @@ class Icon extends GUI {
     ctx.shadowBlur = 0;
 
     if (this.state == 'hover' || this.state == 'active') {
-      ctx.fillText(this.text, this.pos.x + this.dim.w * 0.5, this.pos.y - 10);
+      ctx.font = `${this.hover.size}px rubber`;
+      ctx.fillStyle = 'white';
+      ctx.fillText(this.hover.text, this.pos.x + this.dim.w * 0.5, this.pos.y - this.hover.size / 2);
     }
   }
 
   update() {
-    super.update();
-    if (this.state == 'hover' || this.state == 'active') {
-      this.shadow.color = 'white';
-      this.shadow.blur = 20;
+    if (GAME.MOUSE.x >= this.pos.x && GAME.MOUSE.x <= this.pos.x + this.dim.w &&
+      GAME.MOUSE.y >= this.pos.y && GAME.MOUSE.y <= this.pos.y + this.dim.h) {
+
+      this.state = 'hover';
+      this.shadow.color = this.active ? 'lime' : 'white';;
+      this.shadow.blur = this.active ? 10 : 5;
+      this.playerCanShoot = false;
+
+      if (GAME.MOUSE.pressed) {
+        this.state = 'active';
+        if (!this.isClicked) { this.isClicked = true; }
+      } else {
+        this.isClicked = false;
+      }
+
     } else {
-      this.shadow.color = 'gray';
-      this.shadow.blur = 10;
+      this.state = 'default';
+      this.shadow.color = this.active ? 'lime' : 'gray';
+      this.shadow.blur = this.active ? 10 : 5;
+      this.playerCanShoot = true;
     }
   }
 }
-class Menu extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.menu, playerStats, position);
-    this.pos.x *= 0.94;
-    this.pos.y *= 0.02;
-  }
-  update() {
-    super.update();
-    if (this.isClicked) { return GAME.paused = true; }
-  }
-}
-class MenuBg extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.bg, playerStats, position);
+
+class Restart extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.restart, player, position);
     this.pos.x *= 0.5;
+    this.pos.y *= 0.6;
     this.pos.x -= this.dim.w * 0.5;
-    this.pos.y *= 0.5;
-    this.pos.y -= this.dim.h * 0.5;
+    this.hover = { text: 'Restart', size: 48 };
   };
 
   draw(ctx) {
-    super.draw(ctx);
-    ctx.font = 'bold 48px rubber';
-    ctx.fillText('Paused', this.pos.x * 1.53, this.pos.y * 1.26);
+    if (GAME.GAMEOVER) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT);
+      ctx.font = `${this.hover.size * 2}px rubber`;
+      ctx.fillStyle = 'white';
+      ctx.fillText('YOU DIED', this.pos.x + this.dim.w * 0.5, this.pos.y * 0.8);
+      super.draw(ctx);
+    }
   }
 
-  update() { }
-}
-class Back extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.back, playerStats, position);
-    this.pos.x *= 0.376;
-    this.pos.y *= 0.434;
-    this.text = 'Go Back';
-  };
-
   update() {
-    super.update();
-    if (this.isClicked) { return GAME.paused = false; }
-  }
-}
-class Restart extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.restart, playerStats, position);
-    this.pos.x *= 0.476;
-    this.pos.y *= 0.434;
-    this.text = 'Restart';
-  };
-
-  update() {
-    super.update();
-    if (this.isClicked) { return GAME.paused = false; }
-  }
-}
-class Resume extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.resume, playerStats, position);
-    this.pos.x *= 0.576;
-    this.pos.y *= 0.434;
-    this.text = 'Resume';
-  };
-
-  update() {
-    super.update();
-    if (this.isClicked) { return GAME.paused = false; }
-  }
-}
-class Power extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.power, playerStats, position);
-    this.pos.x *= 0.377;
-    this.pos.y *= 0.567;
-    this.text = 'Cheat Mode';
-    this.playerStats = playerStats;
-    this.oldStats = playerStats;
-  };
-
-  update() {
-    super.update();
-    if (this.isClicked) { GAME.cheatMode = !GAME.cheatMode; }
-
-    if (GAME.cheatMode) {
-      this.playerStats.level = 999;
-      this.playerStats.perks = 999;
-      this.playerStats.health = 999;
-      this.playerStats.maxHealth = 999;
-      this.playerStats.bonusHealth = 999;
-      this.playerStats.maxBonusHealth = 999;
-      this.playerStats.mana = 999;
-      this.playerStats.maxMana = 999;
-      this.playerStats.manaReg = 3;
-      this.playerStats.oxygen = 9999;
-      this.playerStats.maxOxygen = 9999;
-      this.playerStats.jumpBoost = 20;
-      this.playerStats.movementSpeed = 150;
-      this.playerStats.fireRate = 0;
-    } else {
-      this.playerStats = this.oldStats;
+    if (GAME.GAMEOVER) {
+      super.update();
+      if (this.isClicked) { window.location.reload(); }
     }
   }
 }
-class Info extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.info, playerStats, position);
-    this.pos.x *= 0.476;
-    this.pos.y *= 0.567;
-    this.text = 'Stats Info';
+class Debug extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.debug, player, position);
+    this.pos.x *= 0.02;
+    this.pos.y *= 0.04;
+    this.hover.text = 'DEBUG';
   };
 
   update() {
     super.update();
-    if (this.isClicked) { GAME.statsInfo = !GAME.statsInfo; }
+    if (this.isClicked) { this.active = onClick('DEBUG'); }
   }
 }
 class Fps extends Icon {
-  constructor(sprite, playerStats, position) {
-    super(sprite.fps, playerStats, position);
-    this.pos.x *= 0.576;
-    this.pos.y *= 0.567;
-    this.text = 'Show FPS';
+  constructor(sprite, player, position) {
+    super(sprite.fps, player, position);
+    this.pos.x *= 0.06;
+    this.pos.y *= 0.04;
+    this.hover.text = 'Show FPS';
   };
 
   update() {
     super.update();
-    if (this.isClicked) { return GAME.showFps = !GAME.showFps; }
+    if (this.isClicked) { this.active = onClick('showFps'); }
+  }
+}
+class Info extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.info, player, position);
+    this.pos.x *= 0.10;
+    this.pos.y *= 0.04;
+    this.hover.text = 'Show Stats';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { this.active = onClick('showStats'); }
+  }
+}
+class Power extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.power, player, position);
+    this.pos.x *= 0.14;
+    this.pos.y *= 0.04;
+    this.hover.text = 'Immortal';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked) { this.active = onClick('immortal'); }
   }
 }
 
-const elements = [
-  // MenuBg,
-  // Restart,
-  // Resume,
-  // Back,
-  // Power,
-  // Info,
-  // Fps,
-  // Menu,
+const ui = [
+  Power,
+  Info,
+  Fps,
+  Debug,
   Stats,
   ManaBar,
   OxygenBar,
   HealthBar,
   BonusBar,
   HUD,
+  Restart,
 ];
 
+let buttonDelay = 0;
+
 (function create() {
-  elements.forEach(i => {
-    interfaces.push(new i(ASSETS.gui, players[0].stats, relativePosition(1, 1)));
+  ui.forEach(i => {
+    interfaces.push(new i(ASSETS.gui, players[0], relativePosition(1, 1)));
   });
 })();
 
-function guiAnimation(ctx) {
+function guiAnimation(ctx, deltaTime) {
   interfaces.forEach(i => {
     i.draw(ctx);
     i.update();
   });
+
+  buttonDelay += deltaTime;
+}
+
+function onClick(prop) {
+  if (buttonDelay >= 150) {
+    buttonDelay = 0;
+    GAME[prop] = !GAME[prop];
+  }
+  return GAME[prop];
 }
 
 export {
