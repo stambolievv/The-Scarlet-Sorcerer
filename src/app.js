@@ -4,7 +4,7 @@ import { platformsAnimation } from './entities/platform.js';
 import { playerAnimation } from './entities/player.js';
 import { enemiesAnimation } from './entities/enemy.js';
 import { projectileFire, projectilesAnimation } from './entities/projectile.js';
-import { perkAnimation, spawnPerk } from './entities/perk.js';
+import { perkAnimation } from './entities/perk.js';
 import { guiAnimation } from './util/GUI.js';
 import { floatingMessages } from './util/floatingMessage.js';
 import tick from './util/fps.js';
@@ -16,47 +16,56 @@ canvas.height = GAME.HEIGHT;
 
 const ctx = canvas.getContext('2d', { alpha: false });
 ctx.imageSmoothingEnabled = false;
-ctx.DEBUG = false; // fps, hitboxes and stuff
 
 let lastTime = 0;
 
 ASSETS.audio.background.play();
 
 function animate(timestamp) {
+  requestAnimationFrame(animate);
+
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
+  soundVolume(ASSETS.audio, GAME.VOLUME, !GAME.FOCUS || GAME.GAMEOVER);
+
+  if (!GAME.FOCUS) { return; }
+
   backgroundParallax(ASSETS.background);
   platformsAnimation(ctx);
-  guiAnimation(ctx);
-  playerAnimation(ctx, deltaTime);
-  perkAnimation(ctx, deltaTime);
-  projectilesAnimation(ctx, deltaTime);
-  enemiesAnimation(ctx, deltaTime);
-  floatingMessages(ctx);
 
-  soundVolume(ASSETS.audio, GAME.VOLUME);
+  if (!GAME.GAMEOVER) {
+    playerAnimation(ctx, deltaTime);
+    floatingMessages(ctx);
+    perkAnimation(ctx, deltaTime);
+    projectilesAnimation(ctx, deltaTime);
+    enemiesAnimation(ctx, deltaTime);
+  }
+
   tick(ctx, deltaTime);
-
-  requestAnimationFrame(animate);
+  guiAnimation(ctx, deltaTime);
 }
-window.spawnPerk = spawnPerk;
+
 function backgroundParallax(background) {
   Object.values(background).forEach(layer => {
     const posX = layer.moving ? (Math.round(players[0].pos.x * -0.1)) : 0;
     ctx.drawImage(layer, posX, 0, layer.width, layer.height);
   });
 }
-
-function soundVolume(sounds, masterVolume) {
-  Object.values(sounds).forEach(s => s.volume = masterVolume);
+function soundVolume(sounds, masterVolume, pause) {
+  Object.values(sounds).forEach(s => {
+    s.volume = masterVolume;
+    if (s.loop) {
+      if (pause) { return s.pause(); }
+      s.volume *= 0.3;
+      s.play();
+    }
+  });
 }
-
 
 //?    /////////////////////////
 //?   //// EVENT LISTENERS ////
 //?  /////////////////////////
-
 window.addEventListener('keydown', (e) => {
   GAME.KEYBOARD.add(e.code);
 });
@@ -64,8 +73,8 @@ window.addEventListener('keyup', (e) => {
   GAME.KEYBOARD.delete(e.code);
 });
 canvas.addEventListener('mousemove', (e) => {
-  GAME.MOUSE.x = e.offsetX || e.layerX;
-  GAME.MOUSE.y = e.offsetY || e.layerY;
+  GAME.MOUSE.x = e.offsetX;
+  GAME.MOUSE.y = e.offsetY;
 });
 canvas.addEventListener('mousedown', (e) => {
   GAME.MOUSE.pressed = true;
@@ -73,5 +82,11 @@ canvas.addEventListener('mousedown', (e) => {
 });
 canvas.addEventListener('mouseup', (e) => {
   GAME.MOUSE.pressed = false;
+});
+window.addEventListener('focus', () => {
+  GAME.FOCUS = true;
+});
+window.addEventListener('blur', () => {
+  GAME.FOCUS = false;
 });
 window.addEventListener('load', animate(0));
