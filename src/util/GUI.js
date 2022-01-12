@@ -86,8 +86,8 @@ class Stats extends GUI {
     this.pos.y *= 0.889;
     this.pos.x *= 0.5;
     this.pos.x -= this.dim.w * 0.5;
-    this._infoText = [];
-    this._textPos = [
+    this.statsInfoText = [];
+    this.textPos = [
       { x: 0.26, y: 1.03 },
       { x: 0.26, y: 1.09 },
       { x: 0.66, y: 1.03 },
@@ -106,8 +106,8 @@ class Stats extends GUI {
     ctx.textAlign = 'right';
     ctx.font = '18px rubber';
     ctx.fillStyle = 'white';
-    this._infoText.forEach((t, i) => {
-      ctx.fillText(t, this.pos.x * this._textPos[i].x, this.pos.y * this._textPos[i].y);
+    this.statsInfoText.forEach((t, i) => {
+      ctx.fillText(t, this.pos.x * this.textPos[i].x, this.pos.y * this.textPos[i].y);
     });
 
     ctx.textAlign = 'center';
@@ -116,32 +116,28 @@ class Stats extends GUI {
     ctx.fillText(this.playerStats.level, ctx.canvas.width * 0.413, ctx.canvas.height * 0.921);
     ctx.fillText(this.playerStats.health, ctx.canvas.width * 0.461, ctx.canvas.height * 0.921);
     ctx.fillText(Math.floor(this.playerStats.mana) / 10, ctx.canvas.width * 0.511, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.jumpBoost.toFixed(1), ctx.canvas.width * 0.561, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.fireRate.toFixed(1), ctx.canvas.width * 0.611, ctx.canvas.height * 0.921);
-
+    ctx.fillText(this.playerStats.jumpBoost, ctx.canvas.width * 0.561, ctx.canvas.height * 0.921);
+    ctx.fillText(this.playerStats.fireRate, ctx.canvas.width * 0.611, ctx.canvas.height * 0.921);
     ctx.fillText(this.playerStats.perks, ctx.canvas.width * 0.413, ctx.canvas.height * 0.965);
     ctx.fillText(this.playerStats.bonusHealth, ctx.canvas.width * 0.461, ctx.canvas.height * 0.965);
     ctx.fillText(Math.round(this.playerStats.oxygen / 10), ctx.canvas.width * 0.511, ctx.canvas.height * 0.965);
-    ctx.fillText(this.playerStats.movementSpeed.toFixed(1), ctx.canvas.width * 0.561, ctx.canvas.height * 0.965);
+    ctx.fillText(this.playerStats.movementSpeed, ctx.canvas.width * 0.561, ctx.canvas.height * 0.965);
   }
 
   update() {
     super.update();
-    if (GAME.showStats) {
-      this._infoText = [
-        `Level: ${this.playerStats.level}`,
-        `Perks: ${this.playerStats.perks}`,
-        `Health: ${this.playerStats.health}`,
-        `Bonus Health: ${this.playerStats.bonusHealth}`,
-        `Mana: ${Math.floor(this.playerStats.mana) / 10}`,
-        `Oxygen: ${Math.round(this.playerStats.oxygen / 10)}`,
-        `Jump Boost: ${this.playerStats.jumpBoost.toFixed(1)}`,
-        `Movement Speed: ${this.playerStats.movementSpeed.toFixed(1)}`,
-        `Fire Rate: ${this.playerStats.fireRate.toFixed(1)}`,
-      ];
-    } else {
-      this._infoText = [];
-    }
+    if (!GAME.showStats) { return this.statsInfoText = []; }
+    this.statsInfoText = [
+      `Level: ${this.playerStats.level}`,
+      `Perks: ${this.playerStats.perks}`,
+      `Health: ${this.playerStats.health}`,
+      `Bonus Health: ${this.playerStats.bonusHealth}`,
+      `Mana: ${Math.floor(this.playerStats.mana) / 10}`,
+      `Oxygen: ${Math.round(this.playerStats.oxygen / 10)}`,
+      `Jump Boost: ${this.playerStats.jumpBoost.toFixed(1)}`,
+      `Movement Speed: ${this.playerStats.movementSpeed.toFixed(1)}`,
+      `Fire Rate: ${this.playerStats.fireRate.toFixed(1)}`,
+    ];
   }
 }
 

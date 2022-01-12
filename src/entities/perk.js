@@ -57,7 +57,7 @@ function perkAnimation(ctx, deltaTime) {
 
   overlap(players, perks, (player, perk) => {
     if (perk.type.name == 'BS') {
-      if (player.stats.health < 3) {
+      if (player.stats.health < player.stats.maxHealth) {
         player.stats.health += 1;
       } else {
         player.stats.bonusHealth += 1;
@@ -66,27 +66,35 @@ function perkAnimation(ctx, deltaTime) {
 
     if (perk.type.name == 'JB') {
       player.stats.jumpBoost += 0.2;
+      player.stats.jumpBoost = Number(player.stats.jumpBoost.toFixed(1));
     }
 
     if (perk.type.name == 'MS') {
       player.stats.movementSpeed += 0.2;
+      player.stats.movementSpeed = Number(player.stats.movementSpeed.toFixed(1));
     }
 
-    if (perk.type.name == 'FR') {
+    if (perk.type.name == 'FR' && player.stats.fireRate > player.stats.minFireRate) {
       player.stats.fireRate -= 0.2;
+      player.stats.fireRate = Number(player.stats.fireRate.toFixed(1));
     }
 
     if (perk.type.name == 'MANA') {
       player.stats.manaReg += 0.01;
+      player.stats.manaReg = Number(player.stats.manaReg.toFixed(2));
     }
 
-    const playerCenter = { x: (player.pos.x + player.dim.w / 2) / GAME.WIDTH, y: (player.pos.y + player.dim.h / 2) / GAME.HEIGHT };
+    const playerCenter = { x: (player.pos.x + player.dim.w * 0.5) / GAME.WIDTH, y: (player.pos.y + player.dim.h * 0.5) / GAME.HEIGHT };
     messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
+
     player.stats.perks += 1;
     ASSETS.audio.collect.play();
 
     perks.splice(perks.indexOf(perk), 1);
   });
+}
+for (let index = 0; index < 200; index++) {
+  spawnPerk();
 }
 
 export {

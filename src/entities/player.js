@@ -41,6 +41,7 @@ class Player {
       jumpBoost: 15.4,
       movementSpeed: 4,
       fireRate: 1.6,
+      minFireRate: 0,
       fireRateReg: 0
     };
   }
