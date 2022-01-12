@@ -18,6 +18,7 @@ class Platform {
       ctx.fillStyle = 'yellow';
       ctx.fillText(this.tileValue, this.pos.x + this.dim.w / 2, this.pos.y + this.dim.h / 2);
       ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }
