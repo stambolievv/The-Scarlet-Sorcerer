@@ -7,7 +7,7 @@ const GAME = {
   HEIGHT: 720,
   FOCUS: true,
   DEBUG: false,
-  MOUSE: { x: 0, y: 0, pressed: false },
+  MOUSE: { x: 0, y: 0, pressed: false, onMenu: false },
   KEYBOARD: new Set(),
   TIMER: new createTimer(),
   VOLUME: 0.5,

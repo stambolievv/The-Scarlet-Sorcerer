@@ -10,6 +10,7 @@ class GUI {
     this.maxWidth = this.dim.w;
     this.playerStats = player.stats;
   }
+
   draw(ctx) {
     ctx.drawImage(this.sprite, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
 
@@ -18,6 +19,7 @@ class GUI {
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }
+  
   update() { }
 }
 
@@ -125,7 +127,6 @@ class Stats extends GUI {
   }
 
   update() {
-    super.update();
     if (!GAME.showStats) { return this.statsInfoText = []; }
     this.statsInfoText = [
       `Level: ${this.playerStats.level}`,
@@ -146,9 +147,9 @@ class Icon extends GUI {
     super(sprite, player, position);
     this.state = 'default';
     this.isClicked = false;
+    this.active = false;
     this.hover = { text: '', size: 18 };
     this.shadow = { color: 'gray', blur: 10 };
-    this.active = false;
   }
 
   draw(ctx) {
@@ -169,10 +170,11 @@ class Icon extends GUI {
     if (GAME.MOUSE.x >= this.pos.x && GAME.MOUSE.x <= this.pos.x + this.dim.w &&
       GAME.MOUSE.y >= this.pos.y && GAME.MOUSE.y <= this.pos.y + this.dim.h) {
 
+      GAME.MOUSE.onMenu = true;
+
       this.state = 'hover';
-      this.shadow.color = this.active ? 'lime' : 'white';;
+      this.shadow.color = this.active ? 'lime' : 'white';
       this.shadow.blur = this.active ? 10 : 5;
-      this.playerCanShoot = false;
 
       if (GAME.MOUSE.pressed) {
         this.state = 'active';
@@ -185,7 +187,6 @@ class Icon extends GUI {
       this.state = 'default';
       this.shadow.color = this.active ? 'lime' : 'gray';
       this.shadow.blur = this.active ? 10 : 5;
-      this.playerCanShoot = true;
     }
   }
 }
@@ -293,6 +294,8 @@ let buttonDelay = 0;
 })();
 
 function guiAnimation(ctx, deltaTime) {
+  GAME.MOUSE.onMenu = false;
+
   interfaces.forEach(i => {
     i.draw(ctx);
     i.update();
