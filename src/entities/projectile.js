@@ -61,7 +61,7 @@ function projectileFire(e) {
       ASSETS.audio.projectile.play();
     }
   } else {
-    messageCreate('Out of Mana. Cant cast that spell', 10, 18, 'blue');
+    messageCreate('Out of Mana. Cant cast that spell', 10, 24, 'blue');
   }
 }
 

@@ -14,9 +14,9 @@ class Platform {
     ctx.drawImage(this.sprite, this.src.x, this.src.y, this.dim.w, this.dim.h, this.pos.x, this.pos.y, this.dim.w, this.dim.h);
 
     if (GAME.DEBUG) {
-      ctx.font = '22px rubber';
+      ctx.font = '22px Vanderick';
       ctx.fillStyle = 'yellow';
-      ctx.fillText(this.tileValue, this.pos.x + this.dim.w / 2, this.pos.y + this.dim.h / 2);
+      ctx.fillText(this.tileValue, this.pos.x + this.dim.w / 2, this.pos.y + this.dim.h * 0.6);
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 3;
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);

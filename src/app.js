@@ -33,17 +33,16 @@ function animate(timestamp) {
 
   backgroundParallax(ASSETS.background);
   platformsAnimation(ctx);
+  tick(ctx, deltaTime);
+  guiAnimation(ctx, deltaTime);
 
   if (!GAME.GAMEOVER) {
     playerAnimation(ctx, deltaTime);
-    floatingMessages(ctx);
+    floatingMessages(ctx, deltaTime);
     perkAnimation(ctx, deltaTime);
     projectilesAnimation(ctx, deltaTime);
     enemiesAnimation(ctx, deltaTime);
   }
-
-  tick(ctx, deltaTime);
-  guiAnimation(ctx, deltaTime);
 }
 
 function backgroundParallax(background) {

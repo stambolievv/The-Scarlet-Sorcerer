@@ -85,7 +85,7 @@ function perkAnimation(ctx, deltaTime) {
     }
 
     const playerCenter = { x: (player.pos.x + player.dim.w * 0.5) / GAME.WIDTH, y: (player.pos.y + player.dim.h * 0.5) / GAME.HEIGHT };
-    messageCreate(perk.type.text, 100, 22, perk.type.color, playerCenter, false);
+    messageCreate(perk.type.text, 100, 24, perk.type.color, playerCenter, false);
 
     player.stats.perks += 1;
     ASSETS.audio.collect.play();

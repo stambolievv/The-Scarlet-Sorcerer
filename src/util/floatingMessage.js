@@ -16,7 +16,7 @@ class FloatingMessage {
   draw(ctx) {
     ctx.globalAlpha = this.opacity;
 
-    ctx.font = this.size + 'px rubber';
+    ctx.font = this.size + 'px Vanderick';
     ctx.fillStyle = this.color;
     ctx.textAlign = 'center';
     this.text.split('\n').forEach((t, i) => ctx.fillText(t, this.pos.x, this.pos.y + (i * this.size)));
@@ -24,10 +24,10 @@ class FloatingMessage {
     ctx.globalAlpha = 1;
   }
 
-  update() {
+  update(deltaTime) {
     this.pos.y -= 0.3;
     this.lifeSpan += 1;
-    if (this.opacity > 0.01) { this.opacity -= 0.005; }
+    if (this.opacity > 0.01) { this.opacity -= deltaTime * 0.00035; }
   }
 }
 
@@ -36,19 +36,19 @@ function messageCreate(text, priority = 0, size = 18, color = 'white', position 
   textMessages.unshift({ priority, text: new FloatingMessage(text, spawnPoint, fixed, size, color) });
 }
 
-function floatingMessages(ctx) {
+function floatingMessages(ctx, deltaTime) {
   textMessages
     .sort((a, b) => b.priority - a.priority)
     .forEach(({ text }, i) => {
-      if (text.fixed) { text.pos.y = GAME.HEIGHT * 0.3 - i * 30; }
+      if (text.fixed) { text.pos.y = (GAME.HEIGHT * 0.3) - (i * 35); }
       text.draw(ctx);
-      text.update();
-      if (text.lifeSpan > 200) { textMessages.splice(i, 1); }
+      text.update(deltaTime);
+      if (text.lifeSpan > 170) { textMessages.splice(i, 1); }
     });
 
   //text on display
   GAME.TIMER.start();
-  ctx.font = '22px rubber';
+  ctx.font = '22px Vanderick';
   ctx.fillStyle = 'white';
   ctx.fillText('Timer: ' + GAME.TIMER.output, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.040);
   ctx.fillText('Score: ' + GAME.SCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.075);

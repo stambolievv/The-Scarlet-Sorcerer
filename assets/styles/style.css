@@ -1,10 +1,6 @@
 @font-face {
-  font-family: "rubber";
-  style: normal;
-  weight: 400;
-  stretch: 100;
-  src: url("../fonts/rubber-biscuit.bold.ttf") format("truetype");
-  index: 0;
+  font-family: "Vanderick";
+  src: url("../fonts/Vanderick.woff") format("woff");
 }
 
 * {
@@ -19,7 +15,7 @@ html,
 body {
   height: 100%;
   width: 100%;
-  font-family: "rubber";
+  font-family: "Vanderick";
 }
 
 body {

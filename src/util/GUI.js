@@ -88,15 +88,15 @@ class Stats extends GUI {
     this.pos.x -= this.dim.w * 0.5;
     this.statsInfoText = [];
     this.textPos = [
-      { x: 0.26, y: 1.03 },
-      { x: 0.26, y: 1.09 },
-      { x: 0.66, y: 1.03 },
-      { x: 0.66, y: 1.09 },
-      { x: 0.96, y: 1.03 },
-      { x: 0.96, y: 1.09 },
-      { x: 2.16, y: 1.03 },
-      { x: 2.16, y: 1.09 },
-      { x: 2.56, y: 1.03 },
+      { x: 0.26, y: 1.04 },
+      { x: 0.26, y: 1.10 },
+      { x: 0.66, y: 1.04 },
+      { x: 0.66, y: 1.10 },
+      { x: 0.96, y: 1.04 },
+      { x: 0.96, y: 1.10 },
+      { x: 2.16, y: 1.04 },
+      { x: 2.16, y: 1.10 },
+      { x: 2.56, y: 1.04 },
     ];
   }
 
@@ -104,14 +104,14 @@ class Stats extends GUI {
     super.draw(ctx);
 
     ctx.textAlign = 'right';
-    ctx.font = '18px rubber';
+    ctx.font = '22px Vanderick';
     ctx.fillStyle = 'white';
     this.statsInfoText.forEach((t, i) => {
       ctx.fillText(t, this.pos.x * this.textPos[i].x, this.pos.y * this.textPos[i].y);
     });
 
     ctx.textAlign = 'center';
-    ctx.font = '14px rubber';
+    ctx.font = '16px Vanderick';
     ctx.fillStyle = 'white';
     ctx.fillText(this.playerStats.level, ctx.canvas.width * 0.413, ctx.canvas.height * 0.921);
     ctx.fillText(this.playerStats.health, ctx.canvas.width * 0.461, ctx.canvas.height * 0.921);
@@ -146,7 +146,7 @@ class Icon extends GUI {
     super(sprite, player, position);
     this.state = 'default';
     this.isClicked = false;
-    this.hover = { text: '', size: 14 };
+    this.hover = { text: '', size: 18 };
     this.shadow = { color: 'gray', blur: 10 };
     this.active = false;
   }
@@ -159,9 +159,9 @@ class Icon extends GUI {
     ctx.shadowBlur = 0;
 
     if (this.state == 'hover' || this.state == 'active') {
-      ctx.font = `${this.hover.size}px rubber`;
+      ctx.font = `${this.hover.size}px Vanderick`;
       ctx.fillStyle = 'white';
-      ctx.fillText(this.hover.text, this.pos.x + this.dim.w * 0.5, this.pos.y - this.hover.size / 2);
+      ctx.fillText(this.hover.text, this.pos.x + this.dim.w * 0.5, this.pos.y - this.hover.size / 3);
     }
   }
 
@@ -196,16 +196,16 @@ class Restart extends Icon {
     this.pos.x *= 0.5;
     this.pos.y *= 0.6;
     this.pos.x -= this.dim.w * 0.5;
-    this.hover = { text: 'Restart', size: 48 };
+    this.hover = { text: 'Restart', size: 60 };
   };
 
   draw(ctx) {
     if (GAME.GAMEOVER) {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       ctx.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT);
-      ctx.font = `${this.hover.size * 2}px rubber`;
+      ctx.font = `${this.hover.size * 2}px Vanderick`;
       ctx.fillStyle = 'white';
-      ctx.fillText('YOU DIED', this.pos.x + this.dim.w * 0.5, this.pos.y * 0.8);
+      ctx.fillText('YOU DIED!', this.pos.x + this.dim.w * 0.5, this.pos.y * 0.8);
       super.draw(ctx);
     }
   }
@@ -305,6 +305,7 @@ function onClick(prop) {
   if (buttonDelay >= 150) {
     buttonDelay = 0;
     GAME[prop] = !GAME[prop];
+    ASSETS.audio.click.play();
   }
   return GAME[prop];
 }
