@@ -93,9 +93,6 @@ function perkAnimation(ctx, deltaTime) {
     perks.splice(perks.indexOf(perk), 1);
   });
 }
-for (let index = 0; index < 200; index++) {
-  spawnPerk();
-}
 
 export {
   spawnPerk,
