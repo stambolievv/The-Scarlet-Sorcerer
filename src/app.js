@@ -82,6 +82,13 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mouseup', (e) => {
   GAME.MOUSE.pressed = false;
 });
+canvas.addEventListener('touchstart', (e) => {
+  GAME.MOUSE.pressed = true;
+  projectileFire(e);
+});
+canvas.addEventListener('touchend', (e) => {
+  GAME.MOUSE.pressed = false;
+});
 window.addEventListener('focus', () => {
   GAME.FOCUS = true;
 });
