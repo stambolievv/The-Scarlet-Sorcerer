@@ -115,15 +115,15 @@ class Stats extends GUI {
     ctx.textAlign = 'center';
     ctx.font = '16px Vanderick';
     ctx.fillStyle = 'white';
-    ctx.fillText(this.playerStats.level, ctx.canvas.width * 0.413, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.health, ctx.canvas.width * 0.461, ctx.canvas.height * 0.921);
-    ctx.fillText(Math.floor(this.playerStats.mana) / 10, ctx.canvas.width * 0.511, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.jumpBoost, ctx.canvas.width * 0.561, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.fireRate, ctx.canvas.width * 0.611, ctx.canvas.height * 0.921);
-    ctx.fillText(this.playerStats.perks, ctx.canvas.width * 0.413, ctx.canvas.height * 0.965);
-    ctx.fillText(this.playerStats.bonusHealth, ctx.canvas.width * 0.461, ctx.canvas.height * 0.965);
-    ctx.fillText(Math.round(this.playerStats.oxygen / 10), ctx.canvas.width * 0.511, ctx.canvas.height * 0.965);
-    ctx.fillText(this.playerStats.movementSpeed, ctx.canvas.width * 0.561, ctx.canvas.height * 0.965);
+    ctx.fillText(this.playerStats.level, GAME.WIDTH * 0.413, GAME.HEIGHT * 0.921);
+    ctx.fillText(this.playerStats.health, GAME.WIDTH * 0.461, GAME.HEIGHT * 0.921);
+    ctx.fillText(Math.floor(this.playerStats.mana) / 10, GAME.WIDTH * 0.511, GAME.HEIGHT * 0.921);
+    ctx.fillText(this.playerStats.jumpBoost, GAME.WIDTH * 0.561, GAME.HEIGHT * 0.921);
+    ctx.fillText(this.playerStats.fireRate, GAME.WIDTH * 0.611, GAME.HEIGHT * 0.921);
+    ctx.fillText(this.playerStats.perks, GAME.WIDTH * 0.413, GAME.HEIGHT * 0.965);
+    ctx.fillText(this.playerStats.bonusHealth, GAME.WIDTH * 0.461, GAME.HEIGHT * 0.965);
+    ctx.fillText(Math.round(this.playerStats.oxygen / 10), GAME.WIDTH * 0.511, GAME.HEIGHT * 0.965);
+    ctx.fillText(this.playerStats.movementSpeed, GAME.WIDTH * 0.561, GAME.HEIGHT * 0.965);
   }
 
   update() {
