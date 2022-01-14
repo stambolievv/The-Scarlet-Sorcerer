@@ -82,6 +82,10 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mouseup', (e) => {
   GAME.MOUSE.pressed = false;
 });
+canvas.addEventListener('touchmove', (e) => {
+  GAME.MOUSE.x = e.offsetX;
+  GAME.MOUSE.y = e.offsetY;
+});
 canvas.addEventListener('touchstart', (e) => {
   GAME.MOUSE.pressed = true;
   projectileFire(e);
