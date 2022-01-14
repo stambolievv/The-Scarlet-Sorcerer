@@ -305,7 +305,7 @@ function guiAnimation(ctx, deltaTime) {
 }
 
 function onClick(prop) {
-  if (buttonDelay >= 200) {
+  if (buttonDelay >= 250) {
     buttonDelay = 0;
     GAME[prop] = !GAME[prop];
     ASSETS.audio.click.play();
