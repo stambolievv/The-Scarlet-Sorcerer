@@ -19,7 +19,7 @@ class GUI {
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }
-  
+
   update() { }
 }
 
@@ -305,7 +305,7 @@ function guiAnimation(ctx, deltaTime) {
 }
 
 function onClick(prop) {
-  if (buttonDelay >= 150) {
+  if (buttonDelay >= 200) {
     buttonDelay = 0;
     GAME[prop] = !GAME[prop];
     ASSETS.audio.click.play();
