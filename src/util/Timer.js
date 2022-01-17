@@ -4,12 +4,19 @@ export default class createTimer {
     this._lastTime = performance.now();
     this._elapsed = 0;
     this._raw = raw;
+    this._active = true;
+  }
+
+  set active(boolean) {
+    this._active = boolean;
   }
 
   start() {
+    if (!this._active) { return this._lastTime = performance.now(); }
+
     const delta = performance.now() - this._lastTime;
-    this._elapsed += delta;
     this._lastTime = performance.now();
+    this._elapsed += delta;
 
     const total = this._elapsed / 1000;
     const seconds = total % 60;
