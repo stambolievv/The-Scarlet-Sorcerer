@@ -2,7 +2,7 @@
 🎮 The Scarlet Sorcerer is the 2D platform game where you fight against odd enemies you've never seen! 🎮
 
 # Controls
-  W / ↑ / Space   --  Jump Up < /br >
+  W / ↑ / Space   --  Jump Up <br />
   A / ←           --  Moving Left
   S / ↓           --  Moving Down
   D / →           --  Moving Right
