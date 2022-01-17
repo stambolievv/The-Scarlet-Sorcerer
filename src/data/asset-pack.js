@@ -36,6 +36,21 @@ export default
         'width': 128,
         'height': 128,
       },
+      'resume': {
+        'src': 'assets/images/gui/resume_icon.png',
+        'width': 128,
+        'height': 128,
+      },
+      'pause': {
+        'src': 'assets/images/gui/pause_icon.png',
+        'width': 48,
+        'height': 48,
+      },
+      'mute': {
+        'src': 'assets/images/gui/mute_icon.png',
+        'width': 32,
+        'height': 32,
+      },
       'debug': {
         'src': 'assets/images/gui/debug_icon.png',
         'width': 32,

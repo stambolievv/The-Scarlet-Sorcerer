@@ -218,6 +218,64 @@ class Restart extends Icon {
     }
   }
 }
+class Resume extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.resume, player, position);
+    this.pos.x *= 0.5;
+    this.pos.y *= 0.6;
+    this.pos.x -= this.dim.w * 0.5;
+    this.hover = { text: 'Play', size: 60 };
+  };
+
+  draw(ctx) {
+    if (GAME.PAUSE) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT);
+      ctx.font = `${this.hover.size * 2}px Vanderick`;
+      ctx.fillStyle = 'white';
+      ctx.fillText('Game is paused!', this.pos.x + this.dim.w * 0.5, this.pos.y * 0.8);
+      super.draw(ctx);
+    }
+  }
+
+  update() {
+    if (GAME.PAUSE) {
+      super.update();
+      if (this.isClicked) {
+        this.isClicked = false;
+        GAME.PAUSE = false;
+      }
+    }
+  }
+}
+class Pause extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.pause, player, position);
+    this.pos.x *= 0.95;
+    this.pos.y *= 0.04;
+    this.hover.text = 'Pause';
+  };
+
+  update() {
+    super.update();
+    if (this.isClicked && !GAME.GAMEOVER) { onClick('PAUSE'); }
+  }
+}
+class Mute extends Icon {
+  constructor(sprite, player, position) {
+    super(sprite.mute, player, position);
+    this.pos.x *= 0.14;
+    this.pos.y *= 0.04;
+    this.hover.text = 'Unmute';
+    this.active = true;
+  };
+
+  update() {
+    super.update();
+    this.hover.text = this.active ? 'Unmute' : 'Mute';
+    if (this.isClicked) { this.active = onClick('MUTE'); }
+  }
+}
 class Debug extends Icon {
   constructor(sprite, player, position) {
     super(sprite.debug, player, position);
@@ -234,7 +292,7 @@ class Debug extends Icon {
 class Fps extends Icon {
   constructor(sprite, player, position) {
     super(sprite.fps, player, position);
-    this.pos.x *= 0.06;
+    this.pos.x *= 0.05;
     this.pos.y *= 0.04;
     this.hover.text = 'Show FPS';
   };
@@ -247,7 +305,7 @@ class Fps extends Icon {
 class Info extends Icon {
   constructor(sprite, player, position) {
     super(sprite.info, player, position);
-    this.pos.x *= 0.10;
+    this.pos.x *= 0.08;
     this.pos.y *= 0.04;
     this.hover.text = 'Show Stats';
   };
@@ -260,7 +318,7 @@ class Info extends Icon {
 class Power extends Icon {
   constructor(sprite, player, position) {
     super(sprite.power, player, position);
-    this.pos.x *= 0.14;
+    this.pos.x *= 0.11;
     this.pos.y *= 0.04;
     this.hover.text = 'Immortal';
   };
@@ -276,12 +334,15 @@ const ui = [
   Info,
   Fps,
   Debug,
+  Mute,
+  Pause,
   Stats,
   ManaBar,
   OxygenBar,
   HealthBar,
   BonusBar,
   HUD,
+  Resume,
   Restart,
 ];
 
@@ -293,7 +354,7 @@ let buttonDelay = 0;
   });
 })();
 
-function guiAnimation(ctx, deltaTime) {
+function guiComponents(ctx, deltaTime) {
   GAME.MOUSE.onMenu = false;
 
   interfaces.forEach(i => {
@@ -314,5 +375,5 @@ function onClick(prop) {
 }
 
 export {
-  guiAnimation
+  guiComponents 
 };
