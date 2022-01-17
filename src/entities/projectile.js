@@ -50,8 +50,10 @@ function create(mouseX, mouseY) {
 };
 
 function projectileFire(e) {
+  if (GAME.MOUSE.onMenu) { return; }
+
   if (GAME.MOUSE.pressed && players[0].stats.mana >= 20) {
-    if (players[0].state.canShoot && !GAME.MOUSE.onMenu) {
+    if (players[0].state.canShoot) {
       players[0].state.canShoot = false;
       players[0].stats.fireRateReg = 0;
       players[0].stats.mana -= 20;
