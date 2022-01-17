@@ -48,6 +48,7 @@ function floatingMessages(ctx, deltaTime) {
 
   //text on display
   GAME.TIMER.start();
+  GAME.TIMER.active = !GAME.PAUSE;
   ctx.font = '22px Vanderick';
   ctx.fillStyle = 'white';
   ctx.fillText('Timer: ' + GAME.TIMER.output, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.040);
