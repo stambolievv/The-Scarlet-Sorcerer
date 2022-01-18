@@ -8,6 +8,7 @@
 @font-face {
   font-family: "Vanderick";
   src: url("../fonts/Vanderick.woff") format("woff");
+  font-display: swap;
 }
 
 * {
@@ -34,7 +35,6 @@ body {
 
 main {
   box-shadow: 1px 1px 30px var(--shadow-clr), -1px -1px 30px var(--shadow-clr);
-  
 }
 
 canvas {
