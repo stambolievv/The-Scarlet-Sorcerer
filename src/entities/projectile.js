@@ -50,7 +50,7 @@ function create(mouseX, mouseY) {
 };
 
 function projectileFire(e) {
-  if (GAME.MOUSE.onMenu) { return; }
+  if (GAME.MOUSE.onMenu || GAME.PAUSE || GAME.GAMEOVER) { return; }
 
   if (GAME.MOUSE.pressed && players[0].stats.mana >= 20) {
     if (players[0].state.canShoot) {
@@ -63,7 +63,7 @@ function projectileFire(e) {
       ASSETS.audio.projectile.play();
     }
   } else {
-    messageCreate('Out of Mana. Cant cast that spell', 10, 24, 'blue');
+    messageCreate('Out of Mana. Cant cast that spell!', 10, 24, 'blue');
   }
 }
 
