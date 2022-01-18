@@ -2,11 +2,12 @@ import { GAME, ASSETS, DATA } from '../properties.js';
 import { platforms } from '../constants.js';
 
 class Platform {
-  constructor(tilesheet, sourceX, sourceY, destinationX, destinationY, frameWidth, frameHeight, tileValue) {
+  constructor(tilesheet, sourceX, sourceY, destinationX, destinationY, frameWidth, frameHeight, decoration, tileValue) {
     this.sprite = tilesheet;
     this.src = { x: sourceX, y: sourceY };
     this.pos = { x: destinationX, y: destinationY };
     this.dim = { w: frameWidth, h: frameHeight };
+    this.decoration = decoration;
     this.tileValue = tileValue;
   }
 
@@ -36,6 +37,9 @@ class Platform {
     /* If value of the tile the tile is in the ignore array skip it */
     if (tileset.ignoreFrame.includes(tileValue)) { continue; }
 
+    /* If value of the tile the tile is in the decoration array mark it */
+    const decoration = tileset.decorationFrame.includes(tileValue);
+
     /* This is the "x" and "y" location at which to cut the tile
     image out of the tileset. */
     const sourceX = (tileValue % tileset.columns) * tileset.frameWidth;
@@ -46,7 +50,7 @@ class Platform {
     const destinationX = (index % Math.round(GAME.WIDTH / tileset.frameWidth)) * tileset.frameWidth;
     const destinationY = Math.floor(index / Math.round(GAME.WIDTH / tileset.frameWidth)) * tileset.frameHeight;
 
-    platforms.push(new Platform(ASSETS.images.tileset, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, tileValue));
+    platforms.push(new Platform(ASSETS.images.tileset, sourceX, sourceY, destinationX, destinationY, tileset.frameWidth, tileset.frameHeight, decoration, tileValue));
   }
 })();
 

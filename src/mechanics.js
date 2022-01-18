@@ -56,22 +56,25 @@ function collision(AA, BB) {
   const side = { top: false, bottom: false, left: false, right: false, type: undefined };
   AA.forEach(a => {
     BB.forEach(b => {
-      // Get the center distance for the two objects
+      /* Check if its decoration block */
+      if (a.decoration || b.decoration) { return; }
+
+      /* Get the center distance for the two objects */
       const diffX = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
       const diffY = (a.pos.y + (a.dim.h / 2)) - (b.pos.y + (b.dim.h / 2));
 
-      // Add the half widths and half heights of the objects.
+      /* Add the half widths and half heights of the objects. */
       const widthHalf = (a.dim.w / 2) + (b.dim.w / 2);
       const heightHalf = (a.dim.h / 2) + (b.dim.h / 2);
 
-      // If the "x" and "y" vector are less than the half width or half height, they we must be inside the object, causing a collision.
+      /* If the "x" and "y" vector are less than the half width or half height, they we must be inside the object, causing a collision. */
       if (Math.abs(diffX) < widthHalf && Math.abs(diffY) < heightHalf) {
 
-        // Figures out on which side we are colliding (top, bottom, left, or right).
+        /* Figures out on which side we are colliding (top, bottom, left, or right). */
         const crossWidth = Math.ceil(widthHalf - Math.abs(diffX));
         const crossHeight = heightHalf - Math.abs(diffY);
 
-        // Pass the value of the tile to check if its painful or not.
+        /* Pass the value of the tile to check if its painful or not. */
         side.type = b.tileValue;
 
         if (crossWidth > crossHeight) {

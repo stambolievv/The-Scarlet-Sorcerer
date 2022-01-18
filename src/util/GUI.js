@@ -26,14 +26,14 @@ class GUI {
 class HUD extends GUI {
   constructor(sprite, player, position) {
     super(sprite.hud, player, position);
-    this.pos.x *= 0.05;
+    this.pos.x *= 0.07;
     this.pos.y *= 0.15;
   }
 }
 class HealthBar extends GUI {
   constructor(sprite, player, position) {
     super(sprite.healthBar, player, position);
-    this.pos.x *= 0.1;
+    this.pos.x *= 0.12;
     this.pos.y *= 0.164;
   }
 
@@ -46,7 +46,7 @@ class HealthBar extends GUI {
 class BonusBar extends GUI {
   constructor(sprite, player, position) {
     super(sprite.bonusBar, player, position);
-    this.pos.x *= 0.1;
+    this.pos.x *= 0.12;
     this.pos.y *= 0.164;
   }
 
@@ -59,7 +59,7 @@ class BonusBar extends GUI {
 class ManaBar extends GUI {
   constructor(sprite, player, position) {
     super(sprite.manaBar, player, position);
-    this.pos.x *= 0.101;
+    this.pos.x *= 0.123;
     this.pos.y *= 0.197;
   }
 
@@ -72,7 +72,7 @@ class ManaBar extends GUI {
 class OxygenBar extends GUI {
   constructor(sprite, player, position) {
     super(sprite.oxygenBar, player, position);
-    this.pos.x *= 0.1;
+    this.pos.x *= 0.12;
     this.pos.y *= 0.214;
   }
 
