@@ -270,9 +270,13 @@ class Mute extends Icon {
     this.active = true;
   };
 
+  draw(ctx) {
+    super.draw(ctx);
+    this.hover.text = this.active ? 'Unmute' : 'Mute';
+  }
+
   update() {
     super.update();
-    this.hover.text = this.active ? 'Unmute' : 'Mute';
     if (this.isClicked) { this.active = onClick('MUTE'); }
   }
 }
@@ -297,6 +301,11 @@ class Fps extends Icon {
     this.hover.text = 'Show FPS';
   };
 
+  draw(ctx) {
+    super.draw(ctx);
+    this.hover.text = this.active ? 'Hide FPS' : 'Show FPS';
+  }
+
   update() {
     super.update();
     if (this.isClicked) { this.active = onClick('showFps'); }
@@ -309,6 +318,11 @@ class Info extends Icon {
     this.pos.y *= 0.04;
     this.hover.text = 'Show Stats';
   };
+
+  draw(ctx) {
+    super.draw(ctx);
+    this.hover.text = this.active ? 'Hide Stats' : 'Show Stats';
+  }
 
   update() {
     super.update();
@@ -375,5 +389,5 @@ function onClick(prop) {
 }
 
 export {
-  guiComponents 
+  guiComponents
 };

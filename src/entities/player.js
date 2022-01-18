@@ -199,7 +199,7 @@ function playerAnimation(ctx, deltaTime) {
     p.update(GAME.KEYBOARD, sideWorld, sideCollision);
     p.handleStats(deltaTime);
     if (p.state.outOfOxygen) {
-      messageCreate('Out of oxygen. You are taking damage', 90, 40, 'red');
+      messageCreate('Out of oxygen. You are taking damage!', 90, 40, 'red');
     }
   });
 
