@@ -75,7 +75,7 @@ function collision(AA, BB) {
         const crossHeight = heightHalf - Math.abs(diffY);
 
         /* Pass the value of the tile to check if its painful or not. */
-        side.type = b.tileValue;
+        side.type = a.tileValue || b.tileValue;
 
         if (crossWidth > crossHeight) {
           if (diffY > 0) {
