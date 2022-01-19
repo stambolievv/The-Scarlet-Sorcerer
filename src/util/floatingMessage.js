@@ -48,13 +48,13 @@ function floatingMessages(ctx, deltaTime) {
 
   //text on display
   GAME.TIMER.start();
-  GAME.TIMER.active = !GAME.PAUSE;
+  GAME.TIMER.isPaused = GAME.PAUSE || GAME.GAMEOVER;
   ctx.font = '22px Vanderick';
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
   ctx.fillText('Timer: ' + GAME.TIMER.output, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.040);
   ctx.fillText('Score: ' + GAME.SCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.075);
-  ctx.fillText('High Score: ' + GAME.HIGHSCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.11);
+  ctx.fillText('High Score: ' + GAME.HIGHSCORE, GAME.WIDTH * 0.5, GAME.HEIGHT * 0.110);
 }
 
 export {

@@ -1,39 +1,39 @@
 export default class createTimer {
   constructor(raw = false) {
     this.output = 0;
-    this._lastTime = performance.now();
-    this._elapsed = 0;
-    this._raw = raw;
-    this._active = true;
+    this.lastTime = performance.now();
+    this.elapsed = 0;
+    this.raw = raw;
+    this.pause = false;
   }
 
-  set active(boolean) {
-    this._active = boolean;
+  set isPaused(boolean) {
+    this.pause = boolean;
   }
 
   start() {
-    if (!this._active) { return this._lastTime = performance.now(); }
+    if (this.pause) { return this.lastTime = performance.now(); }
 
-    const delta = performance.now() - this._lastTime;
-    this._lastTime = performance.now();
-    this._elapsed += delta;
+    const delta = performance.now() - this.lastTime;
+    this.lastTime = performance.now();
+    this.elapsed += delta;
 
-    const total = this._elapsed / 1000;
+    const total = this.elapsed / 1000;
     const seconds = total % 60;
     const minutes = (total / 60);// % 60;
     // const hours = total / 3600;
 
-    if (!this._raw) {
-      this.output = `${this.formatTime(minutes)}:${this.formatTime(seconds)}`;
-    } else {
+    if (this.raw) {
       this.output = Math.round(seconds);
+    } else {
+      this.output = `${this.formatTime(minutes)}:${this.formatTime(seconds)}`;
     }
   }
 
   reset() {
     this.output = 0;
-    this._lastTime = performance.now();
-    this._elapsed = 0;
+    this.lastTime = performance.now();
+    this.elapsed = 0;
   }
 
   formatTime(value) {
