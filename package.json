@@ -23,9 +23,9 @@
   "author": "DKS",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "babel-eslint": "^8.2.6",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^v8.6.0",
     "git": "^0.1.5",
-    "http-server": "^0.12.3"
+    "http-server": "^14.1.0"
   }
 }
