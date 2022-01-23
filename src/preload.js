@@ -36,6 +36,6 @@ export default function loadFiles(source) {
     });
   }
 
-  function onLoad() { if (++loadedFiles >= totalFiles) { return media; } }
+  function onLoad() { if (loadedFiles++ >= totalFiles) { return media; } }
   return onLoad();
 };
