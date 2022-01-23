@@ -26,38 +26,21 @@ function overlap(AA, BB, callback) {
 }
 
 /**
- * @param {Array} AA 
+ * @param {Array} AA  
  * @param {Array} BB 
  * @returns {Object}
  */
 function collision(AA, BB) {
-  /* 
-  ?---------------------------------------------+
-  !                    ISSUE                    |
-  !              Hours spent: >20               |
-  ?---------------------------------------------+
-  !     Whenever player right border is         |
-  !     close to one of the platform            |
-  !     left border and they collide            |
-  !     when jump on it, player is moved        |
-  !     to the left, flush with the border.     |
-  !     Turn on DEBUG for easier visualization. |
-  ?---------------------------------------------+
-  !                   QUICK FIX:                |
-  !          Math.ceil() on "crossWidth".       |
-  !          If removed is getting worst.       |
-  ?---------------------------------------------+
-  */
-
   /*
   Collision detection with different side of objects.
   The "a" from "AA" array stop because "b" from "BB" array is immovable.
   */
   const side = { top: false, bottom: false, left: false, right: false, type: undefined };
+  
   AA.forEach(a => {
     BB.forEach(b => {
       /* Check if its decoration block */
-      if (a.decoration || b.decoration) { return; }
+      if (b.decoration) { return; }
 
       /* Get the center distance for the two objects */
       const diffX = (a.pos.x + (a.dim.w / 2)) - (b.pos.x + (b.dim.w / 2));
@@ -70,34 +53,39 @@ function collision(AA, BB) {
       /* If the "x" and "y" vector are less than the half width or half height, they we must be inside the object, causing a collision. */
       if (Math.abs(diffX) < widthHalf && Math.abs(diffY) < heightHalf) {
 
-        /* Figures out on which side we are colliding (top, bottom, left, or right). */
-        const crossWidth = Math.ceil(widthHalf - Math.abs(diffX));
-        const crossHeight = heightHalf - Math.abs(diffY);
-
         /* Pass the value of the tile to check if its painful or not. */
-        side.type = a.tileValue || b.tileValue;
+        side.type = b.tileValue;
+
+        /* Figures out on which side we are colliding (top, bottom, left, or right). */
+        const crossWidth = widthHalf - Math.abs(diffX);
+        const crossHeight = heightHalf - Math.abs(diffY);
 
         if (crossWidth > crossHeight) {
           if (diffY > 0) {
             side.top = true;
             a.pos.y += crossHeight;
+            a.vel.y = 0;
           } else {
             side.bottom = true;
             a.pos.y -= crossHeight;
+            a.vel.y = 0;
           }
         }
-        if (crossWidth < crossHeight) {
-          if (diffX > 0) {
+        if (Math.ceil(crossWidth) < Math.floor(crossHeight)) {
+          if (diffX >= 0) {
             side.left = true;
             a.pos.x += crossWidth;
+            a.vel.x = 0;
           } else {
             side.right = true;
             a.pos.x -= crossWidth;
+            a.vel.x = 0;
           }
         }
       }
     });
   });
+
   return side;
 }
 
