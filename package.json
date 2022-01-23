@@ -4,8 +4,7 @@
   "description": "The Scarlet Sorcerer is the 2D platform game where you fight against odd enemies you've never seen!",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server -a localhost -p 3000 -P http://localhost:3000?"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -23,9 +22,7 @@
   "author": "DKS",
   "license": "MIT",
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^v8.6.0",
-    "git": "^0.1.5",
-    "http-server": "^14.1.0"
+    "eslint": "^8.6.0",
+    "git": "^0.1.5"
   }
 }
