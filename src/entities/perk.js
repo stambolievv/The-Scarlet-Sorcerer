@@ -7,24 +7,27 @@ class Perk {
   constructor(data, position) {
     this.prop = data.prop;
     this.sprite = data.sprite;
-    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.dim = { w: 24, h: 24 };
-    this.type = this.prop.variety[random(0, this.prop.variety.length - 1)];
+    this.animation = {
+      elapsed: 0,
+      type: this.prop.variety[random(0, this.prop.variety.length - 1)],
+      orientation: ''
+    };
     this.theta = 0;
   }
 
   draw(ctx, deltaTime) {
-    this.elapsed += deltaTime * 0.005;
+    this.animation.elapsed += deltaTime * 0.005;
 
-    const position = Math.floor(this.elapsed) % this.prop.animations[this.type.name].loc.length;
-    const frameX = this.prop.animations[this.type.name].loc[position].x;
-    const frameY = this.prop.animations[this.type.name].loc[position].y;
+    const position = Math.floor(this.animation.elapsed) % this.prop.animations[this.animation.type.name].loc.length;
+    const frameX = this.prop.animations[this.animation.type.name].loc[position].x;
+    const frameY = this.prop.animations[this.animation.type.name].loc[position].y;
 
     ctx.drawImage(this.sprite, frameX, frameY, this.prop.frameWidth, this.prop.frameHeight, this.pos.x, this.pos.y, this.prop.frameWidth, this.prop.frameHeight);
 
     if (GAME.DEBUG) {
-      ctx.strokeStyle = this.type.color;
+      ctx.strokeStyle = this.animation.type.color;
       ctx.strokeRect(this.pos.x, this.pos.y, this.dim.w, this.dim.h);
     }
   }
@@ -56,7 +59,7 @@ function perkAnimation(ctx, deltaTime) {
   });
 
   overlap(players, perks, (player, perk) => {
-    if (perk.type.name == 'BS') {
+    if (perk.animation.type.name == 'BS') {
       if (player.stats.health < player.stats.maxHealth) {
         player.stats.health += 1;
       } else {
@@ -64,28 +67,28 @@ function perkAnimation(ctx, deltaTime) {
       }
     }
 
-    if (perk.type.name == 'JB') {
+    if (perk.animation.type.name == 'JB') {
       player.stats.jumpBoost += 0.2;
       player.stats.jumpBoost = Number(player.stats.jumpBoost.toFixed(1));
     }
 
-    if (perk.type.name == 'MS') {
+    if (perk.animation.type.name == 'MS') {
       player.stats.movementSpeed += 0.2;
       player.stats.movementSpeed = Number(player.stats.movementSpeed.toFixed(1));
     }
 
-    if (perk.type.name == 'FR' && player.stats.fireRate > player.stats.minFireRate) {
+    if (perk.animation.type.name == 'FR' && player.stats.fireRate > player.stats.minFireRate) {
       player.stats.fireRate -= 0.2;
       player.stats.fireRate = Number(player.stats.fireRate.toFixed(1));
     }
 
-    if (perk.type.name == 'MANA') {
+    if (perk.animation.type.name == 'MANA') {
       player.stats.manaReg += 0.01;
       player.stats.manaReg = Number(player.stats.manaReg.toFixed(2));
     }
 
     const playerCenter = { x: (player.pos.x + player.dim.w * 0.5) / GAME.WIDTH, y: (player.pos.y + player.dim.h * 0.5) / GAME.HEIGHT };
-    messageCreate(perk.type.text, 100, 24, perk.type.color, playerCenter, false);
+    messageCreate(perk.animation.type.text, 100, 24, perk.animation.type.color, playerCenter, false);
 
     player.stats.perks += 1;
     ASSETS.audio.collect.play();

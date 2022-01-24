@@ -8,19 +8,23 @@ class Projectiles {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.player = data.player;
-    this.elapsed = 0;
     this.pos = { x: this.player.pos.x + this.player.dim.w / 4, y: this.player.pos.y - this.player.dim.h / 4 };
     this.vel = { x: 3, y: 3 };
     this.dim = { w: this.prop.frameWidth, h: this.prop.frameHeight / 2 };
+    this.animation = {
+      elapsed: 0,
+      type: 'projectile',
+      orientation: ''
+    };
     this.angle = data.angle;
   }
 
   draw(ctx, deltaTime) {
-    this.elapsed += deltaTime * 0.01;
+    this.animation.elapsed += deltaTime * 0.01;
 
-    const position = Math.floor(this.elapsed) % this.prop.animations['projectile'].loc.length;
-    const frameX = this.prop.animations['projectile'].loc[position].x;
-    const frameY = this.prop.animations['projectile'].loc[position].y;
+    const position = Math.floor(this.animation.elapsed) % this.prop.animations[this.animation.type].loc.length;
+    const frameX = this.prop.animations[this.animation.type].loc[position].x;
+    const frameY = this.prop.animations[this.animation.type].loc[position].y;
 
     ctx.setTransform(1, 0, 0, 1, this.pos.x + this.dim.w / 2, this.pos.y + this.dim.h / 2);
     ctx.rotate(this.angle - Math.PI / 2);

@@ -8,13 +8,13 @@ class Player {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.painfulFrame = data.painfulFrame;
-    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.vel = { x: 0, y: 0 };
     this.dim = { w: 30, h: 50 };
-    this.gravity = { x: 0, y: 0.5 };
-    this.friction = { x: 0.9, y: 0.99 };
+    this.gravity = { x: 0, y: 0.6 };
+    this.friction = { x: 0.9, y: 0.97 };
     this.animation = {
+      elapsed: 0,
       type: 'idle',
       orientation: 'Right'
     };
@@ -38,7 +38,7 @@ class Player {
       oxygen: 300,
       maxOxygen: 300,
       oxygenReg: 0,
-      jumpBoost: 15.4,
+      jumpBoost: 16,
       movementSpeed: 4,
       fireRate: 1.6,
       minFireRate: 0,
@@ -47,9 +47,9 @@ class Player {
   }
 
   draw(ctx, deltaTime) {
-    this.elapsed += deltaTime * 0.01;
+    this.animation.elapsed += deltaTime * 0.01;
 
-    const position = Math.floor(this.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
+    const position = Math.floor(this.animation.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
     const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
     const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
 
@@ -73,16 +73,17 @@ class Player {
 
     this.controller(keysPressed, side);
 
+    this.animation.type = side.bottom || side.top ? this.animation.type : this.vel.y == 0 ? 'idle' : this.vel.y < 0 ? 'jump' : 'fall';
+
     this.state.grounded = false;
     if (side.bottom && !(side.left || side.right)) {
       this.state.grounded = true;
       this.state.jumping = false;
     }
+
     if (side.left || side.right) { this.vel.x = 0; }
-    if (side.top) { this.vel.y *= -0.1; }
 
     if (this.painfulFrame.includes(side.type) && side.bottom) { this.state.onIsland = true; } else { this.state.onIsland = false; }
-    if (!(side.left || side.top || side.right || side.bottom || this.state.jumping)) { this.animation.type = 'fall'; }
 
     this.vel.x += this.gravity.x;
     this.vel.y += this.gravity.y;
@@ -91,35 +92,35 @@ class Player {
     this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
 
-    if (Math.abs(this.vel.x) < 0.1) { this.vel.x = 0; }
+    if (Math.abs(this.vel.x) < 0.01) { this.vel.x = 0; }
     if (this.state.grounded) { this.vel.y = 0; }
   }
 
   controller(keysPressed, side) {
     const controls = {
       KeyW: () => {
+        this.animation.type = 'jump';
         if (!this.state.jumping && this.state.grounded) {
           this.state.jumping = true;
           this.state.grounded = false;
           this.vel.y -= this.stats.jumpBoost;
         }
-        this.animation.type = this.state.grounded ? 'idle' : 'jump';
       },
       KeyA: () => {
-        if (!side.left && this.vel.x > -this.stats.movementSpeed) { this.vel.x--; }
-        if (side.bottom) { ASSETS.audio.footsteps.play(); }
-        this.animation.orientation = 'Left';
         this.animation.type = 'run';
+        this.animation.orientation = 'Left';
+        if (!side.left && this.vel.x > -this.stats.movementSpeed) { this.vel.x--; }
+        if (this.state.grounded) { ASSETS.audio.footsteps.play(); }
       },
       KeyS: () => {
-        if (!side.bottom && this.vel.y < this.stats.jumpBoost) { this.vel.y++; }
         this.animation.type = this.state.grounded ? 'idle' : 'fall';
+        if (!this.state.grounded && this.vel.y < this.stats.jumpBoost) { this.vel.y += this.stats.jumpBoost * 0.1; }
       },
       KeyD: () => {
-        if (!side.right && this.vel.x < this.stats.movementSpeed) { this.vel.x++; }
-        if (side.bottom) { ASSETS.audio.footsteps.play(); }
-        this.animation.orientation = 'Right';
         this.animation.type = 'run';
+        this.animation.orientation = 'Right';
+        if (!side.right && this.vel.x < this.stats.movementSpeed) { this.vel.x++; }
+        if (this.state.grounded) { ASSETS.audio.footsteps.play(); }
       },
       Space: () => { controls.KeyW(); },
       ArrowUp: () => { controls.KeyW(); },
@@ -133,7 +134,7 @@ class Player {
       try {
         keys.forEach(key => { controls[key](); });
       } catch (err) {
-        // console.error('Not a functional key is pressed!');
+        /* console.error('Not a functional key is pressed!'); */
       }
     } else {
       this.animation.type = 'idle';

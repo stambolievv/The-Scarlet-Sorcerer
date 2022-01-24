@@ -9,12 +9,12 @@ class Enemy {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.player = data.player;
-    this.elapsed = 0;
     this.pos = { x: position.x, y: position.y };
     this.vel = { x: 0, y: 0 };
     this.dim = { w: this.prop.frameWidth * 0.7, h: this.prop.frameHeight * 0.7 };
     this.gravity = { x: 0, y: 0.1 };
     this.animation = {
+      elapsed: 0,
       type: this.constructor.name.toLocaleLowerCase(),
       orientation: Math.random() < 0.45 ? 'Left' : 'Right'
     };
@@ -27,9 +27,9 @@ class Enemy {
   static spawnInterval = 0;
 
   draw(ctx, deltaTime) {
-    this.elapsed += deltaTime * 0.01;
+    this.animation.elapsed += deltaTime * 0.01;
 
-    const position = Math.floor(this.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
+    const position = Math.floor(this.animation.elapsed) % this.prop.animations[(this.animation.type + this.animation.orientation)].loc.length;
     const frameX = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].x;
     const frameY = this.prop.animations[(this.animation.type + this.animation.orientation)].loc[position].y;
 
@@ -174,13 +174,15 @@ function handleScore() {
     spawnPerk();
     messageCreate('New Perk spawned for 15 sec', 70, 22);
   }
-  // Coming soon
-  // if (GAME.SCORE == 100 || GAME.SCORE == 200) {
+
+  // Bosses - coming soon
+
+  // if (players[0].stats.level % 10 == 0) {
   //   messageCreate('Mini Boss will spawn\n after 5 seconds', 100, 38, 'orange');
   // }
 
-  // if (GAME.SCORE == 300) {
-  //   messageCreate('Final Boss will spawn\n after 5 seconds', 100, 38, 'orange');
+  // if (players[0].stats.level % 15 == 0) {
+  //   messageCreate('Boss will spawn\n after 5 seconds', 100, 38, 'orange');
   // }
 }
 
