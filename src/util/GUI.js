@@ -89,7 +89,7 @@ class Stats extends GUI {
     this.pos.x *= 0.5;
     this.pos.x -= this.dim.w * 0.5;
     this.statsInfoText = [];
-    this.textPos = [
+    this.statsInfoPos = [
       { x: 0.26, y: 1.04 },
       { x: 0.26, y: 1.10 },
       { x: 0.66, y: 1.04 },
@@ -109,7 +109,7 @@ class Stats extends GUI {
     ctx.font = '22px Vanderick';
     ctx.fillStyle = 'white';
     this.statsInfoText.forEach((t, i) => {
-      ctx.fillText(t, this.pos.x * this.textPos[i].x, this.pos.y * this.textPos[i].y);
+      ctx.fillText(t, this.pos.x * this.statsInfoPos[i].x, this.pos.y * this.statsInfoPos[i].y);
     });
 
     ctx.textAlign = 'center';
@@ -135,9 +135,9 @@ class Stats extends GUI {
       `Bonus Health: ${this.playerStats.bonusHealth}`,
       `Mana: ${Math.floor(this.playerStats.mana) / 10}`,
       `Oxygen: ${Math.round(this.playerStats.oxygen / 10)}`,
-      `Jump Boost: ${this.playerStats.jumpBoost.toFixed(1)}`,
-      `Movement Speed: ${this.playerStats.movementSpeed.toFixed(1)}`,
-      `Fire Rate: ${this.playerStats.fireRate.toFixed(1)}`,
+      `Jump Boost: ${this.playerStats.jumpBoost}`,
+      `Movement Speed: ${this.playerStats.movementSpeed}`,
+      `Fire Rate: ${this.playerStats.fireRate}`,
     ];
   }
 }
