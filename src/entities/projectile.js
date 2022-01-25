@@ -8,8 +8,8 @@ class Projectiles {
     this.prop = data.prop;
     this.sprite = data.sprite;
     this.player = data.player;
-    this.pos = { x: this.player.pos.x + this.player.dim.w / 4, y: this.player.pos.y - this.player.dim.h / 4 };
-    this.vel = { x: 3, y: 3 };
+    this.pos = { x: this.player.pos.x + this.player.dim.w * 0.25, y: this.player.pos.y - this.player.dim.h * 0.25 };
+    this.vel = { x: 7 - this.player.stats.fireRate * 2, y: 7 - this.player.stats.fireRate * 2 };
     this.dim = { w: this.prop.frameWidth, h: this.prop.frameHeight / 2 };
     this.animation = {
       elapsed: 0,
