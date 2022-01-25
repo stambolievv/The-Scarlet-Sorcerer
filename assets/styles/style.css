@@ -40,6 +40,7 @@ main {
 canvas {
   width: var(--width);
   height: var(--height);
+  cursor: crosshair;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: -o-crisp-edges;
