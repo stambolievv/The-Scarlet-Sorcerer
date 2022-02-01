@@ -68,14 +68,24 @@ window.addEventListener('keyup', (e) => {
   GAME.KEYBOARD.delete(e.code);
 });
 canvas.addEventListener('mousemove', (e) => {
-  GAME.MOUSE.x = e.offsetX;
-  GAME.MOUSE.y = e.offsetY;
+  const screen = canvas.getBoundingClientRect();
+
+  GAME.MOUSE.x = (e.clientX - screen.left) / (screen.right - screen.left) * canvas.width;
+  GAME.MOUSE.y = (e.clientY - screen.top) / (screen.bottom - screen.top) * canvas.height;
 });
 canvas.addEventListener('mousedown', (e) => {
   GAME.MOUSE.pressed = true;
-  projectileFire(e);
+  projectileFire();
 });
 canvas.addEventListener('mouseup', (e) => {
+  GAME.MOUSE.pressed = false;
+});
+canvas.addEventListener('touchmove', (e) => {
+});
+canvas.addEventListener('touchstart', (e) => {
+  GAME.MOUSE.pressed = true;
+});
+canvas.addEventListener('touchend', (e) => {
   GAME.MOUSE.pressed = false;
 });
 // window.addEventListener('focus', () => {
