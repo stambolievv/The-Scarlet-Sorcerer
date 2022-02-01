@@ -59,32 +59,38 @@ function perkAnimation(ctx, deltaTime) {
   });
 
   overlap(players, perks, (player, perk) => {
-    if (perk.animation.type.name == 'BS') {
-      if (player.stats.health < player.stats.maxHealth) {
-        player.stats.health += 1;
-      } else {
-        player.stats.bonusHealth += 1;
-      }
-    }
 
-    if (perk.animation.type.name == 'JB') {
-      player.stats.jumpBoost += 0.2;
-      player.stats.jumpBoost = Number(player.stats.jumpBoost.toFixed(1));
-    }
+    switch (perk.animation.type.name) {
 
-    if (perk.animation.type.name == 'MS') {
-      player.stats.movementSpeed += 0.2;
-      player.stats.movementSpeed = Number(player.stats.movementSpeed.toFixed(1));
-    }
+      case 'BS':
+        if (player.stats.health < player.stats.maxHealth) {
+          player.stats.health += 1;
+        } else {
+          player.stats.bonusHealth += 1;
+        }
+        break;
 
-    if (perk.animation.type.name == 'FR' && player.stats.fireRate > player.stats.minFireRate) {
-      player.stats.fireRate -= 0.2;
-      player.stats.fireRate = Number(player.stats.fireRate.toFixed(1));
-    }
+      case 'JB':
+        player.stats.jumpBoost += 0.2;
+        player.stats.jumpBoost = Number(player.stats.jumpBoost.toFixed(1));
+        break;
 
-    if (perk.animation.type.name == 'MANA') {
-      player.stats.manaReg += 0.01;
-      player.stats.manaReg = Number(player.stats.manaReg.toFixed(2));
+      case 'MS':
+        player.stats.movementSpeed += 0.2;
+        player.stats.movementSpeed = Number(player.stats.movementSpeed.toFixed(1));
+        break;
+
+      case 'FR':
+        player.stats.fireRate -= 0.2;
+        player.stats.fireRate = Number(player.stats.fireRate.toFixed(1));
+        break;
+
+      case 'MANA':
+        player.stats.manaReg += 0.01;
+        player.stats.manaReg = Number(player.stats.manaReg.toFixed(2));
+        break;
+
+      default: break;
     }
 
     const playerCenter = { x: (player.pos.x + player.dim.w * 0.5) / GAME.WIDTH, y: (player.pos.y + player.dim.h * 0.5) / GAME.HEIGHT };
