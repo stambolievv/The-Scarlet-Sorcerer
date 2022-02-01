@@ -35,11 +35,17 @@ body {
 
 main {
   box-shadow: 1px 1px 30px var(--shadow-clr), -1px -1px 30px var(--shadow-clr);
+  max-width: var(--width);
+  max-height: var(--height);
+  width: 100%;
+  height: 100%;
 }
 
 canvas {
-  width: var(--width);
-  height: var(--height);
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   cursor: crosshair;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
