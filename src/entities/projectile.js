@@ -53,7 +53,7 @@ function create(mouseX, mouseY) {
   projectiles.push(new Projectiles(data));
 };
 
-function projectileFire(e) {
+function projectileFire() {
   if (GAME.MOUSE.onMenu || GAME.PAUSE || GAME.GAMEOVER) { return; }
 
   if (GAME.MOUSE.pressed && players[0].stats.mana >= 20) {
@@ -63,7 +63,7 @@ function projectileFire(e) {
       players[0].stats.mana -= 20;
       players[0].animation.state = 'attack';
 
-      create(e.offsetX, e.offsetY);
+      create(GAME.MOUSE.x, GAME.MOUSE.y);
       ASSETS.audio.projectile.play();
     }
   } else {
