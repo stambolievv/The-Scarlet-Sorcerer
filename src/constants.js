@@ -6,6 +6,7 @@ const perks = [];
 const enemies = [];
 const enemyStats = { speed: 2 };
 const textMessages = [];
+const particles = [];
 
 export {
   platforms,
@@ -16,4 +17,5 @@ export {
   enemies,
   enemyStats,
   textMessages,
+  particles
 };

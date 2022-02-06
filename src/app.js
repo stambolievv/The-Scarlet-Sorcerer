@@ -7,6 +7,7 @@ import { projectileFire, projectilesAnimation } from './entities/projectile.js';
 import { perkAnimation } from './entities/perk.js';
 import { guiComponents } from './util/GUI.js';
 import { floatingMessages } from './util/floatingMessage.js';
+import { particlesAnimation } from './util/particle.js';
 import tick from './util/fps.js';
 
 /** @type {HTMLCanvasElement} */
@@ -38,6 +39,7 @@ function animate(timestamp) {
     perkAnimation(ctx, deltaTime);
     projectilesAnimation(ctx, deltaTime);
     enemiesAnimation(ctx, deltaTime);
+    particlesAnimation(ctx, deltaTime);
   }
 }
 

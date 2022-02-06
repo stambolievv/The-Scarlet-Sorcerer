@@ -3,6 +3,7 @@ import { enemies, enemyStats, players, platforms, projectiles } from '../constan
 import { overlap, collision, removeWorldOutBounds, relativePosition, random } from '../mechanics.js';
 import { spawnPerk } from './perk.js';
 import { messageCreate } from '../util/floatingMessage.js';
+import { spawnParticles } from '../util/particle.js';
 
 class Enemy {
   constructor(data, position) {
@@ -137,20 +138,17 @@ function enemiesAnimation(ctx, deltaTime) {
 
   overlap(enemies, projectiles, (enemy, projectile) => {
     if (enemy.animation.type == 'saw') { return; }
-
     projectiles.splice(projectiles.indexOf(projectile), 1);
+    ASSETS.audio.enemyKill.play();
 
     enemy.stats.health -= 1;
 
     if (enemy.stats.health == 0) {
-      GAME.SCORE += enemy.prop.pointsForDeath;
+      checkScore(enemy.prop.pointsForDeath);
       checkHighScore();
+      spawnParticles(enemy.pos.x, enemy.pos.y);
       enemies.splice(enemies.indexOf(enemy), 1);
     }
-
-    ASSETS.audio.enemyKill.play();
-
-    handleScore();
   });
 
   removeWorldOutBounds(enemies);
@@ -163,7 +161,9 @@ function checkHighScore() {
   }
 }
 
-function handleScore() {
+function checkScore(pointsForDeath) {
+  GAME.SCORE += pointsForDeath;
+
   if (GAME.SCORE % 20 == 0) {
     enemyStats.speed += 0.2;
     messageCreate('Enemy speed increase', 50);

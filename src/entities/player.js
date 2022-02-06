@@ -2,6 +2,7 @@ import { GAME, ASSETS, DATA } from '../properties.js';
 import { players, enemies, platforms } from '../constants.js';
 import { overlap, collision, collideWorldBounds, relativePosition } from '../mechanics.js';
 import { messageCreate } from '../util/floatingMessage.js';
+import { spawnParticles } from '../util/particle.js';
 
 class Player {
   constructor(data, position) {
@@ -207,6 +208,7 @@ function playerAnimation(ctx, deltaTime) {
   overlap(players, enemies, (player, enemy) => {
     enemies.splice(enemies.indexOf(enemy), 1);
     ASSETS.audio.enemyKill.play();
+    spawnParticles(enemy.pos.x, enemy.pos.y, 5);
 
     if (player.stats.bonusHealth > 0) {
       player.stats.bonusHealth -= 1;
