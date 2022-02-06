@@ -82,14 +82,17 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mouseup', (e) => {
   GAME.MOUSE.pressed = false;
 });
-canvas.addEventListener('touchmove', (e) => {
-});
-canvas.addEventListener('touchstart', (e) => {
-  GAME.MOUSE.pressed = true;
-});
-canvas.addEventListener('touchend', (e) => {
-  GAME.MOUSE.pressed = false;
-});
+//! COMING SOON ↓
+// canvas.addEventListener('touchmove', (e) => {
+// });
+// canvas.addEventListener('touchstart', (e) => {
+//   GAME.MOUSE.pressed = true;                  
+// });
+// canvas.addEventListener('touchend', (e) => {
+//   GAME.MOUSE.pressed = false;
+// });
+//! COMING SOON ↑
+//? optional ↓
 // window.addEventListener('focus', () => {
 //   if (!GAME.GAMEOVER) { GAME.PAUSE = false; }
 // });
