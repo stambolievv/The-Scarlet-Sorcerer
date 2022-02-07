@@ -6,8 +6,9 @@ class FloatingMessage {
   constructor(text, position, fixed, size, color) {
     this.text = text;
     this.pos = { x: position.x, y: position.y };
-    this.fixed = fixed;
+    this.vel = { x: 0, y: 0.3 };
     this.size = size;
+    this.fixed = fixed;
     this.color = color;
     this.lifeSpan = 0;
     this.opacity = 1;
@@ -25,9 +26,10 @@ class FloatingMessage {
   }
 
   update(deltaTime) {
-    this.pos.y -= 0.3;
-    this.lifeSpan += 1;
+    this.lifeSpan += deltaTime * 0.05;
     if (this.opacity > 0.01) { this.opacity -= deltaTime * 0.00035; }
+
+    this.pos.y -= this.vel.y;
   }
 }
 

@@ -110,7 +110,7 @@ class Player {
       KeyA: () => {
         this.animation.type = 'run';
         this.animation.orientation = 'Left';
-        if (!side.left && this.vel.x > -this.stats.movementSpeed) { this.vel.x--; }
+        if (!side.left && this.vel.x > -this.stats.movementSpeed) { this.vel.x -= 1; }
         if (this.state.grounded) { ASSETS.audio.footsteps.play(); }
       },
       KeyS: () => {
@@ -120,7 +120,7 @@ class Player {
       KeyD: () => {
         this.animation.type = 'run';
         this.animation.orientation = 'Right';
-        if (!side.right && this.vel.x < this.stats.movementSpeed) { this.vel.x++; }
+        if (!side.right && this.vel.x < this.stats.movementSpeed) { this.vel.x += 1; }
         if (this.state.grounded) { ASSETS.audio.footsteps.play(); }
       },
       Space: () => { controls.KeyW(); },

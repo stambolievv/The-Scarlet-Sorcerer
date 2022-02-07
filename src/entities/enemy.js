@@ -103,7 +103,7 @@ class Saw extends Enemy {
 
   update() {
     this.pos.x += this.props.movement * 10;
-    this.vel.y += this.gravity.y / 2;
+    this.vel.y += this.gravity.y * 0.5;
     this.pos.y += this.vel.y;
   }
 }
@@ -146,7 +146,7 @@ function enemiesAnimation(ctx, deltaTime) {
     if (enemy.stats.health == 0) {
       checkScore(enemy.prop.pointsForDeath);
       checkHighScore();
-      spawnParticles(enemy.pos.x, enemy.pos.y);
+      spawnParticles(enemy.pos.x, enemy.pos.y, 20);
       enemies.splice(enemies.indexOf(enemy), 1);
     }
   });

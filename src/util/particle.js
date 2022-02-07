@@ -5,7 +5,7 @@ class Particle {
   constructor(position) {
     this.pos = { x: position.x, y: position.y };
     this.vel = { x: random(-5, 5), y: random(-5, 5) };
-    this.dim = { w:  random(2, 5), h:  random(2, 5) };
+    this.dim = { w: random(2, 5), h: random(2, 5) };
     this.gravity = { x: 0, y: 0.5 };
     this.friction = { x: 0.92, y: 0.90 };
     this.color = `hsl(${random(20, 60)}, 100%, 50%)`;
@@ -21,7 +21,7 @@ class Particle {
   }
 
   update(deltaTime) {
-    this.lifeSpan += 1;
+    this.lifeSpan += deltaTime * 0.05;
     if (this.opacity > 0.01) { this.opacity -= deltaTime * 0.0025; }
 
     this.vel.x += this.gravity.x;
@@ -33,8 +33,8 @@ class Particle {
   }
 }
 
-function spawnParticles(posX, posY, length = 20) {
-  for (let i = 0; i < length; i++) {
+function spawnParticles(posX, posY, range) {
+  for (let i = 0; i < range; i++) {
     particles.push(new Particle({ x: posX, y: posY }));
   }
 }
