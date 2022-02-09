@@ -10,5 +10,4 @@ package-lock.json
 .vscode
 
 # misc
-TODO
-*.log
+*.todo
